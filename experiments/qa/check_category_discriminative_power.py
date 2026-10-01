@@ -12,6 +12,12 @@ Nhan nhom doc tu --groups-file (JSONL), moi dong:
   - "error" true   -> bo qua
 sample_id khop voi ten file JSON dac trung (bo hau to _static.json).
 Nhom co the sinh tu VirusTotal + AVClass (family) hoac ATT&CK tactic.
+
+Kem theo: voi moi nhom (va benign), moi technique_id - bang chung nam o ham
+co boundary_flags RONG hay KHONG RONG, so voi ty le call site API o ham bi
+gan co (lift) - xem fire co tap trung bat thuong o ham angr co the gop nham
+(OVERLAP/SPREAD) cua rieng nhom nao khong. JSON thieu boundary_flags -> bo
+qua phan nay kem canh bao.
 """
 import argparse
 import json
@@ -21,8 +27,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 
-from _common import RANDOM_STATE, add_data_root_arg, iter_samples, list_sample_files, sample_id, \
-    simple_features
+from collections import Counter
+
+from _common import RANDOM_STATE, add_data_root_arg, evidence_by_boundary, has_boundary_flags, iter_samples, \
+    list_sample_files, load_techniques, merge_boundary_stats, print_boundary_table, sample_id, simple_features
 
 
 def load_groups(groups_file, target_groups):
@@ -57,8 +65,15 @@ def main():
     id_to_groups, benign_ids = load_groups(args.groups_file, target_groups)
     print(f"Da nap {len(id_to_groups)} mau malicious, {len(benign_ids)} mau benign tu {args.groups_file}")
 
-    features_by_id = {sample_id(fp): simple_features(data)
-                      for fp, data in iter_samples(list_sample_files(args.data_root))}
+    features_by_id, boundary_by_id = {}, {}
+    n_missing_boundary = 0
+    for fp, data in iter_samples(list_sample_files(args.data_root)):
+        sid = sample_id(fp)
+        features_by_id[sid] = simple_features(data)
+        if has_boundary_flags(data):
+            boundary_by_id[sid] = evidence_by_boundary(data)
+        else:
+            n_missing_boundary += 1
     print(f"Da nap feature cho {len(features_by_id)} mau tu {args.data_root}\n")
 
     all_groups = target_groups or set().union(set(), *id_to_groups.values())
@@ -96,6 +111,24 @@ def main():
         elif acc > 0.85:
             flag = "<-- MANH, tin hieu tot"
         print(f"{group:22s} {n:6d} {acc:8.4f} {f1:8.4f}   {flag}")
+
+
+    print(f"\n=== Bang chung theo boundary_flags cua ham, tung nhom (clean = khong bi gan co) ===")
+    if n_missing_boundary:
+        print(f"[CANH BAO] {n_missing_boundary} mau thieu field boundary_flags - BO QUA phan nay (khong in so "
+              f"lieu tren du lieu thieu). Dung lai src/bfbg/bfbg_builder.py de sinh lai JSON.")
+        return
+    names = {t[0]: t[1] for t in load_techniques()}
+    members = {g: [s for s, gs in id_to_groups.items() if g in gs] for g in sorted(all_groups)}
+    members['(benign)'] = sorted(benign_ids)
+    for group, sids in members.items():
+        sids = [s for s in sids if s in boundary_by_id]
+        if not sids:
+            continue
+        acc = (Counter(), {})
+        for s in sids:
+            merge_boundary_stats(acc, boundary_by_id[s])
+        print_boundary_table(f"{group} ({len(sids)} mau)", acc[0], acc[1], names)
 
 
 if __name__ == '__main__':

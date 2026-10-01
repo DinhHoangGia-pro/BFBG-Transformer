@@ -37,6 +37,7 @@ KEY_NODES = 'nodes'
 KEY_EDGES_SEQ = 'edges_seq'
 KEY_SEED_EDGES = 'seed_edges'                  # [{src_node_id, dst_node_id, technique_id, ...}] - src/bfbg/bfbg_builder.py
 KEY_NODE_INDICATORS = 'node_indicators'        # [{node_id, technique_id, ...}] - bang chung 1 node don le
+KEY_BOUNDARY_FLAGS = 'boundary_flags'          # ['SPREAD'|'FAR_UNLINK'|'OVERLAP'] - ham angr co the gop nham
 KEY_CALL_GRAPH = 'inter_procedural_call_graph'
 
 LABEL_NAMES = {0: 'benign', 1: 'malicious'}
@@ -68,7 +69,8 @@ def add_data_root_arg(parser):
 
 
 def list_sample_files(data_root):
-    return glob.glob(os.path.join(data_root, '*.json'))
+    """Chi file mau (*_static.json) - bo qua file khac cung thu muc, vd vex_vocab.json."""
+    return glob.glob(os.path.join(data_root, '*' + SAMPLE_SUFFIX))
 
 
 def iter_samples(files):
@@ -210,3 +212,62 @@ def balanced_split(data_root, split_ratio=DATASET_CFG['split']['train_ratio'], r
     np.random.shuffle(final_files)
 
     return train_test_split(final_files, test_size=(1 - split_ratio), random_state=random_state)
+
+
+# === Bang chung theo co ranh gioi ham (boundary_flags) ===
+EVIDENCE_KINDS = ('edge', 'indicator', 'any')
+
+
+def has_boundary_flags(data):
+    return all(KEY_BOUNDARY_FLAGS in u for u in units(data).values())
+
+
+def evidence_by_boundary(data):
+    """Dem bang chung cua 1 mau tach theo ham co boundary_flags rong ('clean')
+    hay khong rong ('flagged'):
+      base[side]                = so call site API (moc so sanh: luat chi fire tai loi goi API)
+      items[tid][kind][side]    = so bang chung (seed edge / node indicator / tong)
+    """
+    base = Counter()
+    items = {}
+    for u in units(data).values():
+        side = 'flagged' if u.get(KEY_BOUNDARY_FLAGS) else 'clean'
+        base[side] += len(u.get('api_calls', []))
+        e, i = unit_evidence(u)
+        for kind, c in (('edge', e), ('indicator', i), ('any', e + i)):
+            for tid, n in c.items():
+                items.setdefault(tid, {k: Counter() for k in EVIDENCE_KINDS})[kind][side] += n
+    return base, items
+
+
+def merge_boundary_stats(acc, sample_stats):
+    """Cong don ket qua evidence_by_boundary() cua nhieu mau vao acc = (base, items)."""
+    base, items = acc
+    s_base, s_items = sample_stats
+    base.update(s_base)
+    for tid, kinds in s_items.items():
+        dst = items.setdefault(tid, {k: Counter() for k in EVIDENCE_KINDS})
+        for kind, c in kinds.items():
+            dst[kind].update(c)
+    return acc
+
+
+def print_boundary_table(title, base, items, names, indent='  '):
+    """In bang: moi technique_id x loai bang chung -> so o ham clean/flagged,
+    % o ham flagged, lift = (% bang chung o ham flagged) / (% call site API o
+    ham flagged). lift ~1: phan bo binh thuong; lift >> 1: tap trung o ham
+    bi gan co (nghi do ranh gioi ham sai)."""
+    total_sites = base['clean'] + base['flagged']
+    site_share = base['flagged'] / total_sites if total_sites else 0.0
+    print(f"{indent}{title}: call site API o ham bi gan co = {base['flagged']}/{total_sites} "
+          f"({site_share*100:.1f}%)")
+    print(f"{indent}{'Ky thuat':28s} {'Loai':10s} {'clean':>7s} {'flagged':>8s} {'% flagged':>10s} {'lift':>7s}")
+    for tid in sorted(set(names) | set(items)):
+        for kind in EVIDENCE_KINDS:
+            c = items.get(tid, {}).get(kind, Counter())
+            n = c['clean'] + c['flagged']
+            share = c['flagged'] / n if n else 0.0
+            lift = f"{share / site_share:7.2f}" if n and site_share else f"{'-':>7s}"
+            label = f"{tid} {names.get(tid, '?')}" if kind == 'edge' else ""
+            pct = f"{share*100:9.1f}%" if n else f"{'-':>10s}"
+            print(f"{indent}{label:28s} {kind:10s} {c['clean']:7d} {c['flagged']:8d} {pct} {lift}")

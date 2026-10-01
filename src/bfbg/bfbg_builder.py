@@ -17,6 +17,8 @@ Dung BFBG (Binary Function Block Graph) cho 1 file PE va ghi ra JSON:
      dung chung (paths.vex_vocab) - vocab chi THEM token moi, id cu khong
      doi, nen JSON ghi truoc van tra dung. Khong chay song song nhieu tien
      trinh cung ghi 1 vocab.
+  5. Moi ham: func["boundary_flags"] (SPREAD/FAR_UNLINK/OVERLAP, rong neu
+     binh thuong) tu src/bfbg/boundary_flags.py - ham angr co the gop nham.
 
 Node = 1 lenh may (khop TokenSequenceTransformer: 1 token / node).
 node_id = dia chi lenh dang hex ("0x401000") - duy nhat trong ca binary.
@@ -35,6 +37,7 @@ Schema JSON (cac khoa cap ham giu khung cu de experiments/qa/ doc duoc):
       edges_cfg: [[i, j]]    (lenh cuoi block -> lenh dau block ke tiep),
       blocks:  [{addr, size, first_idx, num_insns, jumpkind, vex_ids}],
       api_calls:       [{node_id, idx, api, position}],
+      boundary_flags:  ["OVERLAP", ...]  (rong = khong bi gan co),
       seed_edges:      [{src_node_id, dst_node_id, src_idx, dst_idx, technique_id, rule_name, confidence}],
       node_indicators: [{node_id, idx, technique_id, rule_name}] } },
   inter_procedural_call_graph: {edges, num_edges}
@@ -51,6 +54,8 @@ import pefile
 
 from src.disassembly.callgraph_extractor import extract_callgraph, resolve_apis
 from src.disassembly.pe_lifter import lift_pe
+from src.bfbg.boundary_flags import analyze_sample
+from src.bfbg.boundary_flags import default_params as default_boundary_params
 from src.disassembly.vex_tokenizer import Vocab, instruction_token
 from src.semantic.seed_rules_attck import (
     ResolvedCall,
@@ -160,7 +165,7 @@ def load_vex_vocab(path):
     return Vocab.load(path) if os.path.exists(path) else Vocab()
 
 
-def build_bfbg(path, vex_vocab, label=None, window_size=None):
+def build_bfbg(path, vex_vocab, label=None, window_size=None, boundary_params=None):
     """Dung toan bo BFBG cho 1 file PE, tra ve dict san sang ghi JSON.
     vex_vocab (Vocab) duoc THEM token moi tai cho - goi save sau khi ghi JSON."""
     if window_size is None:
@@ -172,6 +177,9 @@ def build_bfbg(path, vex_vocab, label=None, window_size=None):
     structural = compute_structural_indicators(entropies, import_table_anomaly=num_imports < MIN_NORMAL_IMPORTS)
 
     intra = {f"func_{f.addr}": build_function_graph(lifted, f, window_size, vex_vocab) for f in lifted.functions}
+    boundary_params = boundary_params or default_boundary_params()
+    for key, result in analyze_sample(intra, boundary_params).items():
+        intra[key]['boundary_flags'] = result['flags'] if result else []
 
     return {
         'sha256': lifted.sha256,
@@ -196,6 +204,7 @@ def build_bfbg(path, vex_vocab, label=None, window_size=None):
         },
         'window_size': window_size,
         'vex_vocab_size': len(vex_vocab),
+        'boundary_params': boundary_params,
         'intra_procedural_graphs': intra,
         'inter_procedural_call_graph': {
             'edges': [list(e) for e in callgraph.edges],

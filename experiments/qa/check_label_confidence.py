@@ -17,12 +17,18 @@ Phan 1 (tu v1): trong cac mau malicious, ty le mau KHONG co bang chung nao
 Phan 2 (tu v2): ty le khop tung ky thuat tren CA HAI lop - ky thuat khop
   gan bang nhau o ca 2 lop thi khong con phan biet, la nhieu chu khong phai
   tin hieu.
+Phan 3: moi lop, moi technique_id - bang chung nam o ham co boundary_flags
+  RONG hay KHONG RONG (angr co the gop nham ham), so voi ty le call site API
+  nam o ham bi gan co (lift). Tra loi: ty le fire co tap trung bat thuong o
+  ham bi gan co OVERLAP/SPREAD khong. JSON thieu boundary_flags -> bo qua
+  phan nay kem canh bao, khong in so lieu.
 """
 import argparse
 from collections import Counter
 
-from _common import DATASET_CFG, KEY_LABEL, LABEL_NAMES, add_data_root_arg, iter_samples, list_sample_files, \
-    load_techniques, require_evidence_fields, sample_techniques
+from _common import DATASET_CFG, KEY_LABEL, LABEL_NAMES, add_data_root_arg, evidence_by_boundary, \
+    has_boundary_flags, iter_samples, list_sample_files, load_techniques, merge_boundary_stats, \
+    print_boundary_table, require_evidence_fields, sample_techniques
 
 TIERS = ['high', 'medium', 'low', 'unknown']
 KINDS = ('edge', 'indicator', 'any')
@@ -62,6 +68,8 @@ def main():
     stats = {label: {k: Counter() for k in KINDS} for label in (0, 1)}
     totals = Counter()
     n_unlabeled = 0
+    boundary = {label: (Counter(), {}) for label in (0, 1)}
+    n_missing_boundary = 0
 
     for _, data in samples:
         label = data.get(KEY_LABEL)
@@ -70,6 +78,10 @@ def main():
             continue
         by_edge, by_ind = sample_techniques(data)
         totals[label] += 1
+        if has_boundary_flags(data):
+            merge_boundary_stats(boundary[label], evidence_by_boundary(data))
+        else:
+            n_missing_boundary += 1
         for kind, techs in (('edge', by_edge), ('indicator', by_ind), ('any', by_edge | by_ind)):
             for t in techs:
                 stats[label][kind][t] += 1
@@ -130,6 +142,17 @@ def main():
             flag = "  <-- KHONG PHAN BIET, LA NHIEU" if abs(diff) < 15 and p_ben > 30 else ""
             label = f"{tid} {names.get(tid, '?')}" if kind == 'edge' else ""
             print(f"{label:28s} {kind:10s} {p_ben:9.1f}% {p_mal:11.1f}% {diff:+11.1f}%{flag}")
+
+
+    # === Phan 3 ===
+    print(f"\n=== PHAN 3: bang chung theo boundary_flags cua ham (clean = khong bi gan co) ===")
+    if n_missing_boundary:
+        print(f"[CANH BAO] {n_missing_boundary} mau thieu field boundary_flags - BO QUA phan nay (khong in so "
+              f"lieu tren du lieu thieu). Dung lai src/bfbg/bfbg_builder.py de sinh lai JSON.")
+        return
+    for label in (1, 0):
+        base, items = boundary[label]
+        print_boundary_table(f"{LABEL_NAMES[label]} ({totals[label]} mau)", base, items, names)
 
 
 if __name__ == '__main__':

@@ -25,3 +25,9 @@ split:
 
 qa:
   min_fire_rate: 0.01                     # cảnh báo luật seed fire < 1% mẫu dương
+
+boundary_flags:                           # co ham angr co the gop nham (src/bfbg/boundary_flags.py)
+  min_spread: 4096                        # SPREAD: spread (byte) >= nguong ...
+  max_coverage: 0.5                       #   ... va coverage < nguong
+  far_gap: 1024                           # FAR_UNLINK: khe (byte) giua 2 segment coi la "xa"
+  gap_tol: 16                             # khe (byte) van coi la lien mach (padding can le)
