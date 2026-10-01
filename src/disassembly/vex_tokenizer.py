@@ -17,7 +17,10 @@ Module nay KHONG phu thuoc angr - chi lam viec tren du lieu da lift boi
 src/disassembly/pe_lifter.py (LiftedBlock) va object pyvex.
 """
 
+import fcntl
 import json
+import os
+import tempfile
 from collections import Counter
 
 UNK_TOKEN = '<UNK>'
@@ -115,8 +118,16 @@ class Vocab:
         return token in self.stoi
 
     def save(self, path):
-        with open(path, 'w') as f:
-            json.dump(self.itos, f, indent=0)
+        """Ghi NGUYEN TU (file tam + os.replace): nguoi doc khong bao gio thay file ghi do."""
+        directory = os.path.dirname(os.path.abspath(path))
+        fd, tmp = tempfile.mkstemp(dir=directory, prefix='.vocab-', suffix='.tmp')
+        try:
+            with os.fdopen(fd, 'w') as f:
+                json.dump(self.itos, f, indent=0)
+            os.replace(tmp, path)
+        except BaseException:
+            os.unlink(tmp)
+            raise
 
     @classmethod
     def load(cls, path):
@@ -125,3 +136,28 @@ class Vocab:
         if not itos or itos[0] != UNK_TOKEN:
             raise ValueError(f"{path}: phan tu dau tien phai la {UNK_TOKEN}")
         return cls(itos[1:])
+
+
+def update_shared_vocab(path, tokens):
+    """Them `tokens` vao vocab dung chung o `path` an toan khi nhieu tien
+    trinh chay song song; tra ve Vocab moi nhat (da gom token cua moi tien
+    trinh khac).
+
+    Khoa (fcntl.flock tren file <path>.lock) bao TRON chu trinh doc lai ->
+    them token -> ghi: neu chi khoa luc ghi, 2 tien trinh co the cung cap 1
+    id cho 2 token khac nhau (file vocab van hop le nhung JSON da ghi sai
+    nghia). Vocab chi THEM, id cu khong doi. Chi dung tren cung 1 may (flock
+    khong dang tin tren NFS)."""
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path + '.lock', 'w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            vocab = Vocab.load(path) if os.path.exists(path) else Vocab()
+            n_before = len(vocab)
+            for tok in tokens:
+                vocab.add(tok)
+            if len(vocab) != n_before or not os.path.exists(path):
+                vocab.save(path)
+            return vocab
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)

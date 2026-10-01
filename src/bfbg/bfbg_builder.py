@@ -15,8 +15,8 @@ Dung BFBG (Binary Function Block Graph) cho 1 file PE va ghi ra JSON:
   4. Ghi JSON <sha256>_static.json (khong indent) vao paths.features_dir
      (configs/config.yaml). Token VEX luu dang id tham chieu MOT bang vocab
      dung chung (paths.vex_vocab) - vocab chi THEM token moi, id cu khong
-     doi, nen JSON ghi truoc van tra dung. Khong chay song song nhieu tien
-     trinh cung ghi 1 vocab.
+     doi, nen JSON ghi truoc van tra dung. An toan khi chay song song nhieu
+     tien trinh tren cung 1 may (update_shared_vocab khoa file).
   5. Moi ham: func["boundary_flags"] (SPREAD/FAR_UNLINK/OVERLAP, rong neu
      binh thuong) tu src/bfbg/boundary_flags.py - ham angr co the gop nham.
 
@@ -56,7 +56,7 @@ from src.disassembly.callgraph_extractor import extract_callgraph, resolve_apis
 from src.disassembly.pe_lifter import lift_pe
 from src.bfbg.boundary_flags import analyze_sample
 from src.bfbg.boundary_flags import default_params as default_boundary_params
-from src.disassembly.vex_tokenizer import Vocab, instruction_token
+from src.disassembly.vex_tokenizer import instruction_token, update_shared_vocab
 from src.semantic.seed_rules_attck import (
     ResolvedCall,
     compute_structural_indicators,
@@ -106,7 +106,7 @@ def resolve_call_sites(lifted, lfunc):
     return resolved
 
 
-def build_function_graph(lifted, lfunc, window_size, vex_vocab):
+def build_function_graph(lifted, lfunc, window_size):
     nodes, edges_seq, blocks_out = [], [], []
     first_idx_of_block, last_idx_of_block = {}, {}
     for block in lfunc.blocks:
@@ -123,7 +123,7 @@ def build_function_graph(lifted, lfunc, window_size, vex_vocab):
         last_idx_of_block[block.addr] = len(nodes) - 1
         blocks_out.append({'addr': block.addr, 'size': block.size, 'first_idx': first_idx_of_block[block.addr],
                            'num_insns': len(block.instructions), 'jumpkind': block.jumpkind,
-                           'vex_ids': [vex_vocab.add(t) for t in block.vex_tokens]})
+                           'vex_tokens': list(block.vex_tokens)})   # doi sang vex_ids trong build_bfbg
 
     edges_cfg = []
     for u, v in lfunc.edges:
@@ -161,13 +161,19 @@ def build_function_graph(lifted, lfunc, window_size, vex_vocab):
     }
 
 
-def load_vex_vocab(path):
-    return Vocab.load(path) if os.path.exists(path) else Vocab()
+def encode_vex_tokens(intra, vocab_path):
+    """Doi blocks[].vex_tokens -> vex_ids theo vocab dung chung (cap id duoi
+    khoa); tra ve kich thuoc vocab tai thoi diem cap id."""
+    tokens = {t for g in intra.values() for b in g['blocks'] for t in b['vex_tokens']}
+    vocab = update_shared_vocab(vocab_path, sorted(tokens))
+    for g in intra.values():
+        for b in g['blocks']:
+            b['vex_ids'] = vocab.encode(b.pop('vex_tokens'))
+    return len(vocab)
 
 
-def build_bfbg(path, vex_vocab, label=None, window_size=None, boundary_params=None):
-    """Dung toan bo BFBG cho 1 file PE, tra ve dict san sang ghi JSON.
-    vex_vocab (Vocab) duoc THEM token moi tai cho - goi save sau khi ghi JSON."""
+def build_bfbg(path, vex_vocab_path, label=None, window_size=None, boundary_params=None):
+    """Dung toan bo BFBG cho 1 file PE, tra ve dict san sang ghi JSON."""
     if window_size is None:
         window_size = load_config('model')['semantic']['window_size']
 
@@ -176,10 +182,11 @@ def build_bfbg(path, vex_vocab, label=None, window_size=None, boundary_params=No
     entropies, num_imports = section_stats(path)
     structural = compute_structural_indicators(entropies, import_table_anomaly=num_imports < MIN_NORMAL_IMPORTS)
 
-    intra = {f"func_{f.addr}": build_function_graph(lifted, f, window_size, vex_vocab) for f in lifted.functions}
+    intra = {f"func_{f.addr}": build_function_graph(lifted, f, window_size) for f in lifted.functions}
     boundary_params = boundary_params or default_boundary_params()
     for key, result in analyze_sample(intra, boundary_params).items():
         intra[key]['boundary_flags'] = result['flags'] if result else []
+    vex_vocab_size = encode_vex_tokens(intra, vex_vocab_path)
 
     return {
         'sha256': lifted.sha256,
@@ -203,7 +210,7 @@ def build_bfbg(path, vex_vocab, label=None, window_size=None, boundary_params=No
             'is_likely_packed': structural.is_likely_packed,
         },
         'window_size': window_size,
-        'vex_vocab_size': len(vex_vocab),
+        'vex_vocab_size': vex_vocab_size,
         'boundary_params': boundary_params,
         'intra_procedural_graphs': intra,
         'inter_procedural_call_graph': {
@@ -234,12 +241,9 @@ def main():
 
     out_dir = args.out_dir or get_path('features_dir')
     vocab_path = args.vex_vocab or get_path('vex_vocab')
-    vex_vocab = load_vex_vocab(vocab_path)
     for path in args.paths:
-        bfbg = build_bfbg(path, vex_vocab, label=args.label)
+        bfbg = build_bfbg(path, vocab_path, label=args.label)
         out_path = write_bfbg(bfbg, out_dir)
-        os.makedirs(os.path.dirname(os.path.abspath(vocab_path)), exist_ok=True)
-        vex_vocab.save(vocab_path)   # luu sau MOI file: JSON da ghi khong bao gio tham chieu id chua luu
         n_edges = sum(len(g['seed_edges']) for g in bfbg['intra_procedural_graphs'].values())
         n_ind = sum(len(g['node_indicators']) for g in bfbg['intra_procedural_graphs'].values())
         print(f"{os.path.basename(path)} -> {out_path}  (ham={bfbg['num_functions']}, "
