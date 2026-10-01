@@ -9,6 +9,7 @@ paths:
   raw_dir: data/raw                       # file PE gốc (.exe/.dll)
   features_dir: data/features_graph       # *_static.json sau khi trích xuất BFBG
   vocab: data/vocab.json                  # Vocab token (src/disassembly/vex_tokenizer.py)
+  vex_vocab: data/vex_vocab.json          # bang id token VEX dung chung cho moi JSON BFBG (src/bfbg/bfbg_builder.py)
   results_dir: results
   checkpoints_dir: results/checkpoints
   logs_dir: results/logs

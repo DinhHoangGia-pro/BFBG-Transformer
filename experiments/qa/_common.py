@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sys
+from collections import Counter
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -34,7 +35,8 @@ KEY_LABEL = 'label'
 KEY_UNITS = 'intra_procedural_graphs'          # {unit_key: do thi noi ham/block}
 KEY_NODES = 'nodes'
 KEY_EDGES_SEQ = 'edges_seq'
-KEY_SEED_EDGES = 'seed_sem_edges'              # [src, dst, rule_name] tu bo luat seed
+KEY_SEED_EDGES = 'seed_edges'                  # [{src_node_id, dst_node_id, technique_id, ...}] - src/bfbg/bfbg_builder.py
+KEY_NODE_INDICATORS = 'node_indicators'        # [{node_id, technique_id, ...}] - bang chung 1 node don le
 KEY_CALL_GRAPH = 'inter_procedural_call_graph'
 
 LABEL_NAMES = {0: 'benign', 1: 'malicious'}
@@ -53,6 +55,7 @@ SIMPLE_FEATURES = [
     ("total_nodes",    lambda d: sum(len(u.get(KEY_NODES, [])) for u in units(d).values())),
     ("total_edges_seq", lambda d: sum(len(u.get(KEY_EDGES_SEQ, []) or []) for u in units(d).values())),
     ("total_seed_edges", lambda d: total_seed_edges(d)),
+    ("total_node_indicators", lambda d: total_node_indicators(d)),
     ("inter_edges",    lambda d: (d.get(KEY_CALL_GRAPH, {}) or {}).get('num_edges', 0)),
 ]
 SIMPLE_FEATURE_NAMES = [name for name, _ in SIMPLE_FEATURES]
@@ -121,9 +124,58 @@ def total_seed_edges(data):
     return sum(len(seed_edges(u)) for u in units(data).values())
 
 
-def seed_rules(data):
-    """Tap ten luat seed (phan tu thu 3 cua moi seed edge) xuat hien trong mau."""
-    return {e[2] for u in units(data).values() for e in seed_edges(u) if len(e) >= 3}
+def node_indicators(unit):
+    return unit.get(KEY_NODE_INDICATORS, []) or []
+
+
+def total_node_indicators(data):
+    return sum(len(node_indicators(u)) for u in units(data).values())
+
+
+def unit_evidence(unit):
+    """(Counter technique_id cua seed edge, Counter technique_id cua node
+    indicator) trong 1 ham."""
+    return (Counter(e['technique_id'] for e in seed_edges(unit)),
+            Counter(i['technique_id'] for i in node_indicators(unit)))
+
+
+def sample_techniques(data):
+    """(tap technique co seed edge, tap technique co node indicator) trong 1 mau."""
+    by_edge, by_ind = set(), set()
+    for u in units(data).values():
+        e, i = unit_evidence(u)
+        by_edge.update(e)
+        by_ind.update(i)
+    return by_edge, by_ind
+
+
+def load_techniques():
+    """[(technique_id, rule_name, co_sinh_node_indicator)] tu bang luat ATT&CK."""
+    from src.semantic.seed_rules_attck import ATTACK_SEED_RULES
+    return [(r.technique_id, r.name, r.singleton_as_node_indicator) for r in ATTACK_SEED_RULES]
+
+
+def missing_evidence_fields(data):
+    """Field bang chung bat buoc (seed_edges, node_indicators) bi thieu o it
+    nhat 1 ham cua mau."""
+    return {key for u in units(data).values() for key in (KEY_SEED_EDGES, KEY_NODE_INDICATORS) if key not in u}
+
+
+def require_evidence_fields(samples):
+    """Dung script (exit 2) neu co mau thieu seed_edges/node_indicators: dem
+    tren JSON thieu field se cho so lieu bang chung thap GIA, khong phai do
+    luat yeu. samples: list (file_path, data)."""
+    bad = [(fp, m) for fp, m in ((fp, missing_evidence_fields(d)) for fp, d in samples) if m]
+    if not bad:
+        return
+    print(f"[LOI] {len(bad)}/{len(samples)} file JSON thieu field bat buoc o cap ham - KHONG tinh so lieu "
+          f"(se thap gia do thieu du lieu, khong phai do luat yeu).", file=sys.stderr)
+    for fp, m in bad[:10]:
+        print(f"  {fp}: thieu {sorted(m)}", file=sys.stderr)
+    if len(bad) > 10:
+        print(f"  ... va {len(bad) - 10} file khac", file=sys.stderr)
+    print("Dung lai src/bfbg/bfbg_builder.py de sinh lai JSON day du schema.", file=sys.stderr)
+    sys.exit(2)
 
 
 def simple_features(data):

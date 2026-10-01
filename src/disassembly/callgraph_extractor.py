@@ -26,6 +26,8 @@ class CallGraph:
 
     @property
     def num_api_calls(self):
+        # Dem theo CANH call-graph (MultiDiGraph cua angr) cho Stage 2 macro - KHAC num_api_calls trong JSON
+        # cua bfbg_builder.py (dem theo call site, gan vao node). Hai so lech nhau la do khac muc dich, khong phai bug.
         return sum(len(v) for v in self.api_calls.values())
 
     @property
@@ -48,16 +50,18 @@ def api_name(func):
     return f"{dll}!{func.name}"
 
 
-def _resolve_apis(callee, functions, callgraph, depth=2):
+def resolve_apis(callee, functions, callgraph, depth=2):
     """API ma callee dai dien: chinh no neu la SimProcedure, hoac cac
     SimProcedure ma thunk (is_plt) nhay toi."""
+    # Dung chung 2 noi, KHAC muc dich: extract_callgraph() (theo canh call-graph, cho Stage 2 macro) va
+    # bfbg_builder.resolve_call_sites() (theo call site, cho dac trung node) -> 2 so dem API lech nhau la binh thuong.
     if callee.is_simprocedure:
         return [api_name(callee)]
     if callee.is_plt and depth > 0:
         apis = []
         for nxt in set(callgraph.successors(callee.addr)):
             if nxt in functions:
-                apis.extend(_resolve_apis(functions[nxt], functions, callgraph, depth - 1))
+                apis.extend(resolve_apis(functions[nxt], functions, callgraph, depth - 1))
         return apis
     return []
 
@@ -81,7 +85,7 @@ def extract_callgraph(lifted):
         if callee in index:
             edges.add((index[caller], index[callee]))
         elif callee in functions:
-            apis = _resolve_apis(functions[callee], functions, callgraph)
+            apis = resolve_apis(functions[callee], functions, callgraph)
             if apis:
                 api_calls.setdefault(caller, []).extend(apis)
 

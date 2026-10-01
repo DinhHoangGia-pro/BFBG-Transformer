@@ -7,19 +7,25 @@ gan nhan malicious), doc tu khoa --agreement-key trong JSON; chia tang
 high/medium/low theo nguong --high-min/--medium-min. Mau thieu khoa nay
 roi vao tang 'unknown'.
 
-Phan 1 (tu v1): trong cac mau malicious, ty le mau KHONG co seed edge nao
+Bang chung muc lenh gom 2 loai, dem RIENG theo technique_id:
+  - seed_edges      : quan he cap node
+  - node_indicators : 1 lenh goi API don le
+
+Phan 1 (tu v1): trong cac mau malicious, ty le mau KHONG co bang chung nao
   (nhan chi den tu nguon ngoai, mo hinh khong co bang chung muc lenh de
-  hoc) - tach theo tung tang tin cay - va phan bo theo tung luat seed.
-Phan 2 (tu v2): ty le khop tung luat tren CA HAI lop - luat khop gan bang
-  nhau o ca 2 lop thi khong con phan biet, la nhieu chu khong phai tin hieu.
+  hoc) - tach theo tung tang tin cay - va phan bo theo tung ky thuat.
+Phan 2 (tu v2): ty le khop tung ky thuat tren CA HAI lop - ky thuat khop
+  gan bang nhau o ca 2 lop thi khong con phan biet, la nhieu chu khong phai
+  tin hieu.
 """
 import argparse
 from collections import Counter
 
 from _common import DATASET_CFG, KEY_LABEL, LABEL_NAMES, add_data_root_arg, iter_samples, list_sample_files, \
-    seed_rules, total_seed_edges
+    load_techniques, require_evidence_fields, sample_techniques
 
 TIERS = ['high', 'medium', 'low', 'unknown']
+KINDS = ('edge', 'indicator', 'any')
 
 
 def confidence_tier(data, agreement_key, high_min, medium_min):
@@ -45,69 +51,85 @@ def main():
                         help="So engine toi thieu cho tang medium")
     args = parser.parse_args()
 
+    samples = list(iter_samples(list_sample_files(args.data_root)))
+    require_evidence_fields(samples)
+
     tier_total = Counter()
-    tier_zero_seed = Counter()
-    tier_has_seed = Counter()
-    mal_rule_counter = Counter()
+    tier_no_evidence = Counter()     # khong edge, khong indicator
+    tier_indicator_only = Counter()  # chi co indicator
+    tier_has_edge = Counter()        # co it nhat 1 seed edge
 
-    rule_stats = {0: Counter(), 1: Counter()}
-    totals = {0: 0, 1: 0}
+    stats = {label: {k: Counter() for k in KINDS} for label in (0, 1)}
+    totals = Counter()
+    n_unlabeled = 0
 
-    for _, data in iter_samples(list_sample_files(args.data_root)):
-        label = data.get(KEY_LABEL, 0)
-        rules_seen = seed_rules(data)
+    for _, data in samples:
+        label = data.get(KEY_LABEL)
+        if label not in (0, 1):
+            n_unlabeled += 1
+            continue
+        by_edge, by_ind = sample_techniques(data)
         totals[label] += 1
-        for r in rules_seen:
-            rule_stats[label][r] += 1
+        for kind, techs in (('edge', by_edge), ('indicator', by_ind), ('any', by_edge | by_ind)):
+            for t in techs:
+                stats[label][kind][t] += 1
 
         if label != 1:
             continue
         tier = confidence_tier(data, args.agreement_key, args.high_min, args.medium_min)
         tier_total[tier] += 1
-        if total_seed_edges(data) == 0:
-            tier_zero_seed[tier] += 1
+        if by_edge:
+            tier_has_edge[tier] += 1
+        elif by_ind:
+            tier_indicator_only[tier] += 1
         else:
-            tier_has_seed[tier] += 1
-        for r in rules_seen:
-            mal_rule_counter[r] += 1
+            tier_no_evidence[tier] += 1
 
-    n_mal = sum(tier_total.values())
+    n_mal = totals[1]
+    if n_unlabeled:
+        print(f"(Bo qua {n_unlabeled} mau chua gan nhan)")
     if n_mal == 0:
         print("Khong co mau malicious nao.")
         return
 
+    names = {t[0]: t[1] for t in load_techniques()}
+
     # === Phan 1 ===
-    print(f"=== PHAN 1: do phu seed edge tren mau malicious, theo muc tin cay nhan "
+    print(f"=== PHAN 1: do phu bang chung tren mau malicious, theo muc tin cay nhan "
           f"('{args.agreement_key}': high>={args.high_min}, medium>={args.medium_min}) ===")
     print(f"Tong mau malicious: {n_mal}\n")
-    print(f"{'Tang':10s} {'N':>7s} {'Khong seed':>16s} {'Co seed':>16s}")
-    print("-" * 52)
+    print(f"{'Tang':10s} {'N':>7s} {'Khong bang chung':>18s} {'Chi indicator':>16s} {'Co seed edge':>16s}")
+    print("-" * 72)
     for tier in TIERS + ['TONG']:
         if tier == 'TONG':
-            n, z, h = n_mal, sum(tier_zero_seed.values()), sum(tier_has_seed.values())
+            n, z, i, h = (n_mal, sum(tier_no_evidence.values()), sum(tier_indicator_only.values()),
+                          sum(tier_has_edge.values()))
         else:
-            n, z, h = tier_total[tier], tier_zero_seed[tier], tier_has_seed[tier]
+            n, z, i, h = tier_total[tier], tier_no_evidence[tier], tier_indicator_only[tier], tier_has_edge[tier]
         if n == 0:
             continue
-        print(f"{tier:10s} {n:7d} {z:7d} ({z/n*100:5.1f}%) {h:7d} ({h/n*100:5.1f}%)")
+        print(f"{tier:10s} {n:7d} {z:9d} ({z/n*100:5.1f}%) {i:7d} ({i/n*100:5.1f}%) {h:7d} ({h/n*100:5.1f}%)")
 
-    print(f"\nPhan bo theo tung luat (1 hop dong co the co nhieu luat):")
-    for rule, count in mal_rule_counter.most_common():
-        print(f"  {rule}: {count} mau")
+    print(f"\nPhan bo theo tung ky thuat tren mau malicious (1 mau co the co nhieu ky thuat):")
+    for tid, count in stats[1]['any'].most_common():
+        print(f"  {tid} {names.get(tid, '?')}: {count} mau "
+              f"(seed edge: {stats[1]['edge'][tid]}, node indicator: {stats[1]['indicator'][tid]})")
 
     # === Phan 2 ===
     b, m = LABEL_NAMES[0], LABEL_NAMES[1]
-    print(f"\n=== PHAN 2: ty le khop luat tren ca hai lop ===")
+    print(f"\n=== PHAN 2: ty le khop ky thuat tren ca hai lop (edge / indicator / bat ky) ===")
     print(f"Tong: {b}={totals[0]}, {m}={totals[1]}\n")
-    print(f"{'Luat':40s} {b + ' %':>10s} {m + ' %':>12s} {'Chenh lech':>12s}")
+    print(f"{'Ky thuat':28s} {'Loai':10s} {b + ' %':>10s} {m + ' %':>12s} {'Chenh lech':>12s}")
     print("-" * 77)
-    all_rules = set(rule_stats[0]) | set(rule_stats[1])
-    for rule in sorted(all_rules):
-        p_ben = rule_stats[0][rule] / totals[0] * 100 if totals[0] else 0
-        p_mal = rule_stats[1][rule] / totals[1] * 100 if totals[1] else 0
-        diff = p_mal - p_ben
-        flag = "  <-- KHONG PHAN BIET, LA NHIEU" if abs(diff) < 15 and p_ben > 30 else ""
-        print(f"{rule:40s} {p_ben:9.1f}% {p_mal:11.1f}% {diff:+11.1f}%{flag}")
+    all_techs = set(stats[0]['any']) | set(stats[1]['any'])
+    for tid in sorted(all_techs):
+        for kind in KINDS:
+            p_ben = stats[0][kind][tid] / totals[0] * 100 if totals[0] else 0
+            p_mal = stats[1][kind][tid] / totals[1] * 100 if totals[1] else 0
+            diff = p_mal - p_ben
+            flag = "  <-- KHONG PHAN BIET, LA NHIEU" if abs(diff) < 15 and p_ben > 30 else ""
+            label = f"{tid} {names.get(tid, '?')}" if kind == 'edge' else ""
+            print(f"{label:28s} {kind:10s} {p_ben:9.1f}% {p_mal:11.1f}% {diff:+11.1f}%{flag}")
 
 
 if __name__ == '__main__':
