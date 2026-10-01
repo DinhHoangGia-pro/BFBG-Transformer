@@ -1,0 +1,26 @@
+# Siêu tham số mô hình + huấn luyện.
+# Giá trị khởi tạo lấy từ scripts/train_tcfbg_defi.py (bản EVM).
+
+model:                                    # BFBGTransformer (src/models/bfbg_transformer.py)
+  embed_dim: 64
+  hidden_dim: 128
+  num_global_features: 4
+  num_classes: 2
+  tokenizer_mode: insn                    # insn | vex (src/disassembly/vex_tokenizer.py)
+
+semantic:                                 # Learned Semantic Predictor (src/semantic/link_predictor.py)
+  sem_edge_threshold: 0.5
+  neg_sample_ratio: 3
+  lambda_sem: 0.3                         # loss = CE + lambda_sem * BCE(E_sem)
+  window_size: 8                          # cua so khop luat seed ATT&CK, tinh theo vi tri loi goi API (src/semantic/seed_rules_attck.py)
+
+training:
+  batch_size: 4
+  epochs: 20
+  learning_rate: 0.0002
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  num_workers: 4
+  # Số hàm tối đa giữ lại mỗi mẫu. QA (check_seed_edge_position_bias,
+  # check_seed_rule_fire_rate) dùng cùng ngưỡng này để đo phần bị cắt.
+  max_functions_per_sample: 150

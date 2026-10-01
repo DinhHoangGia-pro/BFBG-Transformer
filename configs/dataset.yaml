@@ -1,0 +1,27 @@
+# Nguồn dữ liệu + gán nhãn VT-consensus + chia tập.
+# Nguyên tắc nhãn: xem docs/LESSONS_FROM_EVM_CODEBASE.md, mục 2
+# (nguồn nhãn ≠ baseline engine).
+
+sources:
+  malicious_dirs: [data/raw/malicious]
+  benign_dirs: [data/raw/benign]
+  vt_reports_dir: data/vt_reports         # report VirusTotal JSON, tên file = sha256
+
+labeling:
+  # Khoá trong JSON đặc trưng chứa số engine VT gắn nhãn malicious.
+  agreement_key: num_engines_detected
+  malicious_min_engines: 5                # >= ngưỡng -> malicious
+  benign_max_engines: 0                   # <= ngưỡng -> benign; ở giữa = vùng xám, loại khỏi train
+  # Engine dùng làm baseline so sánh -> KHÔNG được góp phiếu vào nhãn.
+  excluded_engines: []
+  # Phân tầng mức tin cậy nhãn (experiments/qa/check_label_confidence.py).
+  confidence_tiers:
+    high_min: 15
+    medium_min: 5
+
+split:
+  train_ratio: 0.8
+  group_key: null                         # vd campaign, compile_timestamp - kiểm tra rò rỉ giữa train/test
+
+qa:
+  min_fire_rate: 0.01                     # cảnh báo luật seed fire < 1% mẫu dương

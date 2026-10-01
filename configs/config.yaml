@@ -1,0 +1,14 @@
+# Cấu hình chung: đường dẫn + seed.
+# Mọi đường dẫn tương đối được tính từ GỐC REPO (không phụ thuộc thư mục
+# đang chạy lệnh); đường dẫn tuyệt đối được giữ nguyên.
+# Đọc qua src/utils/path_resolver.py.
+
+seed: 42
+
+paths:
+  raw_dir: data/raw                       # file PE gốc (.exe/.dll)
+  features_dir: data/features_graph       # *_static.json sau khi trích xuất BFBG
+  vocab: data/vocab.json                  # Vocab token (src/disassembly/vex_tokenizer.py)
+  results_dir: results
+  checkpoints_dir: results/checkpoints
+  logs_dir: results/logs
