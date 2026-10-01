@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Pre-commit hook: CHAN commit neu bat ky file nao trong staged changes la
+# file PE (2 byte dau = "MZ") - ke ca khi da `git add -f` qua .gitignore,
+# va bat ke ten/duoi file (mau malware thuong khong co duoi).
+#
+# Doc noi dung DA STAGE (blob trong index), khong doc file tren dia: file
+# tren dia co the da bi sua sau khi add.
+#
+# Cai dat (moi lan clone repo):
+#   cp scripts/hooks/pre-commit.sample .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+
+set -u
+
+blocked=()
+# A/C/M/R: file them moi, copy, sua, doi ten - bo qua file bi xoa.
+while IFS= read -r -d '' path; do
+    magic=$(git cat-file blob ":$path" 2>/dev/null | head -c 2)
+    if [ "$magic" = "MZ" ]; then
+        blocked+=("$path")
+    fi
+done < <(git diff --cached --name-only -z --diff-filter=ACMR)
+
+if [ ${#blocked[@]} -gt 0 ]; then
+    echo "pre-commit: CHAN COMMIT - phat hien file PE (header 'MZ') trong staged changes:" >&2
+    for path in "${blocked[@]}"; do
+        echo "    $path" >&2
+    done
+    echo "Mau PE (malware/benign) khong duoc commit vao repo. Bo stage bang:" >&2
+    echo "    git restore --staged -- <file>" >&2
+    exit 1
+fi
+exit 0

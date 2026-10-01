@@ -2,3 +2,21 @@ __pycache__/
 *.pyc
 *.pth
 *.egg-info/
+
+# === Mau PE that (malware/benign) - KHONG BAO GIO commit ===
+# Moi thu trong data/ (mau PE, ke ca file KHONG co duoi dat ten theo sha256;
+# JSON dac trung; report VirusTotal; vocab sinh ra) - tru README.
+data/*
+!data/README.md
+
+# File PE va file nen o BAT KY dau trong repo. Git o day phan biet hoa/thuong
+# (core.ignorecase chua dat) nen viet ca dang hoa: SAMPLE.EXE, x.Dll...
+*.[eE][xX][eE]
+*.[dD][lL][lL]
+*.[sS][yY][sS]
+*.[sS][cC][rR]
+*.[oO][cC][xX]
+*.[cC][pP][lL]
+*.[zZ][iI][pP]
+*.7[zZ]
+*.[rR][aA][rR]
