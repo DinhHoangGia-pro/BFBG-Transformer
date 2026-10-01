@@ -20,3 +20,12 @@ data/*
 *.[zZ][iI][pP]
 *.7[zZ]
 *.[rR][aA][rR]
+
+# === Bi mat (API key, chung chi) - KHONG BAO GIO commit ===
+.env
+.env.*
+*.pem
+*.key
+
+# === Ket qua chay sinh ra tren may (co duong dan tuyet doi cuc bo) ===
+experiments/qa/lift_failures.jsonl
