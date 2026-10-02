@@ -49,3 +49,14 @@ Kết quả qua `build_graphs.py`:
 **Phát hiện phụ: window=8 cắt chuỗi theo khoảng cách lệnh, không theo ranh giới hàm.** Fixture này khớp đủ 4 bước vì ba API con nằm liền nhau (vị trí 0,1,2). `3bf0` bị cắt mất `CreateRemoteThread` **dù dùng đúng cùng window=8**, vì trong hàm con của nó ba API nằm rải (CreateRemoteThread ở vị trí 19, cách bước trước > 8). Vậy "window quá hẹp" là giới hạn do khoảng cách giữa các lời gọi, xuất hiện cả trong một hàm lẫn qua ranh giới hàm — không phải đặc tính riêng của ranh giới hàm hay của Trickbot.
 
 **Trạng thái.** `generate_cross_function_seed_edges()` và field `cross_function_seed_edges` được GIỮ NGUYÊN để nghiên cứu sau, chưa quyết định xoá hay giữ. T1055 được gắn cờ `training_caveat` trong `src/semantic/seed_rules_attck.py`; `check_seed_rule_fire_rate.py` in cảnh báo cố định mỗi khi báo số liệu T1055.
+
+## 4. Near-duplicate phải nằm cùng phía train/test (ràng buộc split cho dataset loader)
+
+**Chuyện đã xảy ra** (ghi nhận 2026-10-02). `experiments/qa/check_sample_similarity.py` (ppdeep) phát hiện hai mẫu Trickbot `4becc0d518a97cc3…` và `ef6603a7ef46177e…` là near-duplicate (`ppdeep.compare = 96`) dù số hàm rất khác nhau (563 vs 2896). Chế độ proxy cũ bỏ sót vì gom theo (số hàm, số API-call), vốn mù với mức giống byte.
+
+**Yêu cầu thiết kế cho bước dataset/train sắp tới** (CHƯA code — `src/training/` chưa tồn tại). Khi viết dataset loader / hàm chia train-test:
+- Các mẫu trong cùng một cụm near-duplicate phải luôn nằm **CÙNG PHÍA** train hoặc test, không được tách rời. Nếu không, một biến thể lọt vào test gần như trùng với một biến thể trong train → rò rỉ, làm điểm test cao giả.
+- Tức là chia theo **nhóm (group-aware split)**, với nhóm = cụm near-duplicate, không chia theo từng mẫu độc lập. Cùng họ với ý tưởng `group_key` đã có trong `configs/dataset.yaml` (vd campaign) — cụm near-duplicate là một `group_key` nữa cần tôn trọng.
+- Danh sách cụm cụ thể nằm ở `data/raw/near_duplicate_clusters.jsonl` (dữ liệu cục bộ, `data/` bị gitignore; **tái sinh được** bằng `check_sample_similarity.py` trên tập mẫu cuối). Dataset loader nên đọc file này nếu có, và không hard-code sha256 vào mã nguồn.
+
+Chưa loại bỏ mẫu nào; đây chỉ là ràng buộc cho bước sau.
