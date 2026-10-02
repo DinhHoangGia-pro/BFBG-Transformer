@@ -70,3 +70,24 @@ Chưa loại bỏ mẫu nào; đây chỉ là ràng buộc cho bước sau.
 **Lý do khoa học, không chỉ vì tốc độ.** Các mẫu này là **outlier độ phức tạp cực đoan** so với toàn bộ phân phối hiện có (kể cả phía malicious). Giữ chúng lại có nguy cơ lặp lại kiểu confound đã gặp với mẫu benign `93488fa7…` — một mẫu duy nhất (9.880 hàm, 41,1% hàm bị gắn cờ) chi phối toàn bộ thống kê boundary-anomaly của cả nhóm benign (xem mục bảng QA n=55).
 
 **Ràng buộc áp dụng xuyên suốt dự án.** MỌI đợt thu thập sau này — benign lẫn Trickbot mở rộng ở Giai đoạn B — đều phải **lọc theo cùng ngưỡng kích thước này TRƯỚC khi đưa vào lift**, không chỉ riêng đợt này. Ngưỡng sẽ được ghi vào `configs/dataset.yaml` và áp dụng trong các script thu thập/dựng đồ thị để nhất quán.
+
+## 6. Size cap (12MB) cần nhưng không đủ — số hàm, không phải kích thước file, mới là yếu tố chi phối thời gian lift
+
+**Bằng chứng** (ghi nhận 2026-10-02). `c52c9ed2…` (notepad++, 8,15MB — **DƯỚI** ngưỡng 12MB) có **14.512 hàm**, lift mất **584,6s** — gấp ~2,3× khung ~250s quan sát ở kỷ lục cũ (`069739cb…`, 11.217 hàm, 252s). Kích thước file nhỏ hơn hẳn nhưng **số hàm** cao hơn mới là biến chi phối thời gian.
+
+**Vì sao không thể thay size cap bằng ngưỡng số-hàm.** Size cap là bộ lọc **TIỀN-xử-lý**: biết trước khi đọc/lift file (chỉ cần `os.path.getsize`), rất rẻ. Trong khi số hàm chỉ biết được **SAU khi angr đã dựng xong CFG** — tức chính phần chi phí mà ta muốn tránh. Vì vậy ngưỡng số-hàm không thay được vai trò của size cap; hai ngưỡng khác mục đích, không loại trừ nhau.
+
+**Chốt chặn thời gian thực sự vẫn là `--timeout` mỗi mẫu** (hiện 900s) — đây là lưới an toàn cuối cùng, không phải size cap. Trong lô benign này không mẫu nào chạm 900s (lâu nhất 584,6s), nhưng khi quy mô lớn hơn thì timeout mới là thứ bảo đảm batch luôn kết thúc.
+
+**Hướng mở (chưa làm, không cần làm ngay).** Nếu muốn giảm chi phí phí phạm trên mẫu nhiều-hàm TRƯỚC khi lift, cần một proxy rẻ tương quan với số hàm — ví dụ số section, kích thước riêng của section `.text` (thay vì `file_size` tổng), hoặc phân bố entropy. KHÔNG kết luận proxy nào thực sự hoạt động; chỉ ghi như hướng cân nhắc cho Giai đoạn B, khi quy mô lớn hơn khiến vài % mẫu "unlucky" nhiều-hàm cộng dồn thành chi phí đáng kể.
+
+## 7. Boundary-anomaly rate có thể là tín hiệu "outlier hiện diện", không phải tín hiệu benign/malicious
+
+**Bằng chứng** (ghi nhận 2026-10-02). Khi benign tăng 26 → 44 mẫu:
+- Tỉ lệ hàm bị gắn cờ của benign giảm 7,17% → 5,07% (pha loãng ảnh hưởng của outlier cũ `93488fa7…`, vốn một mình đóng 4.063/5.941 cờ).
+- Nhưng BỎ outlier đó ra thì benign ≈ 1,75% ở cả n=26 lẫn n=44, gần bằng malicious (1,98%) — tức khi không có outlier, boundary rate gần như KHÔNG phân biệt hai lớp.
+- Và một outlier benign MỚI xuất hiện ngay trong đợt mở rộng: `3e74aa37…` (9.778 hàm, 4,6%, chủ yếu OVERLAP) — cao hơn hẳn phần còn lại, dù độ lớn chưa bằng `93488fa7` (41,1%).
+
+**Giả thuyết.** Dường như "luôn có 1–2 mẫu cực đoan trong benign" bất kể cỡ mẫu, chứ boundary-anomaly rate không hội tụ về một tỉ lệ ổn định đặc trưng cho lớp. Nếu đúng, tỉ lệ tổng của nhóm chủ yếu phản ánh **có hay không một outlier trong batch**, không phản ánh bản chất benign/malicious.
+
+**Khuyến nghị.** KHÔNG dùng boundary-anomaly rate làm đặc trưng discriminative cho tới khi n đủ lớn để kiểm tra giả thuyết này nghiêm túc — ví dụ khi n→200, xem outlier có tiếp tục xuất hiện theo một tỉ lệ không đổi (ủng hộ "luôn có outlier") hay thực sự hội tụ về một giá trị ổn định. Trước khi có câu trả lời, boundary_flags nên dùng ở cấp từng-hàm (đã có trong JSON) cho mục đích chẩn đoán ranh giới hàm, không gộp thành tỉ lệ cấp-mẫu làm feature.
