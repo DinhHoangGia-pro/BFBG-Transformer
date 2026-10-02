@@ -60,3 +60,13 @@ Kết quả qua `build_graphs.py`:
 - Danh sách cụm cụ thể nằm ở `data/raw/near_duplicate_clusters.jsonl` (dữ liệu cục bộ, `data/` bị gitignore; **tái sinh được** bằng `check_sample_similarity.py` trên tập mẫu cuối). Dataset loader nên đọc file này nếu có, và không hard-code sha256 vào mã nguồn.
 
 Chưa loại bỏ mẫu nào; đây chỉ là ràng buộc cho bước sau.
+
+## 5. Giới hạn kích thước mẫu benign — DLL ffmpeg lớn (>50MB) không lift được trong timeout hợp lý
+
+**Chuyện đã xảy ra** (ghi nhận 2026-10-02). Khi mở rộng benign corpus từ bản dựng FFmpeg release-full-shared, hai DLL lớn (~93MB và ~102MB, như avcodec) **không lift xong trong `--timeout 900s`**; cả lô bị khung quản lý tiến trình nền kết thúc sau 30 phút. Đây **không phải lỗi code**: `angr CFGFast` có chi phí tăng siêu tuyến tính theo kích thước code, và hai DLL này quá lớn so với mọi thứ pipeline từng xử lý.
+
+**Ngưỡng theo bằng chứng.** Trên toàn bộ 64 mẫu đã lift thành công (cả malicious lẫn benign), mẫu lớn nhất là 7,78 MB (`069739cb…`, 11.217 hàm, ~252s); lớn nhì 7,56 MB. Tất cả đều ≤ 7,78 MB. Đặt ngưỡng kích thước tối đa cho mẫu = **12 MB** (≈ 1,5× mẫu lift lớn nhất đã chứng minh), phản ánh đúng "cỡ mà pipeline xử lý được trong thời gian hợp lý" chứ không phải một con số MB cảm tính. (Phương án 2× ≈ 15,6 MB đã cân nhắc nhưng loại: ~2× mức đã chứng minh, rủi ro chạm trần 900s.) Hai DLL ffmpeg bị loại khỏi corpus theo ngưỡng này.
+
+**Lý do khoa học, không chỉ vì tốc độ.** Các mẫu này là **outlier độ phức tạp cực đoan** so với toàn bộ phân phối hiện có (kể cả phía malicious). Giữ chúng lại có nguy cơ lặp lại kiểu confound đã gặp với mẫu benign `93488fa7…` — một mẫu duy nhất (9.880 hàm, 41,1% hàm bị gắn cờ) chi phối toàn bộ thống kê boundary-anomaly của cả nhóm benign (xem mục bảng QA n=55).
+
+**Ràng buộc áp dụng xuyên suốt dự án.** MỌI đợt thu thập sau này — benign lẫn Trickbot mở rộng ở Giai đoạn B — đều phải **lọc theo cùng ngưỡng kích thước này TRƯỚC khi đưa vào lift**, không chỉ riêng đợt này. Ngưỡng sẽ được ghi vào `configs/dataset.yaml` và áp dụng trong các script thu thập/dựng đồ thị để nhất quán.
