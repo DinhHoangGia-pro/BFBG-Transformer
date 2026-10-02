@@ -40,7 +40,11 @@ Schema JSON (cac khoa cap ham giu khung cu de experiments/qa/ doc duoc):
       boundary_flags:  ["OVERLAP", ...]  (rong = khong bi gan co),
       seed_edges:      [{src_node_id, dst_node_id, src_idx, dst_idx, technique_id, rule_name, confidence}],
       node_indicators: [{node_id, idx, technique_id, rule_name}] } },
-  inter_procedural_call_graph: {edges, num_edges}
+  inter_procedural_call_graph: {edges, num_edges},
+  cross_function_seed_edges: [{src_func, src_node_id, src_idx, dst_func, dst_node_id, dst_idx,
+                               technique_id, rule_name, confidence="cross_function_1hop"}]
+      (khop chain LIEN HAM 1-hop qua call graph - TACH RIENG, KHONG gop vao
+       seed_edges cua tung ham; xem docs/LESSONS_LEARNED.md muc 2)
 
 Chay:  python -m src.bfbg.bfbg_builder <file.exe> [...] [--label 0|1] [--out-dir DIR] [--vex-vocab FILE]
 """
@@ -60,6 +64,7 @@ from src.disassembly.vex_tokenizer import instruction_token, update_shared_vocab
 from src.semantic.seed_rules_attck import (
     ResolvedCall,
     compute_structural_indicators,
+    generate_cross_function_seed_edges,
     generate_node_indicators,
     generate_seed_edges,
 )
@@ -172,6 +177,25 @@ def encode_vex_tokens(intra, vocab_path):
     return len(vocab)
 
 
+def build_cross_function_edges(intra, callgraph, window_size):
+    """Goi generate_cross_function_seed_edges() SAU generate_seed_edges() (da chay
+    trong build_function_graph), tren API-call da chuan hoa cua tung ham va
+    canh goi truc tiep cua call graph."""
+    keys = list(intra)
+    assert [intra[k]['addr'] for k in keys] == callgraph.func_addrs, "thu tu ham lech call graph"
+    calls_by_function = {k: [ResolvedCall(node_id=c['node_id'], api_name=c['api'], position=c['position'])
+                             for c in intra[k]['api_calls']] for k in keys}
+    edges = [(keys[u], keys[v]) for u, v in callgraph.edges]
+    owner = {n['node_id']: (k, n['idx']) for k in keys for n in intra[k]['nodes']}
+    out = []
+    for e in generate_cross_function_seed_edges(calls_by_function, edges, window_size=window_size):
+        (src_func, src_idx), (dst_func, dst_idx) = owner[e.src_node_id], owner[e.dst_node_id]
+        out.append({'src_func': src_func, 'src_node_id': e.src_node_id, 'src_idx': src_idx,
+                    'dst_func': dst_func, 'dst_node_id': e.dst_node_id, 'dst_idx': dst_idx,
+                    'technique_id': e.technique_id, 'rule_name': e.rule_name, 'confidence': e.confidence})
+    return out
+
+
 def build_bfbg(path, vex_vocab_path, label=None, window_size=None, boundary_params=None):
     """Dung toan bo BFBG cho 1 file PE, tra ve dict san sang ghi JSON."""
     if window_size is None:
@@ -183,6 +207,7 @@ def build_bfbg(path, vex_vocab_path, label=None, window_size=None, boundary_para
     structural = compute_structural_indicators(entropies, import_table_anomaly=num_imports < MIN_NORMAL_IMPORTS)
 
     intra = {f"func_{f.addr}": build_function_graph(lifted, f, window_size) for f in lifted.functions}
+    cross_edges = build_cross_function_edges(intra, callgraph, window_size)
     boundary_params = boundary_params or default_boundary_params()
     for key, result in analyze_sample(intra, boundary_params).items():
         intra[key]['boundary_flags'] = result['flags'] if result else []
@@ -217,6 +242,7 @@ def build_bfbg(path, vex_vocab_path, label=None, window_size=None, boundary_para
             'edges': [list(e) for e in callgraph.edges],
             'num_edges': len(callgraph.edges),
         },
+        'cross_function_seed_edges': cross_edges,
     }
 
 

@@ -7,6 +7,10 @@ bo du lieu duong (malicious), tach RIENG hai loai bang chung:
 va canh bao ky thuat nao fire (edge HOAC indicator) < --min-fire-rate
 (mac dinh 1%).
 
+cross_function_seed_edges (khop chain lien ham 1-hop, Phuong an B -
+docs/LESSONS_LEARNED.md muc 2) duoc dem trong bang RIENG, KHONG cong vao
+cac cot edge/indicator/bat ky o tren. JSON thieu field nay -> bao loi, dung.
+
 Ly do ton tai: ban EVM cu, luat reentrancy_call_before_sstore chi khop
 4/5797 hop dong (0.07%), tx_origin_authorization khop 0 hop dong - luat
 nhin dung tren ly thuyet nhung gan nhu khong bao gio khop du lieu that
@@ -27,12 +31,15 @@ Kem theo (gop tu scripts/v1/audit_extraction_quality.py): ty le mau duong
 khong co bang chung nao, phan bo so seed edge/mau, ty le mau bi cat unit.
 """
 import argparse
+import sys
 from collections import Counter
 
 from _common import DATASET_CFG, KEY_LABEL, LABEL_NAMES, MAX_UNITS, add_data_root_arg, iter_samples, \
-    list_sample_files, load_techniques, require_evidence_fields, sample_techniques, total_seed_edges, units
+    list_sample_files, load_techniques, require_evidence_fields, sample_techniques, \
+    total_seed_edges, units
 
 KINDS = ('edge', 'indicator', 'any')
+KEY_CROSS = 'cross_function_seed_edges'   # cap file JSON, src/bfbg/bfbg_builder.py
 
 
 def main():
@@ -54,6 +61,15 @@ def main():
     samples = list(iter_samples(list_sample_files(args.data_root)))
 
     require_evidence_fields(samples)   # thieu field -> bao loi va dung, khong in so lieu
+    missing_cross = [fp for fp, d in samples if KEY_CROSS not in d]
+    if missing_cross:
+        print(f"[LOI] {len(missing_cross)}/{len(samples)} file JSON thieu field '{KEY_CROSS}' - KHONG tinh so lieu. "
+              f"Dung lai src/bfbg/bfbg_builder.py de sinh lai JSON.", file=sys.stderr)
+        for fp in missing_cross[:10]:
+            print(f"  {fp}", file=sys.stderr)
+        sys.exit(2)
+    cross_samples = {label: Counter() for label in (0, 1)}   # technique -> so mau co >=1 canh lien ham
+    cross_edges = {label: Counter() for label in (0, 1)}     # technique -> tong so canh lien ham
 
     fire = {label: {k: Counter() for k in KINDS} for label in (0, 1)}
     totals = Counter()
@@ -75,6 +91,9 @@ def main():
             fire[label]['indicator'][t] += 1
         for t in by_edge | by_ind:
             fire[label]['any'][t] += 1
+        cross = Counter(e['technique_id'] for e in data[KEY_CROSS])
+        cross_edges[label].update(cross)
+        cross_samples[label].update(set(cross))
         if len(units(data)) > args.max_units:
             n_truncated += 1
         if label == 1:
@@ -125,6 +144,15 @@ def main():
               "pham vi 1 ham, bien the API A/W/Ex/Nt*).")
     else:
         print(f"\nOK: moi ky thuat deu fire >= {args.min_fire_rate*100:.2f}% mau duong.")
+
+    print(f"\n=== cross_function_seed_edges (lien ham 1-hop) - TACH RIENG, KHONG tinh vao bang tren ===")
+    print(f"{'Technique':10s} {'Luat':20s} {LABEL_NAMES[1] + ' mau':>18s} {'canh':>6s} {LABEL_NAMES[0] + ' mau':>18s} {'canh':>6s}")
+    print("-" * 84)
+    for tid, name, _ in techniques:
+        m, b = cross_samples[1][tid], cross_samples[0][tid]
+        m_pct = f"{m}/{n_pos} ({m / n_pos * 100:5.1f}%)"
+        b_pct = f"{b}/{n_neg} ({b / n_neg * 100:5.1f}%)" if n_neg else "-"
+        print(f"{tid:10s} {name:20s} {m_pct:>18s} {cross_edges[1][tid]:6d} {b_pct:>18s} {cross_edges[0][tid]:6d}")
 
     print(f"\n=== Do phu bang chung tren mau duong ===")
     print(f"KHONG co seed edge lan node indicator nao: {n_pos_no_evidence}/{n_pos} "

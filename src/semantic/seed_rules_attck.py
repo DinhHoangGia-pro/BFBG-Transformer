@@ -93,7 +93,7 @@ class SeedEdge:
     dst_node_id: str
     technique_id: str      # vi du "T1055"
     rule_name: str         # vi du "process_injection"
-    confidence: str        # "full_chain" | "partial_chain" | "co_occurrence"
+    confidence: str        # "full_chain" | "partial_chain" | "co_occurrence" | "cross_function_1hop"
 
 
 @dataclass(frozen=True)
@@ -324,6 +324,77 @@ def generate_node_indicators(
         _, ind = _PAIR_MATCHERS[rule.mode](calls, rule, window_size)
         indicators.extend(ind)
     return indicators
+
+
+# ---------------------------------------------------------------------------
+# 3b. Khop LIEN HAM 1-hop qua call graph (Phuong an B, docs/LESSONS_LEARNED.md
+#     muc 2) - chi cho ORDERED_CHAIN (hien chi T1055). KHONG thay the
+#     generate_seed_edges(): ket qua la bang chung RIENG, confidence rieng.
+# ---------------------------------------------------------------------------
+
+def generate_cross_function_seed_edges(
+    calls_by_function: dict[str, Sequence[ResolvedCall]],
+    callgraph: Iterable[tuple[str, str]],
+    window_size: int = DEFAULT_WINDOW_SIZE,
+    rules: Iterable[SeedRule] = ATTACK_SEED_RULES,
+) -> list[SeedEdge]:
+    """Khop ORDERED_CHAIN qua ranh gioi 1 canh goi truc tiep: cac buoc dau
+    cua chuoi o ham CHA, cac buoc sau o ham CON F.
+
+    calls_by_function : function_id -> ResolvedCall cua ham do (position la
+                        thu tu TRONG ham do, nhu generate_seed_edges nhan).
+    callgraph         : cac canh (caller_id, callee_id) goi truc tiep.
+
+    Voi moi ham F CHUA khop du chain trong chinh no (_match_ordered_chain
+    tren rieng F khong ra full_chain), voi TUNG ham cha P goi truc tiep F
+    (xet rieng tung cha, khong gop nhieu cha): khop chain tren chuoi noi
+    calls[P] + calls[F]. Chi giu chain co it nhat 1 node o P VA it nhat 1
+    node o F (chain nam tron trong 1 ham khong phai bang chung lien ham).
+    Moi SeedEdge cua chain do co confidence="cross_function_1hop".
+    """
+    calls_by_function = {f: list(c) for f, c in calls_by_function.items()}
+    parents: dict[str, set[str]] = {}
+    for caller, callee in callgraph:
+        if caller != callee:
+            parents.setdefault(callee, set()).add(caller)
+
+    edges: list[SeedEdge] = []
+    seen: set[tuple[str, str, str]] = set()
+    for rule in rules:
+        if rule.mode is not MatchMode.ORDERED_CHAIN:
+            continue
+        chain_apis = set(rule.apis)
+        for f_id, f_calls in calls_by_function.items():
+            if not any(c.api_name in chain_apis for c in f_calls):
+                continue
+            own = _match_ordered_chain(f_calls, rule, window_size)
+            if own and own[0].confidence == "full_chain":
+                continue
+            for p_id in sorted(parents.get(f_id, ())):
+                p_calls = calls_by_function.get(p_id, [])
+                if not any(c.api_name in chain_apis for c in p_calls):
+                    continue
+                # GIA DINH HEURISTIC, CHUA XAC NHAN bang op_str/vi tri lenh call F
+                # trong P (xem docs/LESSONS_LEARNED.md muc 2): MOI API-call cua cha
+                # P duoc coi la XAY RA TRUOC moi API-call cua F. Thuc hien bang cach
+                # doi position cua F len sau position lon nhat cua P; khoang cach
+                # window qua ranh gioi ham = (so loi goi sau buoc cuoi o P) +
+                # (position cua buoc dau o F) + 1.
+                offset = max(c.position for c in p_calls) + 1
+                f_shifted = [ResolvedCall(c.node_id, c.api_name, c.position + offset) for c in f_calls]
+                chain = _match_ordered_chain(p_calls + f_shifted, rule, window_size)
+                p_nodes = {c.node_id for c in p_calls}
+                f_nodes = {c.node_id for c in f_calls}
+                touched = {n for e in chain for n in (e.src_node_id, e.dst_node_id)}
+                if not (touched & p_nodes and touched & f_nodes):
+                    continue
+                for e in chain:
+                    key = (e.src_node_id, e.dst_node_id, e.technique_id)
+                    if key not in seen:
+                        seen.add(key)
+                        edges.append(SeedEdge(e.src_node_id, e.dst_node_id, e.technique_id, e.rule_name,
+                                              "cross_function_1hop"))
+    return edges
 
 
 # ---------------------------------------------------------------------------
