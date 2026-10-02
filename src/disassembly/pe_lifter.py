@@ -24,8 +24,12 @@ import os
 from dataclasses import dataclass, field
 
 import angr
+import pefile
 
 from src.disassembly.vex_tokenizer import operand_type_name, vex_stmt_token
+
+# Data directory 14 = IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR (CLR header).
+_COM_DESCRIPTOR_INDEX = pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR']
 
 
 @dataclass
@@ -75,6 +79,22 @@ def sha256_file(path):
         for chunk in iter(lambda: f.read(1 << 20), b''):
             h.update(chunk)
     return h.hexdigest()
+
+
+def is_dotnet_assembly(path):
+    """True neu PE la .NET/CLR assembly (co CLR header - data directory
+    IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR kich thuoc > 0). Than .NET la CIL
+    bytecode, khong phai ma may x86 -> angr CFGFast khong lift duoc co y
+    nghia (chi thay stub _CorExeMain). Doc bang pefile, khong nap angr."""
+    pe = pefile.PE(path, fast_load=True)
+    try:
+        dirs = pe.OPTIONAL_HEADER.DATA_DIRECTORY
+        if _COM_DESCRIPTOR_INDEX >= len(dirs):
+            return False
+        clr = dirs[_COM_DESCRIPTOR_INDEX]
+        return clr.VirtualAddress != 0 and clr.Size > 0
+    finally:
+        pe.close()
 
 
 def load_project(path):

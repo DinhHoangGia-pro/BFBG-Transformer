@@ -38,9 +38,11 @@ import time
 import traceback
 
 from src.bfbg.bfbg_builder import build_bfbg, write_bfbg
+from src.disassembly.pe_lifter import is_dotnet_assembly
 from src.utils.path_resolver import REPO_ROOT, get_path, load_config, resolve
 
 DEFAULT_FAILURES = os.path.join(REPO_ROOT, 'experiments', 'qa', 'lift_failures.jsonl')
+DEFAULT_OUT_OF_SCOPE = os.path.join(REPO_ROOT, 'experiments', 'qa', 'out_of_scope_samples.jsonl')
 
 
 def sha256_of(path):
@@ -125,6 +127,8 @@ def main():
     parser.add_argument('--out-dir', default=None, help="Mac dinh: paths.features_dir")
     parser.add_argument('--vex-vocab', default=None, help="Mac dinh: paths.vex_vocab")
     parser.add_argument('--failures', default=DEFAULT_FAILURES, help="File JSONL ghi mau loi")
+    parser.add_argument('--out-of-scope', default=DEFAULT_OUT_OF_SCOPE,
+                        help="File JSONL ghi mau ngoai pham vi (vd .NET/CLR) - khong lift, khong phai loi")
     parser.add_argument('--append', action='store_true', help="Ghi tiep vao --failures thay vi ghi de")
     parser.add_argument('--workers', type=int, default=1, help="So mau xu ly song song (vocab VEX co khoa file)")
     parser.add_argument('--timeout', type=int, default=600, help="Giay toi da cho moi mau")
@@ -138,37 +142,62 @@ def main():
     print(f"{len(inputs)} mau, workers={args.workers}, timeout={args.timeout}s -> {args.out_dir}")
 
     os.makedirs(os.path.dirname(os.path.abspath(args.failures)), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(args.out_of_scope)), exist_ok=True)
     failures_f = open(args.failures, 'a' if args.append else 'w')
+    oos_f = open(args.out_of_scope, 'a' if args.append else 'w')
     ctx = mp.get_context('fork')
-    ok, failed = [], []
+    ok, failed, out_of_scope = [], [], []
 
     def handle(path, status, info):
         sha = sha256_of(path)
         if status == 'ok':
             ok.append(path)
-            print(f"  OK   {sha[:16]}...  ham={info['num_functions']:5d}  API-call={info['num_api_calls']:5d}  "
+            print(f"  OK    {sha[:16]}...  ham={info['num_functions']:5d}  API-call={info['num_api_calls']:5d}  "
                   f"{info['seconds']}s")
+        elif status == 'out_of_scope':
+            row = {'sha256': sha, 'path': os.path.abspath(path), 'reason': info['reason'],
+                   'run_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
+            oos_f.write(json.dumps(row) + '\n')
+            oos_f.flush()
+            out_of_scope.append(row)
+            print(f"  SKIP  {sha[:16]}...  out-of-scope: {info['reason']}")
         else:
             row = {'sha256': sha, 'path': os.path.abspath(path), **info,
                    'run_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
             failures_f.write(json.dumps(row) + '\n')
             failures_f.flush()
             failed.append(row)
-            print(f"  FAIL {sha[:16]}...  {info['exception_type']}: {info['exception_message'][:120]}")
+            print(f"  FAIL  {sha[:16]}...  {info['exception_type']}: {info['exception_message'][:120]}")
+
+    def classify_and_run(path):
+        # Phan loai TRUOC khi lift: mau .NET/CLR khong phai ma may x86, angr
+        # khong lift duoc co y nghia -> out-of-scope, khong goi CFGFast.
+        try:
+            if is_dotnet_assembly(path):
+                return 'out_of_scope', {'reason': 'dotnet_clr'}
+        except Exception:
+            pass   # khong doc duoc CLR header -> cu de lift binh thuong, loi (neu co) vao lift_failures
+        return run_one(path, args, ctx)
 
     if args.workers <= 1:
         for path in inputs:
-            handle(path, *run_one(path, args, ctx))
+            handle(path, *classify_and_run(path))
     else:
         from concurrent.futures import ThreadPoolExecutor   # moi thread chi dieu phoi 1 tien trinh con
         with ThreadPoolExecutor(args.workers) as pool:
-            for path, result in zip(inputs, pool.map(lambda p: run_one(p, args, ctx), inputs)):
+            for path, result in zip(inputs, pool.map(classify_and_run, inputs)):
                 handle(path, *result)
     failures_f.close()
+    oos_f.close()
 
     n = len(inputs)
-    print(f"\nLift thanh cong: {len(ok)}/{n} ({len(ok)/n*100:.1f}%) | that bai: {len(failed)}/{n} "
-          f"({len(failed)/n*100:.1f}%)")
+    print(f"\nLift thanh cong: {len(ok)}/{n} ({len(ok)/n*100:.1f}%) | "
+          f"out-of-scope: {len(out_of_scope)}/{n} ({len(out_of_scope)/n*100:.1f}%) | "
+          f"that bai: {len(failed)}/{n} ({len(failed)/n*100:.1f}%)")
+    if out_of_scope:
+        print(f"Mau out-of-scope ({args.out_of_scope}):")
+        for row in out_of_scope:
+            print(f"  {row['sha256']}  {row['reason']}")
     if failed:
         print(f"Chi tiet mau loi ({args.failures}):")
         for row in failed:
