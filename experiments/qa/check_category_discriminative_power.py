@@ -29,12 +29,15 @@ from sklearn.model_selection import train_test_split
 
 from collections import Counter
 
-from _common import RANDOM_STATE, add_data_root_arg, evidence_by_boundary, has_boundary_flags, iter_samples, \
-    list_sample_files, load_techniques, merge_boundary_stats, print_boundary_table, sample_id, simple_features
+from _common import KEY_LABEL, RANDOM_STATE, add_data_root_arg, evidence_by_boundary, has_boundary_flags, \
+    iter_samples, list_sample_files, load_techniques, merge_boundary_stats, print_boundary_table, sample_id, \
+    simple_features
 
 
 def load_groups(groups_file, target_groups):
-    id_to_groups, benign_ids = {}, set()
+    """Chi doc nhom cua mau MALICIOUS tu groups-file. KHONG suy ra benign tu
+    groups=[] nua - benign lay tu label=0 THAT trong JSON (xem main)."""
+    id_to_groups = {}
     with open(groups_file) as f:
         for line in f:
             if not line.strip():
@@ -43,13 +46,10 @@ def load_groups(groups_file, target_groups):
             if row.get("error"):
                 continue
             groups = set(row.get("groups") or [])
-            if not groups:
-                benign_ids.add(row["sample_id"])
-                continue
             real = groups & target_groups if target_groups else groups
             if real:
                 id_to_groups[row["sample_id"]] = real
-    return id_to_groups, benign_ids
+    return id_to_groups
 
 
 def main():
@@ -62,18 +62,28 @@ def main():
     args = parser.parse_args()
 
     target_groups = set(args.groups) if args.groups else None
-    id_to_groups, benign_ids = load_groups(args.groups_file, target_groups)
-    print(f"Da nap {len(id_to_groups)} mau malicious, {len(benign_ids)} mau benign tu {args.groups_file}")
+    id_to_groups = load_groups(args.groups_file, target_groups)
 
-    features_by_id, boundary_by_id = {}, {}
+    # benign = label==0 THAT trong JSON (khong suy ra tu groups=[]), nen mau
+    # malicious khong fire ky thuat nao KHONG bi dem nham la benign.
+    features_by_id, boundary_by_id, benign_ids = {}, {}, set()
     n_missing_boundary = 0
     for fp, data in iter_samples(list_sample_files(args.data_root)):
         sid = sample_id(fp)
         features_by_id[sid] = simple_features(data)
+        # Benign KHONG can nhom theo ky thuat: cau hoi la "ty le fire CHUNG cua
+        # toan bo benign" so voi tung nhom malicious-co-ky-thuat-X. Benign khong
+        # thuoc nhom ky thuat nao, chi la lop doi chung cho MOI nhom. Vi vay doc
+        # truc tiep label==0 la DUNG thiet ke - khong phai thieu nhat quan voi
+        # viec doc malicious qua groups-file (malicious moi can nhom theo ky thuat).
+        if data.get(KEY_LABEL) == 0:
+            benign_ids.add(sid)
         if has_boundary_flags(data):
             boundary_by_id[sid] = evidence_by_boundary(data)
         else:
             n_missing_boundary += 1
+    print(f"Da nap {len(id_to_groups)} mau malicious (co ky thuat) tu {args.groups_file}, "
+          f"{len(benign_ids)} mau benign (label=0) tu {args.data_root}")
     print(f"Da nap feature cho {len(features_by_id)} mau tu {args.data_root}\n")
 
     all_groups = target_groups or set().union(set(), *id_to_groups.values())
