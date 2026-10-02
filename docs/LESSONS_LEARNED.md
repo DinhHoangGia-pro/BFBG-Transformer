@@ -36,3 +36,16 @@ Các bài học phát sinh khi làm pipeline PE-malware. Bài học kế thừa 
 
 Tần suất của pattern này trên toàn bộ dữ liệu cần được đo trước khi chọn phương án.
 
+## 3. T1055 không phân biệt được tự-tiêm với tiêm-tiến-trình-khác — phát hiện qua fixture self-injection benign
+
+**Chuyện đã xảy ra** (ghi nhận 2026-10-02). Phép thử false-positive trên w32.exe/w64.exe ở mục trước vô giá trị vì cả hai không import API nào của T1055. Để có một mẫu benign đúng hình dạng cross-function của `3bf0f489…`, dựng fixture `self_patch_updater.exe` (PE32 tối giản, label benign): `OpenProcess` được gọi với tham số rỗng/vô nghĩa ở hàm cha `_start`, `_start` gọi hàm con `sub_401010`, và hàm con chứa đủ `VirtualAllocEx` → `WriteProcessMemory` → `CreateRemoteThread` liền nhau. Các API được gọi với tham số 0/không hợp lệ — không cấp phát, không ghi, không tạo thread, không có payload; file chỉ để tạo đúng hình dạng import + call-graph cho phân tích tĩnh.
+
+Kết quả qua `build_graphs.py`:
+- `cross_function_seed_edges` fire **đủ 4 bước** OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread (3 cạnh, confidence `cross_function_1hop`) trên chương trình benign này.
+- Seed edge nội hàm vẫn 0 ở cả hai hàm, giống `3bf0`.
+
+**Nguyên nhân gốc.** Luật T1055 chỉ khớp theo **tên API + thứ tự + khoảng cách**. Nó **không đọc tham số** của `OpenProcess` để biết tiến trình đích là chính tiến trình hiện tại (self-injection, phổ biến ở updater/launcher hợp pháp) hay một tiến trình khác (dấu hiệu tiêm mã độc hại). Đây là hạn chế **chung** của cả thiết kế gốc (khớp trong 1 hàm, `generate_seed_edges`) lẫn phần mở rộng Phương án B (khớp xuyên hàm 1-hop, `generate_cross_function_seed_edges`) — **không phải lỗi riêng của phần mở rộng**. Tự-tiêm hợp pháp và tiêm-tiến-trình-khác độc hại dùng đúng cùng một chuỗi API; chỉ tham số (và luồng dữ liệu của handle) mới phân biệt được, mà luật hiện không nhìn tới.
+
+**Phát hiện phụ: window=8 cắt chuỗi theo khoảng cách lệnh, không theo ranh giới hàm.** Fixture này khớp đủ 4 bước vì ba API con nằm liền nhau (vị trí 0,1,2). `3bf0` bị cắt mất `CreateRemoteThread` **dù dùng đúng cùng window=8**, vì trong hàm con của nó ba API nằm rải (CreateRemoteThread ở vị trí 19, cách bước trước > 8). Vậy "window quá hẹp" là giới hạn do khoảng cách giữa các lời gọi, xuất hiện cả trong một hàm lẫn qua ranh giới hàm — không phải đặc tính riêng của ranh giới hàm hay của Trickbot.
+
+**Trạng thái.** `generate_cross_function_seed_edges()` và field `cross_function_seed_edges` được GIỮ NGUYÊN để nghiên cứu sau, chưa quyết định xoá hay giữ. T1055 được gắn cờ `training_caveat` trong `src/semantic/seed_rules_attck.py`; `check_seed_rule_fire_rate.py` in cảnh báo cố định mỗi khi báo số liệu T1055.

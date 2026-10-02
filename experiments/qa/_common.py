@@ -157,6 +157,23 @@ def load_techniques():
     return [(r.technique_id, r.name, r.singleton_as_node_indicator) for r in ATTACK_SEED_RULES]
 
 
+def technique_caveats():
+    """{technique_id: training_caveat} chi cho cac luat co han che DA XAC NHAN
+    khi dung lam tin hieu huan luyen (src/semantic/seed_rules_attck.py)."""
+    from src.semantic.seed_rules_attck import ATTACK_SEED_RULES
+    return {r.technique_id: r.training_caveat for r in ATTACK_SEED_RULES if r.training_caveat}
+
+
+def print_caveat_warnings(technique_ids):
+    """In canh bao co dinh cho moi technique (trong technique_ids) co han che
+    DA XAC NHAN - dung chung cho moi QA script in so lieu T1055."""
+    caveats = technique_caveats()
+    for tid in technique_ids:
+        if tid in caveats:
+            print(f"[CANH BAO] {tid} co FP da xac nhan tren fixture benign tu-tiem - "
+                  f"xem docs/LESSONS_LEARNED.md truoc khi dung lam can cu")
+
+
 def missing_evidence_fields(data):
     """Field bang chung bat buoc (seed_edges, node_indicators) bi thieu o it
     nhat 1 ham cua mau."""

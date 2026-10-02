@@ -15,7 +15,7 @@ import argparse
 from collections import Counter
 
 from _common import KEY_LABEL, MAX_UNITS, add_data_root_arg, iter_samples, list_sample_files, load_techniques, \
-    require_evidence_fields, unit_evidence, unit_position, units
+    print_caveat_warnings, require_evidence_fields, unit_evidence, unit_position, units
 
 KINDS = ('edge', 'indicator', 'any')
 
@@ -85,6 +85,7 @@ def main():
         for kind in KINDS:
             label = f"{t} {names.get(t, '?')}" if kind == 'edge' else ""
             print(f"{label:28s} {kind:10s} {n_with[kind][t]:6d} {n_beyond[kind][t]:11d} {n_lost[kind][t]:9d}")
+    print_caveat_warnings(techs)
 
     for kind in KINDS:
         dist = sorted(position_of_evidence[kind].items())

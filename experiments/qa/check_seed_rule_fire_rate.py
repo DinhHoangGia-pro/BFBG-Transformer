@@ -35,7 +35,7 @@ import sys
 from collections import Counter
 
 from _common import DATASET_CFG, KEY_LABEL, LABEL_NAMES, MAX_UNITS, add_data_root_arg, iter_samples, \
-    list_sample_files, load_techniques, require_evidence_fields, sample_techniques, \
+    list_sample_files, load_techniques, print_caveat_warnings, require_evidence_fields, sample_techniques, \
     total_seed_edges, units
 
 KINDS = ('edge', 'indicator', 'any')
@@ -132,6 +132,7 @@ def main():
         print(f"{tid:10s} {name:20s} {pct(1, 'edge', tid):8.2f}% {ind_col} "
               f"{any_count:5d} ({rate*100:5.2f}%) {pct(0, 'any', tid):9.2f}%{flag}")
     print("('-' = luat khong sinh node_indicator theo thiet ke, vd T1055)")
+    print_caveat_warnings([t[0] for t in techniques])
 
     if unknown:
         print(f"\n[CANH BAO] technique_id xuat hien trong du lieu nhung KHONG co trong bang luat: {sorted(unknown)}")
@@ -153,6 +154,7 @@ def main():
         m_pct = f"{m}/{n_pos} ({m / n_pos * 100:5.1f}%)"
         b_pct = f"{b}/{n_neg} ({b / n_neg * 100:5.1f}%)" if n_neg else "-"
         print(f"{tid:10s} {name:20s} {m_pct:>18s} {cross_edges[1][tid]:6d} {b_pct:>18s} {cross_edges[0][tid]:6d}")
+    print_caveat_warnings([t[0] for t in techniques])
 
     print(f"\n=== Do phu bang chung tren mau duong ===")
     print(f"KHONG co seed edge lan node indicator nao: {n_pos_no_evidence}/{n_pos} "

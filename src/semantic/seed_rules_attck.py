@@ -131,6 +131,11 @@ class SeedRule:
     # True: khi CHI co 1 API khop (khong du de tao edge), van gan
     #   NodeIndicator thay vi bo qua hoan toan. Dat False cho T1055 vi mot
     #   buoc le trong ordered-chain la API qua pho bien de tin cay rieng le.
+    training_caveat: str = ""
+    # Metadata (KHONG anh huong output cua generate_seed_edges /
+    #   generate_cross_function_seed_edges). Khac rong = luat nay co han che
+    #   DA XAC NHAN khi dung lam tin hieu huan luyen; cac buoc sau
+    #   (check_label_confidence, dataset loader) doc de loc/canh bao neu can.
 
 
 ATTACK_SEED_RULES: tuple[SeedRule, ...] = (
@@ -151,6 +156,13 @@ ATTACK_SEED_RULES: tuple[SeedRule, ...] = (
         ),
         min_chain_length=2,
         singleton_as_node_indicator=False,
+        # FP DA XAC NHAN: fixture benign self_patch_updater.exe (self-injection
+        # hop phap) khien ca intra-function lan cross_function_seed_edges fire
+        # du 4 buoc. Luat chi khop theo ten API + thu tu + khoang cach, KHONG
+        # doc tham so OpenProcess de phan biet tien trinh dich la chinh no hay
+        # tien trinh khac. Xem docs/LESSONS_LEARNED.md.
+        training_caveat="api_call_only - khong phan biet tu-tiem voi "
+                        "tiem-tien-trinh-khac, CAN than khi dung lam tin hieu huan luyen",
     ),
     SeedRule(
         technique_id="T1547",

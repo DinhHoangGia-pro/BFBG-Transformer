@@ -28,7 +28,7 @@ from collections import Counter
 
 from _common import DATASET_CFG, KEY_LABEL, LABEL_NAMES, add_data_root_arg, evidence_by_boundary, \
     has_boundary_flags, iter_samples, list_sample_files, load_techniques, merge_boundary_stats, \
-    print_boundary_table, require_evidence_fields, sample_techniques
+    print_boundary_table, print_caveat_warnings, require_evidence_fields, sample_techniques
 
 TIERS = ['high', 'medium', 'low', 'unknown']
 KINDS = ('edge', 'indicator', 'any')
@@ -126,6 +126,7 @@ def main():
     for tid, count in stats[1]['any'].most_common():
         print(f"  {tid} {names.get(tid, '?')}: {count} mau "
               f"(seed edge: {stats[1]['edge'][tid]}, node indicator: {stats[1]['indicator'][tid]})")
+    print_caveat_warnings(names)
 
     # === Phan 2 ===
     b, m = LABEL_NAMES[0], LABEL_NAMES[1]
@@ -142,6 +143,7 @@ def main():
             flag = "  <-- KHONG PHAN BIET, LA NHIEU" if abs(diff) < 15 and p_ben > 30 else ""
             label = f"{tid} {names.get(tid, '?')}" if kind == 'edge' else ""
             print(f"{label:28s} {kind:10s} {p_ben:9.1f}% {p_mal:11.1f}% {diff:+11.1f}%{flag}")
+    print_caveat_warnings(names)
 
 
     # === Phan 3 ===
@@ -153,6 +155,7 @@ def main():
     for label in (1, 0):
         base, items = boundary[label]
         print_boundary_table(f"{LABEL_NAMES[label]} ({totals[label]} mau)", base, items, names)
+    print_caveat_warnings(names)
 
 
 if __name__ == '__main__':
