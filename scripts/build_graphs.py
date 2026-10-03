@@ -7,7 +7,10 @@ ca lo va KHONG am tham bo qua mau loi.
 Moi mau chay trong 1 TIEN TRINH CON rieng, co timeout:
   - exception Python   -> ghi lai type, message, traceback
   - qua --timeout giay -> tien trinh bi kill, ghi exception_type "Timeout"
-                          (CFGFast co the treo tren mau pack/obfuscate)
+                          (CFGFast co the treo tren mau pack/obfuscate).
+                          NGOAI LE: neu worker da ghi xong JSON hop le ngay
+                          truoc khi bi kill (race o bien timeout) thi van tinh
+                          OK, khong phai Timeout - xem _salvage_output().
   - tien trinh chet    -> exception_type "ProcessCrash" (vd segfault trong
                           thu vien C cua angr), kem exit code
 
@@ -89,6 +92,26 @@ def _worker(path, label, out_dir, vocab_path, result_path):
         pickle.dump(res, f)
 
 
+def _salvage_output(path, args):
+    """Vot lai ket qua khi worker bi kill vi timeout: co race o bien timeout
+    - worker co the ghi xong JSON day du NGAY TRUOC khi proc.kill() ban (xem
+    docs/LESSONS_LEARNED.md). Neu JSON dau ra ton tai va doc duoc (json.load
+    khong loi, co field bat buoc) thi day la 'ok' that su, khong phai Timeout.
+    Kill giua chung co the de file cut -> json.load bao loi -> tra None."""
+    out_path = os.path.join(args.out_dir, f"{sha256_of(path)}_static.json")
+    if not os.path.exists(out_path):
+        return None
+    try:
+        with open(out_path) as f:
+            d = json.load(f)
+    except (ValueError, OSError):
+        return None
+    if d.get('num_functions') is None or 'intra_procedural_graphs' not in d:
+        return None
+    return {'out_path': out_path, 'num_functions': d['num_functions'],
+            'num_api_calls': d.get('num_api_calls', 0)}
+
+
 def run_one(path, args, ctx):
     """Chay builder cho 1 mau trong tien trinh con; tra ve (status, info).
     Timeout cung moi mau bang proc.join(timeout) + proc.kill() - khong
@@ -103,6 +126,10 @@ def run_one(path, args, ctx):
         if proc.is_alive():
             proc.kill()
             proc.join()
+            salvaged = _salvage_output(path, args)   # race o bien timeout: JSON co the da ghi xong
+            if salvaged is not None:
+                salvaged['seconds'] = round(time.monotonic() - start, 1)
+                return 'ok', salvaged
             return 'error', {'exception_type': 'Timeout',
                              'exception_message': f"vuot {args.timeout}s (tien trinh bi kill)",
                              'traceback_last_line': None, 'traceback_last_repo_line': None, 'traceback': None}

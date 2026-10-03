@@ -113,3 +113,15 @@ Chưa loại bỏ mẫu nào; đây chỉ là ràng buộc cho bước sau.
 **Hệ quả dataset.** Cả 9 "thất bại" thực chất là **1 biến thể IcedID × 9 bản near-duplicate** (cùng 591 KB / 19 section / 1743 symbol / 66 symbol rác / maxSectNum 30821, lệch vài byte). Dù lift được, chúng cũng gộp về một cụm near-dup → mất 9 mẫu này ≈ mất 1 biến thể độc lập, gần như không giảm đa dạng IcedID.
 
 **Quyết định.** Giữ nguyên là failure (đã ghi đầy đủ traceback vào `lift_failures.jsonl`), KHÔNG workaround. Lý do: (1) lỗi nằm trong cle, vá ở repo đồng nghĩa patch/monkeypatch loader của thư viện — rủi ro, ngoài phạm vi; (2) mất mát thực tế chỉ 1 biến thể. Pipeline đã hành xử đúng: bắt lỗi, ghi lại, không treo, không âm thầm bỏ qua. Nếu sau này cần: có thể bọc `angr.Project(..., main_opts={'force_load_libs':...})` không giúp — cần disable COFF symbol loading ở tầng cle (chưa có cờ public), hoặc strip symbol table trước khi nạp.
+
+## 10. Race ở biên timeout — worker ghi xong JSON đúng lúc cha bắn kill, bị log nhầm Timeout
+
+**Chuyện đã xảy ra** (ghi nhận 2026-10-03, build Lô 4 BumbleBee, 266 mẫu, workers=4, timeout=900). Log thô ghi 260 OK / 6 FAIL, nhưng **2/6 mẫu "FAIL" (Timeout) thực chất đã có JSON hợp lệ, hoàn chỉnh** trong `data/features_graph/`:
+- `e6c6ad04…`: JSON 4,4MB / 485 hàm, mtime **16:15:52** — đúng mốc ~900s kể từ lúc worker bắt đầu. Worker chạy `write_bfbg()` xong (JSON ghi đầy đủ) **đúng vào thời điểm** `proc.join(900)` ở tiến trình cha hết hạn và gọi `proc.kill()`; cha chỉ thấy `proc.is_alive()` → kết luận Timeout, không biết JSON đã ghi.
+- `024291b9…`: JSON 5,4MB / 394 hàm, cũng có sẵn và hợp lệ.
+
+**Nguyên nhân gốc.** `run_one` cũ kết luận Timeout **chỉ dựa vào** `proc.is_alive()` sau `join(timeout)`, không kiểm tra sản phẩm đầu ra. Có một cửa sổ race hẹp: worker hoàn tất `write_bfbg()` trong vài mili-giây cuối trước khi bị kill → JSON tồn tại và đầy đủ, nhưng mẫu vẫn bị tính là thất bại. Hệ quả: (a) đếm trùng — mẫu vừa có JSON dùng được vừa nằm trong `lift_failures.jsonl`; (b) thổi phồng tỉ lệ thất bại.
+
+**Cách sửa** (chỉ `run_one`, không đụng worker/builder/phân loại). Thêm `_salvage_output(path, args)`: sau khi `proc.kill()` vì timeout, kiểm tra `data/features_graph/<sha>_static.json` — nếu `json.load()` không lỗi và có field bắt buộc (`num_functions`, `intra_procedural_graphs`) thì trả kết quả **OK** (vớt lại), ngược lại mới là Timeout. Kill giữa chừng để file cụt → `json.load` báo lỗi → vẫn tính Timeout, an toàn.
+
+**Số liệu bị ảnh hưởng.** Quét lại TOÀN BỘ `lift_failures.jsonl` cả 4 lô, đối chiếu từng dòng `Timeout` với JSON tương ứng: chỉ 2 mẫu trên bị ghi nhầm (đều ở Lô 4). Đã xóa 2 dòng khỏi `lift_failures.jsonl`. Con số tích luỹ trước Lô 4 (11 = 9 IndexError + 2 Dridex Timeout) **không đổi** — 2 Dridex Timeout là thất bại thật, không có JSON. Sau khi dọn: **15 thất bại thật** (9 IndexError + 4 Timeout + 2 KeyError), **1382 malicious JSON dùng được**.
