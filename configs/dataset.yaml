@@ -11,6 +11,12 @@ sources:
   # minh (7,78MB) - KHÔNG phải số tuỳ ý; xem docs/LESSONS_LEARNED.md mục 5.
   # Áp dụng cho mọi đợt thu thập sau (benign lẫn Trickbot Giai đoạn B).
   max_file_size_mb: 12
+  # 5 family malicious đã chốt cho Giai đoạn B (xem docs/DATASET.md). Đây là
+  # nguồn sự thật để chạy lại fetch_malware_samples.py --dry-run xác nhận
+  # trạng thái. QakBot loại (không có trên MB), SystemBC loại (không phải
+  # banking trojan). Lọc: size ≤ max_file_size_mb + dedup sha256 (KHÔNG lọc
+  # near-dup ở bước fetch - đó là việc của split, lesson 4).
+  malware_families: [TrickBot, Emotet, Dridex, IcedID, BumbleBee]
 
 labeling:
   # Khoá trong JSON đặc trưng chứa số engine VT gắn nhãn malicious.
