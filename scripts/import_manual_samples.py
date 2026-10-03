@@ -1,7 +1,7 @@
 """
 import_manual_samples.py
 ========================
-Duong nap mau THU CONG, song song voi duong API (fetch_trickbot_sample.py):
+Duong nap mau THU CONG, song song voi duong API (fetch_malware_samples.py):
 nhan mot thu muc file PE da tai tay tu bat ky nguon nao (vd VX-Underground),
 luu vao data/raw/malicious/<sha256> theo DUNG quy uoc cua duong API, roi goi
 lai scripts/build_graphs.py tren cac mau do.
@@ -28,7 +28,7 @@ import os
 import subprocess
 import sys
 
-from fetch_trickbot_sample import save_sample   # cung kiem tra sha256 + MZ + ghi 0o444 nhu duong API
+from fetch_malware_samples import save_sample   # cung kiem tra sha256 + MZ + ghi 0o444 nhu duong API
 from src.utils.path_resolver import REPO_ROOT, load_config, resolve
 
 
