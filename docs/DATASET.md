@@ -49,6 +49,9 @@ Lưu ý: tỉ lệ .NET khác nhau rõ giữa family — **Emotet 14,1%** (nhi�
 
 Hệ quả: **Dridex tuy có 377 mẫu nhưng chỉ 68 khác biệt** (cụm lớn nhất 85 mẫu); IcedID có một cụm 116 mẫu. Khi báo cáo quy mô dataset và chia train/test phải dùng **số mẫu khác biệt (708)**, không phải 1.382, để tránh rò rỉ gần-trùng giữa train và test.
 
+> **BÁO CÁO QUY MÔ DATASET — PHẢI TRÍCH DẪN CẢ HAI CON SỐ.**
+> Dataset có **1.382 mẫu PE hợp lệ**, nhưng chỉ **708 mẫu KHÁC BIỆT THẬT** (ssdeep < 90 giữa mọi cặp) sau khi loại near-duplicate. Mọi báo cáo về quy mô dataset trong bài báo **PHẢI trích dẫn cả hai con số, không chỉ 1.382**. Báo cáo riêng 1.382 mà không nhắc 708 là **overclaim về tính đa dạng của dữ liệu** — 48,8% số mẫu là near-duplicate, và mức trùng cực kỳ lệch theo family (Dridex chỉ 68 khác biệt / 377 mẫu).
+
 ### Family bị loại, kèm lý do
 
 - **QakBot** — loại vì **không lấy được từ MalwareBazaar**: `get_siginfo(signature="Qakbot"/"QakBot"/"QBot"...)` trả `no_results`; `get_taginfo(tag="qakbot"...)` trả `error` ổn định. MB không phát hành mẫu QakBot dưới các tên này qua API.
