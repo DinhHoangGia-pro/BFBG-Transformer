@@ -32,8 +32,9 @@ import json
 import logging
 import multiprocessing as mp
 import os
-import queue
+import pickle
 import sys
+import tempfile
 import time
 import traceback
 
@@ -70,45 +71,53 @@ def describe_exception(exc):
     }
 
 
-def _worker(path, label, out_dir, vocab_path, result_q):
+def _worker(path, label, out_dir, vocab_path, result_path):
+    # Tra ket qua qua FILE TAM (pickle), KHONG qua multiprocessing.Queue:
+    # Queue + feeder-thread/pipe giua ThreadPool va tien trinh con tung gay
+    # deadlock lam treo khi "het viec" (timeout 900s khong ban). File tam
+    # + join(timeout) o parent loai han lop deadlock do.
     for name in ('angr', 'cle', 'pyvex'):
         logging.getLogger(name).setLevel(logging.CRITICAL)
     try:
         bfbg = build_bfbg(path, vocab_path, label=label)
         out_path = write_bfbg(bfbg, out_dir)
-        result_q.put(('ok', {'out_path': out_path, 'num_functions': bfbg['num_functions'],
-                             'num_api_calls': bfbg['num_api_calls']}))
+        res = ('ok', {'out_path': out_path, 'num_functions': bfbg['num_functions'],
+                      'num_api_calls': bfbg['num_api_calls']})
     except BaseException as exc:   # noqa: BLE001 - ghi lai MOI loi, ke ca KeyboardInterrupt/SystemExit trong angr
-        result_q.put(('error', describe_exception(exc)))
+        res = ('error', describe_exception(exc))
+    with open(result_path, 'wb') as f:
+        pickle.dump(res, f)
 
 
 def run_one(path, args, ctx):
-    """Chay builder cho 1 mau trong tien trinh con; tra ve (status, info)."""
-    result_q = ctx.Queue()
-    proc = ctx.Process(target=_worker, args=(path, args.label, args.out_dir, args.vex_vocab, result_q))
+    """Chay builder cho 1 mau trong tien trinh con; tra ve (status, info).
+    Timeout cung moi mau bang proc.join(timeout) + proc.kill() - khong
+    phu thuoc vao viec doc Queue."""
+    fd, result_path = tempfile.mkstemp(prefix='bfbg_build_', suffix='.pkl')
+    os.close(fd)
+    proc = ctx.Process(target=_worker, args=(path, args.label, args.out_dir, args.vex_vocab, result_path))
     start = time.monotonic()
     proc.start()
-    status, info = None, None
-    deadline = start + args.timeout
-    while status is None:
+    proc.join(args.timeout)
+    try:
+        if proc.is_alive():
+            proc.kill()
+            proc.join()
+            return 'error', {'exception_type': 'Timeout',
+                             'exception_message': f"vuot {args.timeout}s (tien trinh bi kill)",
+                             'traceback_last_line': None, 'traceback_last_repo_line': None, 'traceback': None}
         try:
-            status, info = result_q.get(timeout=1.0)
-        except queue.Empty:
-            if not proc.is_alive():
-                break
-            if time.monotonic() > deadline:
-                proc.kill()
-                proc.join()
-                return 'error', {'exception_type': 'Timeout',
-                                 'exception_message': f"vuot {args.timeout}s (tien trinh bi kill)",
-                                 'traceback_last_line': None, 'traceback_last_repo_line': None, 'traceback': None}
-    proc.join()
-    if status is None:
-        return 'error', {'exception_type': 'ProcessCrash',
-                         'exception_message': f"tien trinh con thoat voi exit code {proc.exitcode} khong tra ket qua",
-                         'traceback_last_line': None, 'traceback_last_repo_line': None, 'traceback': None}
-    info['seconds'] = round(time.monotonic() - start, 1)
-    return status, info
+            with open(result_path, 'rb') as f:
+                status, info = pickle.load(f)
+        except (EOFError, FileNotFoundError, pickle.UnpicklingError):
+            return 'error', {'exception_type': 'ProcessCrash',
+                             'exception_message': f"tien trinh con thoat (exit code {proc.exitcode}) khong ghi ket qua",
+                             'traceback_last_line': None, 'traceback_last_repo_line': None, 'traceback': None}
+        info['seconds'] = round(time.monotonic() - start, 1)
+        return status, info
+    finally:
+        if os.path.exists(result_path):
+            os.unlink(result_path)
 
 
 def collect_inputs(args):

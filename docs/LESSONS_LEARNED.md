@@ -91,3 +91,15 @@ Chưa loại bỏ mẫu nào; đây chỉ là ràng buộc cho bước sau.
 **Giả thuyết.** Dường như "luôn có 1–2 mẫu cực đoan trong benign" bất kể cỡ mẫu, chứ boundary-anomaly rate không hội tụ về một tỉ lệ ổn định đặc trưng cho lớp. Nếu đúng, tỉ lệ tổng của nhóm chủ yếu phản ánh **có hay không một outlier trong batch**, không phản ánh bản chất benign/malicious.
 
 **Khuyến nghị.** KHÔNG dùng boundary-anomaly rate làm đặc trưng discriminative cho tới khi n đủ lớn để kiểm tra giả thuyết này nghiêm túc — ví dụ khi n→200, xem outlier có tiếp tục xuất hiện theo một tỉ lệ không đổi (ủng hộ "luôn có outlier") hay thực sự hội tụ về một giá trị ổn định. Trước khi có câu trả lời, boundary_flags nên dùng ở cấp từng-hàm (đã có trong JSON) cho mục đích chẩn đoán ranh giới hàm, không gộp thành tỉ lệ cấp-mẫu làm feature.
+
+## 8. Deadlock khi thu kết quả build song song — timeout mỗi-mẫu không cứu được
+
+**Chuyện đã xảy ra** (ghi nhận 2026-10-03, lần build Lô 1 Giai đoạn B, 471 mẫu, workers=4). Build chạy xong **toàn bộ phần native** (454 JSON đã ghi đúng) rồi **treo ~2,5 giờ** ở cuối: tiến trình chính + 2 worker con sống mãi ở **<1% CPU** (đang blocked, không tính toán). `--timeout 900s` mỗi-mẫu **không bắn** vì tiến trình cha kẹt ở bước thu kết quả, không phải kẹt trong CFGFast. Dữ liệu không hỏng, không mất — chỉ việc đóng tiến trình sạch là thất bại.
+
+**Nguyên nhân gốc.** Lớp điều phối cũ dùng `multiprocessing.Queue` giữa các luồng giám sát (ThreadPool) và tiến trình con để trả `(status, info)`. Queue có một feeder-thread + pipe nội bộ; dưới fork + nhiều Queue đồng thời, việc này deadlock ở thời điểm "hết việc" (đặc biệt khi mẫu bị skip sớm / vừa xong). Timeout dựa trên `result_q.get(timeout=1.0)` cũng vô hiệu vì get() không nhả.
+
+**Cách sửa** (chỉ lớp thu kết quả + kết thúc tiến trình; KHÔNG đụng `is_dotnet_assembly`, ghi seed/node/boundary, phân loại OK/SKIP/FAIL, format JSON):
+- Tiến trình con ghi `(status, info)` ra **file tạm pickle**, bỏ hẳn `multiprocessing.Queue` → loại cả lớp deadlock feeder/pipe.
+- `run_one` dùng `proc.join(timeout)` rồi `proc.kill()` cho timeout cứng, không phụ thuộc đọc Queue; đọc kết quả từ file tạm sau join; thiếu file → `ProcessCrash`.
+
+**Kiểm chứng và giới hạn.** Ba nhánh đã đổi đều thoát sạch, không sót tiến trình, số liệu không đổi: all-.NET (17/17 out-of-scope, 2,1s), ok (3/3 lift), Timeout (`--timeout 1` → 3/3 hard-kill, 3,4s). KHÔNG tái tạo được cái treo gốc một cách tất định (phụ thuộc timing/race ở lần 471 mẫu; lô 17-.NET vốn chạy xong cả ở code cũ), nên khẳng định đóng lỗi dựa trên review tương tác queue/pool + ba test nhánh, không dựa trên việc dựng lại đúng cái treo.
