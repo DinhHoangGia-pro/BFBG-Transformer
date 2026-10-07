@@ -1,0 +1,1486 @@
+{
+ "seed": 20261008,
+ "rule": "cap<=3 payload/app; dedup ppdeep>=90/sha256 vs v1 holdout -> LOAI/inherit (xem DATASET.md); NirSoft<=50; dual-use -> stress",
+ "scoop": [
+  {
+   "bucket": "Extras",
+   "app": "maxima"
+  },
+  {
+   "bucket": "Extras",
+   "app": "caffeine"
+  },
+  {
+   "bucket": "Main",
+   "app": "terraform-ls"
+  },
+  {
+   "bucket": "Main",
+   "app": "chuck"
+  },
+  {
+   "bucket": "Main",
+   "app": "psake"
+  },
+  {
+   "bucket": "Main",
+   "app": "osquery"
+  },
+  {
+   "bucket": "Extras",
+   "app": "lazy-posh-git"
+  },
+  {
+   "bucket": "Main",
+   "app": "macchina"
+  },
+  {
+   "bucket": "Extras",
+   "app": "httptoolkit"
+  },
+  {
+   "bucket": "Main",
+   "app": "mdq"
+  },
+  {
+   "bucket": "Main",
+   "app": "redshift"
+  },
+  {
+   "bucket": "Extras",
+   "app": "upscayl"
+  },
+  {
+   "bucket": "Extras",
+   "app": "vott"
+  },
+  {
+   "bucket": "Extras",
+   "app": "age"
+  },
+  {
+   "bucket": "Extras",
+   "app": "manifold"
+  },
+  {
+   "bucket": "Extras",
+   "app": "commandbox"
+  },
+  {
+   "bucket": "Main",
+   "app": "schemacrawler"
+  },
+  {
+   "bucket": "Main",
+   "app": "spotdl"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keypirinha"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mpv"
+  },
+  {
+   "bucket": "Extras",
+   "app": "ab-av1"
+  },
+  {
+   "bucket": "Extras",
+   "app": "yapa"
+  },
+  {
+   "bucket": "Main",
+   "app": "cppcryptfsctl"
+  },
+  {
+   "bucket": "Main",
+   "app": "libxml2"
+  },
+  {
+   "bucket": "Main",
+   "app": "gossm"
+  },
+  {
+   "bucket": "Extras",
+   "app": "roughgrep"
+  },
+  {
+   "bucket": "Main",
+   "app": "poetry"
+  },
+  {
+   "bucket": "Extras",
+   "app": "jira-cli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "fysty"
+  },
+  {
+   "bucket": "Extras",
+   "app": "fbflipper"
+  },
+  {
+   "bucket": "Main",
+   "app": "tektoncd-cli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "supermium"
+  },
+  {
+   "bucket": "Extras",
+   "app": "tracy"
+  },
+  {
+   "bucket": "Extras",
+   "app": "freetube"
+  },
+  {
+   "bucket": "Extras",
+   "app": "litebrowser"
+  },
+  {
+   "bucket": "Extras",
+   "app": "vicinae"
+  },
+  {
+   "bucket": "Extras",
+   "app": "now-cli"
+  },
+  {
+   "bucket": "Main",
+   "app": "okteto"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keynavish"
+  },
+  {
+   "bucket": "Main",
+   "app": "nero-aac"
+  },
+  {
+   "bucket": "Extras",
+   "app": "kui"
+  },
+  {
+   "bucket": "Extras",
+   "app": "zed"
+  },
+  {
+   "bucket": "Main",
+   "app": "biome"
+  },
+  {
+   "bucket": "Extras",
+   "app": "tightvnc"
+  },
+  {
+   "bucket": "Extras",
+   "app": "smartcontextmenu"
+  },
+  {
+   "bucket": "Main",
+   "app": "gitsign"
+  },
+  {
+   "bucket": "Main",
+   "app": "mingit"
+  },
+  {
+   "bucket": "Extras",
+   "app": "super-productivity"
+  },
+  {
+   "bucket": "Extras",
+   "app": "cuetools"
+  },
+  {
+   "bucket": "Main",
+   "app": "capnp"
+  },
+  {
+   "bucket": "Main",
+   "app": "gow"
+  },
+  {
+   "bucket": "Main",
+   "app": "wstunnel"
+  },
+  {
+   "bucket": "Main",
+   "app": "lame"
+  },
+  {
+   "bucket": "Extras",
+   "app": "franz"
+  },
+  {
+   "bucket": "Extras",
+   "app": "kelivo"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mpf"
+  },
+  {
+   "bucket": "Main",
+   "app": "fedify"
+  },
+  {
+   "bucket": "Extras",
+   "app": "celestia"
+  },
+  {
+   "bucket": "Extras",
+   "app": "http-downloader"
+  },
+  {
+   "bucket": "Main",
+   "app": "scoop-search"
+  },
+  {
+   "bucket": "Main",
+   "app": "staticcheck"
+  },
+  {
+   "bucket": "Extras",
+   "app": "min"
+  },
+  {
+   "bucket": "Extras",
+   "app": "nsudo"
+  },
+  {
+   "bucket": "Extras",
+   "app": "completionpredictor"
+  },
+  {
+   "bucket": "Extras",
+   "app": "parsec"
+  },
+  {
+   "bucket": "Extras",
+   "app": "localsend"
+  },
+  {
+   "bucket": "Extras",
+   "app": "secureuxtheme"
+  },
+  {
+   "bucket": "Extras",
+   "app": "vcredist2005"
+  },
+  {
+   "bucket": "Main",
+   "app": "astyle"
+  },
+  {
+   "bucket": "Extras",
+   "app": "g-helper"
+  },
+  {
+   "bucket": "Main",
+   "app": "lftp"
+  },
+  {
+   "bucket": "Extras",
+   "app": "tailblazer"
+  },
+  {
+   "bucket": "Extras",
+   "app": "rssguard"
+  },
+  {
+   "bucket": "Extras",
+   "app": "diskcheckup"
+  },
+  {
+   "bucket": "Extras",
+   "app": "hack-font"
+  },
+  {
+   "bucket": "Extras",
+   "app": "goofcord"
+  },
+  {
+   "bucket": "Extras",
+   "app": "sshfs-win-manager"
+  },
+  {
+   "bucket": "Extras",
+   "app": "windowsdesktop-runtime"
+  },
+  {
+   "bucket": "Main",
+   "app": "ipcalc"
+  },
+  {
+   "bucket": "Extras",
+   "app": "databricks-cli"
+  },
+  {
+   "bucket": "Main",
+   "app": "opencv"
+  },
+  {
+   "bucket": "Main",
+   "app": "ccache"
+  },
+  {
+   "bucket": "Extras",
+   "app": "irfanview"
+  },
+  {
+   "bucket": "Extras",
+   "app": "fred-tv"
+  },
+  {
+   "bucket": "Extras",
+   "app": "nvda"
+  },
+  {
+   "bucket": "Extras",
+   "app": "ugene"
+  },
+  {
+   "bucket": "Extras",
+   "app": "markdown-monster"
+  },
+  {
+   "bucket": "Extras",
+   "app": "infekt"
+  },
+  {
+   "bucket": "Extras",
+   "app": "joe"
+  },
+  {
+   "bucket": "Main",
+   "app": "ab"
+  },
+  {
+   "bucket": "Extras",
+   "app": "cruft"
+  },
+  {
+   "bucket": "Main",
+   "app": "scrcpy"
+  },
+  {
+   "bucket": "Extras",
+   "app": "show-disk-partition-style"
+  },
+  {
+   "bucket": "Extras",
+   "app": "smarttaskbar"
+  },
+  {
+   "bucket": "Extras",
+   "app": "centertaskbar"
+  },
+  {
+   "bucket": "Extras",
+   "app": "nwjs"
+  },
+  {
+   "bucket": "Main",
+   "app": "claude-code"
+  },
+  {
+   "bucket": "Main",
+   "app": "keptn-cli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "streamdeck"
+  },
+  {
+   "bucket": "Extras",
+   "app": "apkeep"
+  },
+  {
+   "bucket": "Main",
+   "app": "kubecolor"
+  },
+  {
+   "bucket": "Extras",
+   "app": "rclone-browser"
+  },
+  {
+   "bucket": "Extras",
+   "app": "amp-winoff"
+  },
+  {
+   "bucket": "Extras",
+   "app": "consolez"
+  },
+  {
+   "bucket": "Main",
+   "app": "buck"
+  },
+  {
+   "bucket": "Main",
+   "app": "revanced-cli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "hasher"
+  },
+  {
+   "bucket": "Extras",
+   "app": "logstalgia"
+  },
+  {
+   "bucket": "Extras",
+   "app": "local-browser"
+  },
+  {
+   "bucket": "Extras",
+   "app": "eclipse-sumo"
+  },
+  {
+   "bucket": "Extras",
+   "app": "yek"
+  },
+  {
+   "bucket": "Extras",
+   "app": "folder-marker"
+  },
+  {
+   "bucket": "Main",
+   "app": "winget"
+  },
+  {
+   "bucket": "Main",
+   "app": "gitql"
+  },
+  {
+   "bucket": "Main",
+   "app": "lsd"
+  },
+  {
+   "bucket": "Main",
+   "app": "odo"
+  },
+  {
+   "bucket": "Main",
+   "app": "terraform"
+  },
+  {
+   "bucket": "Extras",
+   "app": "goldendict"
+  },
+  {
+   "bucket": "Extras",
+   "app": "andcli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "rio"
+  },
+  {
+   "bucket": "Extras",
+   "app": "standardnotes"
+  },
+  {
+   "bucket": "Main",
+   "app": "nunit-extension-nunit-project-loader"
+  },
+  {
+   "bucket": "Main",
+   "app": "powershell-yaml"
+  },
+  {
+   "bucket": "Extras",
+   "app": "scallion"
+  },
+  {
+   "bucket": "Extras",
+   "app": "kmeans-colors"
+  },
+  {
+   "bucket": "Main",
+   "app": "rdiff-backup"
+  },
+  {
+   "bucket": "Extras",
+   "app": "etcher-cli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "flamelens"
+  },
+  {
+   "bucket": "Extras",
+   "app": "switcheroo"
+  },
+  {
+   "bucket": "Main",
+   "app": "windows-application-driver"
+  },
+  {
+   "bucket": "Extras",
+   "app": "papercut"
+  },
+  {
+   "bucket": "Main",
+   "app": "worktrunk"
+  },
+  {
+   "bucket": "Extras",
+   "app": "natron"
+  },
+  {
+   "bucket": "Main",
+   "app": "pnpm"
+  },
+  {
+   "bucket": "Main",
+   "app": "argo"
+  },
+  {
+   "bucket": "Main",
+   "app": "xdelta"
+  },
+  {
+   "bucket": "Extras",
+   "app": "injector"
+  },
+  {
+   "bucket": "Extras",
+   "app": "anytype"
+  },
+  {
+   "bucket": "Extras",
+   "app": "ffqueue"
+  },
+  {
+   "bucket": "Main",
+   "app": "pi-coding-agent"
+  },
+  {
+   "bucket": "Extras",
+   "app": "bitmessage"
+  },
+  {
+   "bucket": "Extras",
+   "app": "winutil"
+  },
+  {
+   "bucket": "Main",
+   "app": "oracle-instant-client-sqlplus"
+  },
+  {
+   "bucket": "Main",
+   "app": "eksctl"
+  },
+  {
+   "bucket": "Extras",
+   "app": "proxybridge"
+  },
+  {
+   "bucket": "Main",
+   "app": "unxutils"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mathpix"
+  },
+  {
+   "bucket": "Extras",
+   "app": "azure-iot-explorer"
+  },
+  {
+   "bucket": "Extras",
+   "app": "juce"
+  },
+  {
+   "bucket": "Extras",
+   "app": "godot"
+  },
+  {
+   "bucket": "Extras",
+   "app": "redasm"
+  },
+  {
+   "bucket": "Main",
+   "app": "liquibase"
+  },
+  {
+   "bucket": "Extras",
+   "app": "zmc"
+  },
+  {
+   "bucket": "Extras",
+   "app": "sublime-merge"
+  },
+  {
+   "bucket": "Extras",
+   "app": "goneovim"
+  },
+  {
+   "bucket": "Main",
+   "app": "xq"
+  },
+  {
+   "bucket": "Extras",
+   "app": "codex-monitor"
+  },
+  {
+   "bucket": "Extras",
+   "app": "figma"
+  },
+  {
+   "bucket": "Extras",
+   "app": "identme"
+  },
+  {
+   "bucket": "Extras",
+   "app": "diffmerge"
+  },
+  {
+   "bucket": "Main",
+   "app": "byenow"
+  },
+  {
+   "bucket": "Extras",
+   "app": "drawpen"
+  },
+  {
+   "bucket": "Extras",
+   "app": "7tsp"
+  },
+  {
+   "bucket": "Extras",
+   "app": "claws-mail"
+  },
+  {
+   "bucket": "Extras",
+   "app": "video-compare"
+  },
+  {
+   "bucket": "Main",
+   "app": "waifu2x-ncnn-vulkan"
+  },
+  {
+   "bucket": "Main",
+   "app": "yara-x"
+  },
+  {
+   "bucket": "Extras",
+   "app": "jadx"
+  },
+  {
+   "bucket": "Extras",
+   "app": "syncthingctl"
+  },
+  {
+   "bucket": "Main",
+   "app": "bun"
+  },
+  {
+   "bucket": "Main",
+   "app": "ugrep"
+  },
+  {
+   "bucket": "Main",
+   "app": "llvm"
+  },
+  {
+   "bucket": "Main",
+   "app": "prm"
+  },
+  {
+   "bucket": "Extras",
+   "app": "tremulous"
+  },
+  {
+   "bucket": "Extras",
+   "app": "regexp"
+  },
+  {
+   "bucket": "Extras",
+   "app": "boostnote-local"
+  },
+  {
+   "bucket": "Main",
+   "app": "static-web-server"
+  },
+  {
+   "bucket": "Main",
+   "app": "codex"
+  },
+  {
+   "bucket": "Extras",
+   "app": "xdman"
+  },
+  {
+   "bucket": "Extras",
+   "app": "darktable"
+  },
+  {
+   "bucket": "Extras",
+   "app": "cdburnerxp"
+  },
+  {
+   "bucket": "Main",
+   "app": "ls-lint"
+  },
+  {
+   "bucket": "Extras",
+   "app": "scene-builder"
+  },
+  {
+   "bucket": "Extras",
+   "app": "xmind"
+  },
+  {
+   "bucket": "Main",
+   "app": "regula"
+  },
+  {
+   "bucket": "Main",
+   "app": "flac"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mpls"
+  },
+  {
+   "bucket": "Extras",
+   "app": "wtq"
+  },
+  {
+   "bucket": "Main",
+   "app": "kube-linter"
+  },
+  {
+   "bucket": "Main",
+   "app": "plex-server"
+  },
+  {
+   "bucket": "Extras",
+   "app": "pseps"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mpv-git"
+  },
+  {
+   "bucket": "Main",
+   "app": "nyagos"
+  },
+  {
+   "bucket": "Extras",
+   "app": "synctoy"
+  },
+  {
+   "bucket": "Extras",
+   "app": "devhub"
+  },
+  {
+   "bucket": "Extras",
+   "app": "search-deflector"
+  },
+  {
+   "bucket": "Extras",
+   "app": "conemu"
+  },
+  {
+   "bucket": "Extras",
+   "app": "sts"
+  },
+  {
+   "bucket": "Main",
+   "app": "ccl"
+  },
+  {
+   "bucket": "Main",
+   "app": "magic-wormhole-rs"
+  },
+  {
+   "bucket": "Main",
+   "app": "ddev"
+  },
+  {
+   "bucket": "Main",
+   "app": "tfsec"
+  },
+  {
+   "bucket": "Extras",
+   "app": "wincrypt-sshagent"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mellow"
+  },
+  {
+   "bucket": "Main",
+   "app": "buf"
+  },
+  {
+   "bucket": "Extras",
+   "app": "television"
+  },
+  {
+   "bucket": "Extras",
+   "app": "scantailor-advanced"
+  },
+  {
+   "bucket": "Extras",
+   "app": "testdisk"
+  },
+  {
+   "bucket": "Main",
+   "app": "ispc"
+  },
+  {
+   "bucket": "Extras",
+   "app": "yatqa"
+  },
+  {
+   "bucket": "Extras",
+   "app": "terminal-parrot"
+  },
+  {
+   "bucket": "Main",
+   "app": "rip"
+  },
+  {
+   "bucket": "Main",
+   "app": "sayit"
+  },
+  {
+   "bucket": "Extras",
+   "app": "easycliproxyapi"
+  },
+  {
+   "bucket": "Main",
+   "app": "eilmeldung"
+  },
+  {
+   "bucket": "Extras",
+   "app": "carnac"
+  },
+  {
+   "bucket": "Main",
+   "app": "gunk"
+  },
+  {
+   "bucket": "Extras",
+   "app": "i2p-zero-gui"
+  },
+  {
+   "bucket": "Extras",
+   "app": "umlet"
+  },
+  {
+   "bucket": "Extras",
+   "app": "pencil2d"
+  },
+  {
+   "bucket": "Main",
+   "app": "picoclaw"
+  },
+  {
+   "bucket": "Extras",
+   "app": "fvm"
+  },
+  {
+   "bucket": "Main",
+   "app": "bzip2"
+  },
+  {
+   "bucket": "Extras",
+   "app": "sioyek"
+  },
+  {
+   "bucket": "Main",
+   "app": "hjson"
+  },
+  {
+   "bucket": "Extras",
+   "app": "7tt"
+  },
+  {
+   "bucket": "Main",
+   "app": "apngasm"
+  },
+  {
+   "bucket": "Main",
+   "app": "scaleway-cli"
+  },
+  {
+   "bucket": "Extras",
+   "app": "timeslottracker"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mailspring"
+  },
+  {
+   "bucket": "Extras",
+   "app": "youtube-dl-gui"
+  },
+  {
+   "bucket": "Extras",
+   "app": "beyondcompare"
+  },
+  {
+   "bucket": "Extras",
+   "app": "pietty"
+  },
+  {
+   "bucket": "Extras",
+   "app": "kubelogin"
+  },
+  {
+   "bucket": "Extras",
+   "app": "clementine"
+  },
+  {
+   "bucket": "Extras",
+   "app": "coppeliasim"
+  },
+  {
+   "bucket": "Main",
+   "app": "sofka"
+  },
+  {
+   "bucket": "Main",
+   "app": "bundletool"
+  },
+  {
+   "bucket": "Extras",
+   "app": "beaver-notes"
+  },
+  {
+   "bucket": "Extras",
+   "app": "arcwelder"
+  },
+  {
+   "bucket": "Extras",
+   "app": "neohtop"
+  },
+  {
+   "bucket": "Main",
+   "app": "bazel-buildtools"
+  },
+  {
+   "bucket": "Extras",
+   "app": "dockercompletion"
+  },
+  {
+   "bucket": "Extras",
+   "app": "jamovi"
+  },
+  {
+   "bucket": "Extras",
+   "app": "gdscript-formatter"
+  },
+  {
+   "bucket": "Extras",
+   "app": "universal-ctags"
+  },
+  {
+   "bucket": "Extras",
+   "app": "rufus"
+  },
+  {
+   "bucket": "Main",
+   "app": "mina-sshd"
+  },
+  {
+   "bucket": "Extras",
+   "app": "dz6"
+  },
+  {
+   "bucket": "Main",
+   "app": "srecord"
+  }
+ ],
+ "nirsoft": [
+  {
+   "bucket": "Nirsoft",
+   "app": "bulkfilechanger"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "winsockservicesview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "windefthreatsview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "batteryinfoview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "specialfoldersview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "loadeddllsview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "wifichannelmonitor"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "videocacheview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "freespacelogview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "offlineregistryfinder"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "zipinst"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "fastresolver"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "tcplogview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "wakemeonlan"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "axhelper"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "skypelogview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "iconsext"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "esedatabaseview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "gdiview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "nk2view"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "ippathtableview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "browserautofillview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "ntfslinksview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "nk2edit"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "heapmemview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "regfromapp"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "credentialsfileview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "registrychangesview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "ipnetinfo"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "fileaccesserrorview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "searchfilterview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "jrview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "outlooktools"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "mzcv"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "appnetworkcounter"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "skypecontactsview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "nirext"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "executedprogramslist"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "gacview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "pspv"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "quicksetdns"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "seqdownload"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "dataprotectiondecryptor"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "regdllview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "fileactivitywatch"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "acm"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "networkusageview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "bluetoothleview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "chromecookiesview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "taskschedulerview"
+  }
+ ],
+ "stress_dualuse": [
+  {
+   "bucket": "Main",
+   "app": "1password-cli"
+  },
+  {
+   "bucket": "Main",
+   "app": "gopass-jsonapi"
+  },
+  {
+   "bucket": "Main",
+   "app": "gopass"
+  },
+  {
+   "bucket": "Main",
+   "app": "hashcat"
+  },
+  {
+   "bucket": "Main",
+   "app": "multipass"
+  },
+  {
+   "bucket": "Main",
+   "app": "passbolt-cli"
+  },
+  {
+   "bucket": "Main",
+   "app": "proton-pass-cli"
+  },
+  {
+   "bucket": "Main",
+   "app": "rainbow"
+  },
+  {
+   "bucket": "Main",
+   "app": "sshpass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "aircrack-ng"
+  },
+  {
+   "bucket": "Extras",
+   "app": "authpass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "enpass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "jpass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keeagent"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keeanywhere"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keeautoexec"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keepasshttp"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keepassnatmsg"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keepassrpc"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keetheme"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-keetraytotp"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-kpenhentryview"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-readable-passphrase"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-sequencer"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-webautotype"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass-plugin-yafd"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "keepassxc"
+  },
+  {
+   "bucket": "Extras",
+   "app": "mongodb-compass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "nordpass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "pass-winmenu-nogpg"
+  },
+  {
+   "bucket": "Extras",
+   "app": "proton-pass"
+  },
+  {
+   "bucket": "Extras",
+   "app": "serial-cloner"
+  },
+  {
+   "bucket": "Extras",
+   "app": "simplyserial"
+  },
+  {
+   "bucket": "Extras",
+   "app": "sniffnet"
+  },
+  {
+   "bucket": "Extras",
+   "app": "spacesniffer"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "bulletspassview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "chromepass"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "dialupass"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "dnsquerysniffer"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "extpassword"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "httpnetworksniffer"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "iepv"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "lostmypassword"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "madpassext"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "mailpv"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "mspass"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "netpass"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "operapassview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "passrec"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "passwordfox"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "passwordscan"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "previousfilesrecovery"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "produkey"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "pstpassword"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "routerpassview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "smsniff"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "sniffpass"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "socketsniff"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "vaultpasswordview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "vncpassview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "webbrowserbookmarksview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "webbrowserpassview"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "webcookiessniffer"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "websitesniffer"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "whoisconnectedsniffer"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "winmailpassrec"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "wirelesskeydump"
+  },
+  {
+   "bucket": "Nirsoft",
+   "app": "wirelesskeyview"
+  }
+ ]
+}

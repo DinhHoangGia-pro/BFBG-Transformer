@@ -151,8 +151,15 @@ def run_one(path, args, ctx):
             with open(result_path, 'rb') as f:
                 status, info = pickle.load(f)
         except (EOFError, FileNotFoundError, pickle.UnpicklingError):
-            return 'error', {'exception_type': 'ProcessCrash',
-                             'exception_message': f"tien trinh con thoat (exit code {proc.exitcode}) khong ghi ket qua",
+            # Chet TRUOC timeout khong ghi ket qua. exitcode -9 (SIGKILL) ma KHONG
+            # phai do timeout (nhanh nay la proc da chet, khong bi ta kill) -> gan
+            # nhu chac chan bi OOM-kill (kernel hoac systemd MemoryMax) -> tach khoi
+            # ProcessCrash (segfault/exit code khac) de theo doi rieng.
+            if proc.exitcode == -9:
+                etype, emsg = 'OOMKill', f"tien trinh con bi SIGKILL (exit -9) truoc timeout - gan nhu chac chan OOM (kernel/systemd MemoryMax)"
+            else:
+                etype, emsg = 'ProcessCrash', f"tien trinh con thoat (exit code {proc.exitcode}) khong ghi ket qua"
+            return 'error', {'exception_type': etype, 'exception_message': emsg,
                              'traceback_last_line': None, 'traceback_last_repo_line': None, 'traceback': None}
         info['seconds'] = round(time.monotonic() - start, 1)
         return status, info
