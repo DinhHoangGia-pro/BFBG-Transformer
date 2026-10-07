@@ -23,3 +23,10 @@ train-eligible non-ISO **195**, test_indist **+41**, holdout_source_nirsoft **20
 
 ## Trạng thái
 CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT khớp plan `7f33cfc2ef10e839529a8fe71210b6ff7950e5fa48fbedabac38adc6641c3667` (trừ mẫu rơi).
+
+## v2 manifest THẬT (sau build đợt 1, 2026-10-08)
+- **docs/dataset_v2_manifest.jsonl** = `4f438bcf0eca514dc220df7a520b321ee91ac587e61498e23e1c7c43cc2ef501` — 1886 dòng (v1 1637 bất biến + 249 benign đợt-1 built).
+- Build đợt 1: **249/273 OK**, rơi 24 (23 Timeout + 1 NotImplementedError) → loại khỏi split (luật mẫu-rơi).
+- Delta plan→built theo split: train_pool 195→175, test_indist 41→38, holdout_source_nirsoft 20→20, holdout_lowfreq_toolchain 17→16.
+- benign v2 = 504 (v1 255 + 249). **train benign 351, ISO 141 = 40% > 35% → cap ISO Ở LOADER vẫn binding** (subsample/inverse-weight lúc train).
+- Đây là manifest huấn luyện v2 chốt; **mọi thay đổi đánh giá sau đây = post-hoc**. CHƯA train BFBG.
