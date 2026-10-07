@@ -61,3 +61,13 @@ metadata — choco FPR **8.9%** [3.5,20.7], BumbleBee recall **53%**; graph — 
   - test: test_indist MSVC14 — malicious **40** / benign non-ISO **3**.
   - negative = benign MSVC14 non-ISO (loại ISO để bỏ confound một-nguồn).
   - ⚠️ **benign non-ISO MSVC14 quá ít (train 15 / test 3) → phân tích chính hiện UNDERPOWERED**; chỉ chạy được khi v2 bổ sung benign non-ISO MSVC14. Trước đó dùng phân tích phụ (train toàn bộ + reweight) làm tham chiếu, luôn báo kèm cảnh báo lực.
+
+## 10. Smoke train — chi tiet (2026-10)
+- **Chon 400 mau:** `random.seed(42)` shuffle `train_pool` (1091) → lấy 400 đầu (tái lập được). Batch 2, 3 epoch, GPU, global_features=0.
+- **Số hàm & tiêu chí CẮT:** cap `max_functions_per_sample` = 100 (smoke) → lấy **100 hàm đầu theo thứ tự addr** mỗi program; **318/400 (80%) bị cắt** (#func RAW med=744, p75=1753, max=28168). Mỗi hàm: chuỗi token-node cắt tại `max_len=512` trong TokenSequenceTransformer (max node/func med=360, max=71683). ⇒ phần lớn malware lớn **mất đa số hàm** ở cap 100 — cần cân nhắc cap cao hơn / lấy mẫu hàm khi train thật.
+- **Loss vs entropy prior:** smoke cuối = **0.281**; prior CE lệch-lớp (train_pool ~84% malicious) ≈ **0.44**, prior cân bằng = ln2 = **0.693**. 0.281 < cả hai → **học thật sự vượt prior** (không chỉ đoán lớp đa số).
+- **Batch size theo bộ nhớ:** batch **2** chạy ổn trong cap RAM 8G + GPU 8GB (RTX 2080). Yếu tố giới hạn = **padding của token transformer** (pad mọi hàm trong batch tới max node-count ≤512). Khuyến nghị batch 2–4 kèm cap max_funcs; batch lớn hơn nên **sort theo kích thước** hoặc giảm max_funcs để tránh OOM trên mẫu nhiều hàm lớn.
+
+## 11. Vocab & token mode (2026-10, ĐÓNG BĂNG)
+- **Chế độ token = INSTRUCTION (insn)**, khớp `configs/model.yaml: model.tokenizer_mode=insn` và token mà `bfbg_builder` ghi (vd `mov_reg_mem`). `data/vex_vocab.json` là **VEX-mode (cũ, 497 token) → gây UNK 100%** khi dùng cho node insn ⇒ **deprecated cho training**.
+- **Vocab training ĐÓNG BĂNG:** dựng từ `train_pool` bằng `src/training/build_vocab.py` → `data/insn_vocab_v2.json` (gitignore; tái tạo tất định từ split v1 đã khóa). **size = 1322**, **SHA256 = `af69e190e0c9eed0e39b8b30fc88238b6389fe5033222d4aa00c45c83f9d1bc8`**. Token phổ biến nhất: mov_reg_mem, mov_reg_reg, call_imm, push_reg, lea_reg_mem… `<UNK>`=0. Mọi train/eval BFBG dùng vocab này (không rebuild per-run).
