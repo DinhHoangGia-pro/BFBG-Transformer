@@ -78,3 +78,9 @@ Sau LOFO: ngưỡng OOB@5% không ổn định giữa fold (Emotet thr bão hòa
 - **FPR@ngưỡng-OOB là CHỈ SỐ PHỤ**, chỉ đọc **tương đối giữa các mô hình trên cùng fold/cùng ngưỡng**, không coi là tuyệt đối (artifact bão hòa).
 - Phụ trợ: **recall@FPR cố định {1,5,10}%** trên benign holdout của fold (threshold-free theo nghĩa quét FPR).
 - Baseline graph hiện tại (AUC vs choco): Emotet 0.81 (yếu nhất) → Dridex 0.94; BFBG phải **vượt AUC-vs-choco của graph trên fold yếu (Emotet/IcedID)**, không chỉ in-dist.
+
+## 13. Subsample ISO ở loader (v2, 2026-10-08)
+v2 train benign = 351 (ISO 141 = 40% > cap 35%). **Cap ÁP Ở LOADER, không sửa manifest:**
+- Mỗi epoch: giữ **K=113 ISO** (để K/(non_ISO 210 + K) ≤ 0.35), **drop 28 ISO** còn lại.
+- **Seed cố định** cho phép chọn: `random.Random(20261008 + epoch)` (tái lập, nhưng đổi tập drop mỗi epoch để không bỏ hẳn 28 mẫu). Tùy chọn thay bằng **inverse-weight** nguồn (ISO weight = 113/141) nếu không muốn drop.
+- Số thật tính từ v2 manifest `e2e2c67a` (không ước lượng). Non-ISO train = 210; MSVC≤10 train 55.

@@ -30,3 +30,11 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 - Delta plan→built theo split: train_pool 195→175, test_indist 41→38, holdout_source_nirsoft 20→20, holdout_lowfreq_toolchain 17→16.
 - benign v2 = 504 (v1 255 + 249). **train benign 351, ISO 141 = 40% > 35% → cap ISO Ở LOADER vẫn binding** (subsample/inverse-weight lúc train).
 - Đây là manifest huấn luyện v2 chốt; **mọi thay đổi đánh giá sau đây = post-hoc**. CHƯA train BFBG.
+
+## Cập nhật 2026-10-08 (app provenance + ISO cap + xác nhận)
+- **v2 manifest (thêm orig_name cho 249 benign):** SHA256 `e2e2c67adcf236cd87fe1cdd752e5e776c5069cd69fec11b34a26ceab25350c9` (thay `4f438bcf…`). TRAINING_DESIGN.md SHA256 `2eb3467ce7ab4a7cddd885ab486dd38d4749d090b36458abd3e1481ff0c7e4ca`.
+- **24 mẫu rơi:** toàn scoop (NirSoft 0 rơi); bin MSVC14 13/khác 4/GNU 4/Go 2/MSVC≤10 1; 22 Timeout + 2 NotImplementedError.
+- **Cap GNU/Go/Rust:** 34/351 train benign = 9.7% ≤10% (còn đúng sau rơi).
+- **holdout_nirsoft:** 20 mẫu, phân loại theo NGUỒN; **1 mẫu trùng pilot NirSoft** (pilot chỉ exploratory → không rò rỉ train; GIỮ NGUYÊN holdout theo lệnh, ghi nhận caveat).
+- **ISO cap @loader:** giữ 113/141 ISO (seed 20261008+epoch), drop 28 — xem TRAINING_DESIGN §13.
+- **app provenance:** orig_name (app/base) đã lưu cho benign mới; mẫu v1 không có (giữ nguyên v1).
