@@ -71,3 +71,10 @@ metadata — choco FPR **8.9%** [3.5,20.7], BumbleBee recall **53%**; graph — 
 ## 11. Vocab & token mode (2026-10, ĐÓNG BĂNG)
 - **Chế độ token = INSTRUCTION (insn)**, khớp `configs/model.yaml: model.tokenizer_mode=insn` và token mà `bfbg_builder` ghi (vd `mov_reg_mem`). `data/vex_vocab.json` là **VEX-mode (cũ, 497 token) → gây UNK 100%** khi dùng cho node insn ⇒ **deprecated cho training**.
 - **Vocab training ĐÓNG BĂNG:** dựng từ `train_pool` bằng `src/training/build_vocab.py` → `data/insn_vocab_v2.json` (gitignore; tái tạo tất định từ split v1 đã khóa). **size = 1322**, **SHA256 = `af69e190e0c9eed0e39b8b30fc88238b6389fe5033222d4aa00c45c83f9d1bc8`**. Token phổ biến nhất: mov_reg_mem, mov_reg_reg, call_imm, push_reg, lea_reg_mem… `<UNK>`=0. Mọi train/eval BFBG dùng vocab này (không rebuild per-run).
+
+## 12. Metric chính = AUC threshold-free (bản sửa lần 2, 2026-10)
+Sau LOFO: ngưỡng OOB@5% không ổn định giữa fold (Emotet thr bão hòa 1.0 → FPR_choco 0% giả, recall≈0). ⇒
+- **Tiêu chí CHÍNH = AUC threshold-free** (family giữ-lại vs benign holdout), kèm cluster-bootstrap CI. Báo riêng AUC vs choco, vs NirSoft-dư (khi có), vs test_indist (n=34, ghi rõ n nhỏ).
+- **FPR@ngưỡng-OOB là CHỈ SỐ PHỤ**, chỉ đọc **tương đối giữa các mô hình trên cùng fold/cùng ngưỡng**, không coi là tuyệt đối (artifact bão hòa).
+- Phụ trợ: **recall@FPR cố định {1,5,10}%** trên benign holdout của fold (threshold-free theo nghĩa quét FPR).
+- Baseline graph hiện tại (AUC vs choco): Emotet 0.81 (yếu nhất) → Dridex 0.94; BFBG phải **vượt AUC-vs-choco của graph trên fold yếu (Emotet/IcedID)**, không chỉ in-dist.

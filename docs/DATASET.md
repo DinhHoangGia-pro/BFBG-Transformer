@@ -167,3 +167,12 @@ Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `n
 - **(a) Hạn chế bin MSVC≤10 benign:** benign MSVC≤10 **TRAIN-eligible chỉ = 13** (7-zip 11, ffmpeg 1, git 1; đã trừ holdout_choco + test_indist). Quá ít → **kết quả trên bin MSVC≤10 chỉ báo cáo KÈM khoảng tin cậy (cluster-bootstrap), đánh dấu "underpowered"**, không rút kết luận mạnh cho tới khi v2 bổ sung.
 - **(b) Stratum phân tích chính:** **malicious MSVC14 (n=565) vs benign MSVC14 non-ISO (n=42)** — tránh confound ISO (ISO = 165 MSVC14, một nguồn). Đây là so sánh "cùng toolchain, khác nguồn benign" có n đủ dùng (dù benign non-ISO n=42 vẫn nhỏ → kèm CI).
 - **(c) Cross-family:** toolchain ≈ proxy family (Dridex≡MSVC10, BumbleBee/IcedID≡MSVC14) → một holdout family duy nhất lẫn với cross-toolchain. **Nên dùng leave-one-family-out (LOFO) 5 family** thay cho chỉ holdout BumbleBee, báo 5 kết quả để tách tín hiệu family khỏi toolchain.
+
+## Quy tắc gán split v2 (khóa TRƯỚC khi chạy BFBG trên v2, 2026-10)
+Áp khi hợp nhất benign đợt-1 vào dataset → v2 (v1 GIỮ NGUYÊN, không sửa):
+- **Dedup vs TOÀN BỘ mẫu hiện có:** `ppdeep==100` HOẶC trùng `sha256` → **LOẠI** (không vào v2). `90≤ppdeep<100` → **KẾ THỪA split** của mẫu khớp (giữ ràng buộc cụm).
+- **Seed & thứ tự:** seed=20261008 (seed của batch1_manifest); gán ở mức **cụm near-dup**; thứ tự xử lý: Scoop(Main→Extras) rồi NirSoft (xác định, tái lập).
+- **NirSoft vào TRAIN có cap:** NirSoft ≤35% của bin MSVC≤10 train; **phần dư → holdout nguồn thứ HAI** (song song holdout_source_chocolatey), chỉ dùng đo FPR chéo-nguồn.
+- **Benign mới chia:** group-aware — phần lớn vào train_pool bin tương ứng; trích ~15% (theo cụm) bổ sung test_indist để tăng mẫu âm (đặc biệt MSVC≤10).
+- **dual-use (sniffer/recovery)** → tập **stress riêng** (chỉ FPR), KHÔNG vào train/test/holdout chính; nhãn chưa xác minh.
+- **v1 bất biến:** mọi mẫu/split v1 giữ nguyên; v2 = v1 + benign mới (+ manifest/hash mới).
