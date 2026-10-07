@@ -84,3 +84,26 @@ Hiện **255 mẫu JSON dùng được** (native, ≤12MB), từ 3 nhóm nguồn
 - **Selection effect tỉ lệ Timeout:** benign **14 Timeout** (ISO 12 + choco 2, trên 228 lần thử ≈ 6,1%) cao hơn hẳn malicious (**4 Timeout thật**, 6 lần chạm thô trên 1.416 ≈ 0,4%). Nguyên nhân đã biết: DLL hệ thống Windows và dev-tool thường là binary **rất nhiều hàm** (vd DLL System32 14.250 hàm) → CFGFast dễ vượt budget hơn malware banking vốn nhỏ gọn. Đây là thiên lệch chọn mẫu cần lưu ý khi so tỉ lệ build giữa hai lớp.
 
 SOREL-20M đã khảo sát và **loại**: binaries là malware đã "disarmed" (trường Machine = 0, angr không nạp được) và không có benign binaries. Benign (255) vẫn **mất cân bằng** so với malicious (1.382 thô / 708 khác biệt) — tiếp tục mở rộng.
+
+## Dataset v1 — đóng băng held-out (2026-10-07)
+
+Snapshot đóng băng để mọi thí nghiệm dùng chung một split. Manifest: `docs/dataset_v1_manifest.jsonl` (1.637 dòng, mỗi mẫu: `sha256, label, source, num_functions, cluster, split`). **Hash đóng băng:** `sha256 = 2c2aa06467b69187b42ec8cf394aa9668d449e2f59302813d3d250b67d1e27c6` — kiểm tra bằng `sha256sum docs/dataset_v1_manifest.jsonl`; nếu lệch nghĩa là dataset đã đổi và split không còn hợp lệ.
+
+### Quy mô theo split
+
+| split | malicious | benign | tổng |
+|---|---|---|---|
+| train_pool | 915 | 176 | 1.091 |
+| test_indist | 205 | 34 | 239 |
+| holdout_family_bumblebee | 262 | 0 | 262 |
+| holdout_source_chocolatey | 0 | 45 | 45 |
+| **tổng** | **1.382** | **255** | **1.637** |
+
+### Định nghĩa held-out (Dual, đã chốt)
+
+- **holdout_family_bumblebee** — toàn bộ malicious family **BumbleBee** (262), giữ hoàn toàn ngoài train. Đây là **thí nghiệm cross-family lõi**: train trên TrickBot+Emotet+Dridex+IcedID, đo khả năng bắt một loader family chưa từng thấy.
+- **holdout_source_chocolatey** — toàn bộ benign nguồn **Chocolatey** (45, 28 vendor non-Microsoft), giữ ngoài train. Đo **generalization chéo nguồn benign** (chống rủi ro "học Microsoft thay vì học nhãn" do ISO chiếm 65%).
+- **test_indist** — ~15% phần còn lại, **cluster-aware** (cụm near-dup luôn cùng phía) + stratified theo family/nguồn (malicious 205 ≈ 18%, benign 34 ≈ 16% sau khi làm tròn theo cụm). Đo in-distribution.
+- **train_pool** — phần còn lại (1.091); val tách ra từ đây khi train, KHÔNG đụng vào 3 split trên.
+
+**Bất biến:** split gán ở mức **cụm near-dup** (field `cluster`), không bao giờ tách một cụm qua hai split. `holdout_*` đóng băng theo family/nguồn; `test_indist` sinh với seed 42 (xem `make_v1.py`). Mọi mở rộng dataset (Bậc 1/2) sẽ tạo **v2 mới**, KHÔNG sửa v1 — để kết quả v1 tái lập được.
