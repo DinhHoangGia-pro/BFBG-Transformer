@@ -28,8 +28,9 @@ class BFBGDataset(torch.utils.data.Dataset):
             ed = [(a, b) for a, b in ed if a < len(nodes) and b < len(nodes)]
             ei = torch.tensor(ed, dtype=torch.long).t().contiguous() if ed else torch.zeros((2, 0), dtype=torch.long)
             func_data.append(Data(x=x, edge_index=ei, num_nodes=len(nodes)))
-            sp = [(a, b) for a, b in (g.get('seed_edges') or []) if a < len(nodes) and b < len(nodes)]
-            seed_list.append(torch.tensor(sp, dtype=torch.long).t().contiguous() if sp else torch.zeros((2, 0), dtype=torch.long))
+            sp = [[e['src_idx'], e['dst_idx']] for e in (g.get('seed_edges') or [])
+                  if e.get('src_idx') is not None and e['src_idx'] < len(nodes) and e['dst_idx'] < len(nodes)]
+            seed_list.append(sp)   # list cac cap [i,j] (semantic_link_loss duyet tung cap)
         inter = (d.get('inter_procedural_call_graph') or {}).get('edges') or []
         inter = [(a, b) for a, b in inter if a < nf and b < nf]
         inter_ei = torch.tensor(inter, dtype=torch.long).t().contiguous() if inter else torch.zeros((2, 0), dtype=torch.long)

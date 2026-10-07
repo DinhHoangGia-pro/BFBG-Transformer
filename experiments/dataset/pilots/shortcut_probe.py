@@ -5,7 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 d = pickle.load(open(os.path.expanduser("~/bfbg_benign_work/smoke_emb.pkl"), "rb"))
 emb = np.array(d["emb"], float); metas = d["metas"]
-recs = {json.loads(l)["sha256"]: json.loads(l) for l in open(os.path.expanduser("~/bfbg_benign_work/records.jsonl"))}
+recs = {json.loads(l)["sha"]: json.loads(l) for l in open(os.path.expanduser("~/bfbg_benign_work/records.jsonl"))}
 def reclass(x):
     s=set(x["secs"]); lk=x["lk"]; rich=x["rich"]
     if ".buildid" in s or ".symtab" in s: return "Go"

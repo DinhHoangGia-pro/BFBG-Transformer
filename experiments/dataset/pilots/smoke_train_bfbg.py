@@ -34,7 +34,7 @@ for i in range(10):
         tot += fd.x.numel(); unk += int((fd.x == 0).sum())
 print("UNK rate (10 mau, insn-vocab): %d/%d = %.1f%%" % (unk, tot, unk/max(tot,1)*100), flush=True)
 
-dl = DataLoader(ds, batch_size=2, shuffle=True, num_workers=2, collate_fn=collate)
+dl = DataLoader(ds, batch_size=2, shuffle=True, num_workers=0, collate_fn=collate)
 mcfg = load_config("model")
 model = BFBGTransformer.from_config(vsz, num_global_features=0).to(dev)
 lr = mcfg["training"]["learning_rate"]; lam = mcfg["semantic"]["lambda_sem"]
@@ -63,7 +63,7 @@ cap = {}
 def hook(m, inp): cap["v"] = inp[0].detach().cpu()
 h = model.fc1.register_forward_pre_hook(hook)
 model.eval(); emb = []; metas = []
-dl2 = DataLoader(ds, batch_size=2, shuffle=False, num_workers=2, collate_fn=collate)
+dl2 = DataLoader(ds, batch_size=2, shuffle=False, num_workers=0, collate_fn=collate)
 with torch.no_grad():
     for batch in dl2:
         if batch is None: continue
