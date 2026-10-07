@@ -183,3 +183,9 @@ Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `n
 - **(b) Cap ISO ≤35% benign train v2:** ISO (Microsoft, một nguồn) áp **cùng cap vendor ≤35%** như NirSoft, để train benign không bị một nguồn chi phối (v1 ISO ~80% train benign — phải kéo xuống ở v2).
 - **(c) Dedup 90-99 kế thừa split TRỪ khi mẫu khớp thuộc holdout:** `90≤ppdeep<100` bình thường kế thừa split của mẫu khớp; NHƯNG nếu mẫu khớp nằm trong **holdout** (choco/NirSoft/bumblebee) → **LOẠI mẫu mới** (không để near-dup của holdout lọt vào train/test → rò rỉ).
 - **(d) Manifest v2 sinh bằng SCRIPT + commit hash:** v2 manifest/split tạo bằng script tất định (như `make_v1.py`), ghi **SHA256 vào docs và commit TRƯỚC khi chạy BFBG** trên v2.
+
+## Làm rõ 2 (2026-10): Emotet, cap ISO, within-bin, NirSoft
+- **Emotet (sửa):** fold yếu nhất (AUC-vs-choco graph 0.81) nhưng **NGUYÊN NHÂN CHƯA RÕ** — ablation bỏ từng scalar giữ AUC 0.78-0.87 (bỏ file_size còn tăng 0.869), không scalar đơn nào giải thích; phân phối Emotet phổ rộng, chồng lấn TrickBot/IcedID. (Bỏ các lập luận "profile tách bạch" và "packed" trước đó.)
+- **Within-MSVC14:** malicious-MSVC14 vs choco-MSVC14 (n=21), AUC metadata-full 0.980 ≈ graph 0.988 (hiệu paired −0.008 [−0.060,+0.022], CI chứa 0 → **không khác biệt trong cùng bin**). ⇒ lợi thế metadata cross-source là toolchain fingerprint, không phải tín hiệu malware tốt hơn.
+- **Cap ISO ≤35% train v2 — số học:** v1 train benign = 176 (ISO 141, non-ISO **35**). Sau đợt 1 (benign mới đều non-ISO, ~150 dùng được) → non-ISO ≈ 185 → để ISO ≤35% tổng thì **ISO train ≤ ~100**, tức **~41 ISO bị đẩy KHỎI train**. ISO dư KHÔNG bỏ đi → chuyển sang **test_indist** (tăng mẫu âm MSVC14 in-dist, đang thiếu) và/hoặc **holdout-ISO** (đo FPR nguồn Microsoft); ghi rõ khi sinh split v2.
+- **NirSoft trong mọi bảng AUC:** đánh dấu **"chưa có (v1)"** — NirSoft chỉ ở pilot, chưa vào v1; cột AUC-vs-NirSoft chỉ có từ v2.
