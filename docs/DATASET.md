@@ -120,7 +120,7 @@ Snapshot đóng băng để mọi thí nghiệm dùng chung một split. Manifes
 Dựa trên probe Phần A + Task 2-5 (2026-10-07). **KHÔNG sửa dataset v1/manifest/split**; v2 là tập mới, chỉ bắt đầu khi plan này được duyệt.
 
 ### Mục tiêu theo toolchain-bin (đủ benign non-Microsoft ở MỖI bin, không "khớp %")
-Probe cho thấy benign-train hiện ~MSVC14 (ISO) trong khi malware trải rộng, tập trung **MSVC≤10 (680/1382 ≈ 49%)**. Mục tiêu v2 **KHÔNG** phải ép khớp đúng tỉ lệ % của malware, mà là: **mỗi bin lớn có đủ benign non-Microsoft ở CẢ train lẫn test** (đề xuất **≥150/bin** — con số đề xuất, chốt sau), rồi **reweight theo bin ở dataset loader** để cân bằng. Báo cáo thu thập v2 **theo từng bin** (yield + đếm cuối mỗi bin), không chỉ tổng.
+Probe cho thấy benign-train hiện ~MSVC14 (ISO) trong khi malware trải rộng, tập trung **MSVC≤10 (680/1382 ≈ 49%)**. Mục tiêu v2 **KHÔNG** phải ép khớp đúng tỉ lệ % của malware, mà là: **mỗi bin lớn có tổng ≥N benign non-Microsoft** (đề xuất **N≥150/bin**, chốt sau) **chia được cho CẢ train lẫn test qua group-aware cross-validation** (CV theo cụm near-dup + vendor, không chia ngẫu nhiên từng mẫu), rồi **reweight theo bin ở loader**. **LƯU Ý:** `test_indist` 15% của v1 (chỉ 34 benign) **KHÔNG** đủ cho 150/bin ở test — v2 phải hoặc tăng benign tổng để 15% test đạt ngưỡng mỗi bin, hoặc dùng group-aware CV k-fold thay cho một test_indist cố định. Báo cáo thu thập v2 **theo từng bin** (yield + đếm cuối mỗi bin), không chỉ tổng.
 
 | toolchain-bin | benign v1 hiện có | nguồn phù hợp (đã loại Scoop GNU khỏi bin ≤10) |
 |---|---|---|
@@ -135,7 +135,7 @@ Probe cho thấy benign-train hiện ~MSVC14 (ISO) trong khi malware trải rộ
 ### Quy tắc dedup & gán holdout (bắt buộc)
 - **`ppdeep = 100` HOẶC trùng sha256** với một mẫu **holdout** (hoặc mẫu đã fail/không-JSON) → **LOẠI** (không đưa vào bất kỳ split). *(Pilot Scoop: fd/graphviz/nasm/putty/ripgrep/upx trùng khít holdout_chocolatey; wget trùng sha mẫu đã fail → đều LOẠI.)*
 - **`90 ≤ ppdeep < 100`** với một mẫu hiện có → **kế thừa split** của mẫu đó (giữ ràng buộc cụm near-dup; nếu mẫu đó ở holdout thì mẫu mới cũng vào holdout, không train).
-- **Cap ≤3 payload/app** và **cap theo vendor** (tránh một vendor/nguồn chiếm ưu thế như ISO-65% ở v1). Ưu tiên exe chính (bỏ DLL bundle phụ của bên thứ ba).
+- **Cap ≤3 payload/app** và **cap vendor THEO BIN: đề xuất ≤35% mỗi bin cho một vendor** (con số đề xuất, chốt sau) — tránh một vendor chiếm ưu thế TRONG bin (vd NirSoft một mình phủ bin MSVC≤10 sẽ lặp confound kiểu ISO-65% ở v1, nhưng ở cấp bin). Ưu tiên exe chính (bỏ DLL bundle phụ của bên thứ ba).
 
 ### Nguồn (ngoài Chocolatey — đã là holdout)
 - **Scoop** (0 .NET, phủ nhiều toolchain) — nhưng cho **bin GNU/Go/Rust** và (qua Versions) bin MSVC cũ; dedup chống trùng holdout.
@@ -152,3 +152,12 @@ Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `n
 - **Classifier toolchain:** kiểm chứng 30 mẫu phân tầng (heuristic vs ground-truth bằng chuỗi compiler/section/CRT) → **24/30 đúng (80%)**. **Nhãn "Rust?" (heuristic bcrypt+api-ms-crt) sai 4/4 (100%) → ĐÃ BỎ** (fold vào MSVC14; chỉ nhận Rust khi có chuỗi `rustc`). Lỗi phụ: luật GNU quá rộng gọi nhầm 2 MSVC≤10 (upx/busybox import msvcrt) → bộ đã kiểm chỉ gọi GNU khi có `.eh_frame`/chuỗi GCC/mingw-dll. Dùng bộ đã kiểm cho binning v2. Code: `experiments/dataset/pilots/validate_tc.py`.
 - **Pilot ngẫu nhiên (seed 20261007, `pilot_random.py`):** Scoop Main 25 → yield **11/25 (44%)** (so với 86% chọn tay → **không ngoại suy được**), đa dạng toolchain (MSVC14/≤10/Go/GNU/Rust). Nirsoft 25 → yield **23/25 (92%), toolchain 100% MSVC≤10 (linker 6-8)**, native, 0 near-dup, 0 timeout.
 - **Hệ quả nguồn:** Nirsoft là nguồn lý tưởng cho **bin MSVC≤10** đang thiếu, NHƯNG là **một vendor duy nhất** (Nir Sofer) → áp **cap theo vendor** mạnh để không lặp confound kiểu ISO-65%. Scoop Main (random) bổ sung đa vendor nhưng yield thấp (44%) và lẫn Go/Rust (→ bin GNU/Go/Rust riêng, cap ≤10%).
+
+### Bổ sung v2 (c–e, 2026-10-07)
+- **(c) Tập dual-use "stress" riêng — CHỈ báo FPR, KHÔNG train.** Các tool mạng/sniffer/recovery (bị regex loại khỏi benign thường, xem danh sách ở `pilot_random.py`) gom thành một tập stress riêng để **đo FPR** (model có coi tiện ích hệ thống hợp pháp là malicious không), **không đưa vào train/test chính**. **Ghi chú:** nhãn "benign" của tập này **chưa xác minh được** (dual-use: thật sự lành tính hay bị lạm dụng tùy ngữ cảnh) → chỉ dùng như phép thử FPR, không coi là ground-truth benign.
+- **(d) Mẫu số các con số toolchain:**
+  - **680** = số malware phân loại **MSVC≤10 bằng heuristic header** (Rich/linker, bảng Task 2) trên **mẫu số 1.382 malware v1** → 680/1.382 ≈ 49%.
+  - **728** = số malware có **linker major ≤10 (đọc trực tiếp pefile, proxy nhanh)**, dùng làm nhóm so phân phối num_functions/num_api_calls (Task 1-2), cũng trên **1.382 malware v1**. Chênh 680 vs 728 do hai cách xác định (heuristic đa-tín-hiệu vs chỉ linker major); cả hai là xấp xỉ bin MSVC≤10, không phải con số chính xác tuyệt đối.
+- **(e) Giấy phép nguồn benign đã pilot:**
+  - **NirSoft:** **freeware, đóng mã (proprietary)**; mỗi tool một giấy phép freeware riêng, **nhiều tool CẤM phân phối lại** (redistribute) nếu không xin phép. ⇒ chỉ dùng **cục bộ cho nghiên cứu**, **KHÔNG commit/redistribute** binary (đã gitignore `data/`). Là **một vendor duy nhất** → ràng buộc cap-vendor-theo-bin ở trên.
+  - **Scoop:** bản thân manifest/manager là Unlicense/MIT; **app bên trong mang giấy phép riêng** (hỗn hợp OSS như MIT/GPL/Apache + vài freeware). Manifest Scoop có field `license` (đọc được khi thu thập) → ghi provenance giấy phép theo từng app. Payload lấy ra cũng **không redistribute** (gitignore).
