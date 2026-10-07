@@ -114,3 +114,34 @@ Snapshot đóng băng để mọi thí nghiệm dùng chung một split. Manifes
 - **Hai holdout là MỘT CHIỀU (one-way).** `holdout_family_bumblebee` chỉ có malicious (262, 0 benign) → chỉ đo được **recall/TPR**; `holdout_source_chocolatey` chỉ có benign (45, 0 malicious) → chỉ đo được **FPR/specificity**. Khi đánh giá phải **ghép mẫu âm/dương từ `test_indist`** của nhãn đối diện (vd recall BumbleBee dùng benign test_indist làm âm; FPR Chocolatey dùng malicious test_indist làm dương). **Hạn chế:** mẫu ghép không cùng phân phối với holdout (benign test_indist ≠ benign Chocolatey; malicious test_indist ≠ BumbleBee), nên điểm tuyệt đối chỉ tham khảo; dùng để so sánh tương đối giữa các mô hình trên cùng cách ghép.
 - **test_indist chỉ có 34 benign** (vs 205 malicious) → ước lượng FPR/specificity in-distribution có sai số lớn. v2 phải tăng benign để test_indist có đủ mẫu âm.
 - **Confound metadata (probe Phần A, 2026-10-07).** Classifier CHỈ-metadata (linker, compile-year, entropy, …) đạt **AUC = 1.000** trên test_indist nhưng **FPR 53% trên holdout_chocolatey** (Wilson95 [39%,67%]) → tách lớp in-distribution là **confound nguồn/thời điểm**, KHÔNG generalize. Hệ quả: (1) mọi đánh giá BFBG phải báo kèm holdout chéo-nguồn để phát hiện mô hình ăn gian theo metadata; (2) BFBG dùng VEX token + call graph (không nhận các header này), nhưng vẫn cần kiểm tra nó không gián tiếp học entropy/size. Số liệu thô trong lịch sử phiên; tái lập bằng probe metadata trên manifest v1.
+
+## Kế hoạch v2 benign (chưa thực hiện — v1 giữ nguyên, không sửa)
+
+Dựa trên probe Phần A + Task 2-5 (2026-10-07). **KHÔNG sửa dataset v1/manifest/split**; v2 là tập mới, chỉ bắt đầu khi plan này được duyệt.
+
+### Mục tiêu theo toolchain-bin (khớp phân phối malware để triệt confound)
+Probe cho thấy benign-train hiện ~MSVC14 (ISO) trong khi malware tập trung **MSVC≤10 (680/1382 ≈ 49%)**. Benign v2 phải **mô phỏng phân phối toolchain của malware** để model không tách lớp bằng toolchain:
+
+| toolchain-bin | % malware (mục tiêu benign) | benign v1 hiện có | nguồn pilot phù hợp |
+|---|---|---|---|
+| MSVC≤10 | ~49% | ~rất ít (ISO toàn v14) | **Scoop GNU/MinGW (<12)**, PA app cũ (IrfanView v8), old GitHub tags |
+| MSVC 14 | ~41% | nhiều (ISO 159) | GitHub OSS release (có ký), đã dư |
+| MSVC 11-12 | ~5% | ~0 | GitHub tag 2012-2015, Scoop Versions |
+| GNU/MinGW | ~1-3% | ít | Scoop (busybox/gawk/make/jq…) |
+| Delphi / Go / khác | nhỏ | ~0 | HeidiSQL/IssRC (Delphi), Go CLI |
+
+Báo cáo thu thập v2 **theo từng bin** (yield + đếm cuối mỗi bin), không chỉ tổng.
+
+### Quy tắc dedup & gán holdout (bắt buộc)
+- Mẫu v2 có **`ppdeep.compare ≥ 90`** với **bất kỳ** mẫu hiện có → gán **CÙNG split** với mẫu đó (giữ ràng buộc cụm near-dup). Đặc biệt: trùng một mẫu `holdout_source_chocolatey` → **bắt buộc vào holdout**, KHÔNG vào train (giữ tính một-chiều của holdout). *(Pilot Scoop: 6/19 trùng đúng holdout_chocolatey — fd/graphviz/nasm/putty/ripgrep/upx; nếu thu thật phải route chúng vào holdout, không train.)*
+- Mẫu trùng một mẫu **đã fail lift / không có JSON** (vd wget ↔ 6136e66e) → loại, không đưa vào bất kỳ split.
+- **Cap ≤3 payload/app** và **cap theo vendor** (tránh một vendor/nguồn chiếm ưu thế như ISO-65% ở v1). Ưu tiên exe chính (bỏ DLL bundle phụ của bên thứ ba).
+
+### Nguồn (ngoài Chocolatey — đã là holdout)
+- **Scoop** (yield 86%, 0 .NET, phủ <12) — chủ lực cho bin thấp; dedup chống trùng holdout_chocolatey.
+- **GitHub Releases OSS MSVC** (có ký, nhưng ~toàn MSVC14) — cho bin MSVC14.
+- **PortableApps.com** (có ký, có app cũ <12, 0 trùng) — bổ sung; cần trích URL tốt hơn (yield tự động thấp).
+- Lưu timeout: Rust/Go static + app nhiều hàm cần `--timeout 900` (pilot timeout@300 rớt fd/ripgrep).
+
+### global_features trong classification head — CHƯA định nghĩa
+Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `num_global_features=4`, nhưng loader `src/training/` chưa viết và Eq.16 chỉ nêu **2** đặc trưng (entropy toàn cục, has_any_external_call). **Khuyến nghị: BỎ global_features khỏi head** (`num_global_features=0`) để không nạp entropy vào head — vì probe Phần A cho thấy entropy/size là confound nguồn (AUC metadata=1.0, FPR choco 53%; Task 2 bỏ entropy+packed giảm FPR 18→9%). Giữ entropy **chỉ như một ablation** riêng, không phải input mặc định. Chốt khi viết loader.
