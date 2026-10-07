@@ -119,29 +119,36 @@ Snapshot đóng băng để mọi thí nghiệm dùng chung một split. Manifes
 
 Dựa trên probe Phần A + Task 2-5 (2026-10-07). **KHÔNG sửa dataset v1/manifest/split**; v2 là tập mới, chỉ bắt đầu khi plan này được duyệt.
 
-### Mục tiêu theo toolchain-bin (khớp phân phối malware để triệt confound)
-Probe cho thấy benign-train hiện ~MSVC14 (ISO) trong khi malware tập trung **MSVC≤10 (680/1382 ≈ 49%)**. Benign v2 phải **mô phỏng phân phối toolchain của malware** để model không tách lớp bằng toolchain:
+### Mục tiêu theo toolchain-bin (đủ benign non-Microsoft ở MỖI bin, không "khớp %")
+Probe cho thấy benign-train hiện ~MSVC14 (ISO) trong khi malware trải rộng, tập trung **MSVC≤10 (680/1382 ≈ 49%)**. Mục tiêu v2 **KHÔNG** phải ép khớp đúng tỉ lệ % của malware, mà là: **mỗi bin lớn có đủ benign non-Microsoft ở CẢ train lẫn test** (đề xuất **≥150/bin** — con số đề xuất, chốt sau), rồi **reweight theo bin ở dataset loader** để cân bằng. Báo cáo thu thập v2 **theo từng bin** (yield + đếm cuối mỗi bin), không chỉ tổng.
 
-| toolchain-bin | % malware (mục tiêu benign) | benign v1 hiện có | nguồn pilot phù hợp |
-|---|---|---|---|
-| MSVC≤10 | ~49% | ~rất ít (ISO toàn v14) | **Scoop GNU/MinGW (<12)**, PA app cũ (IrfanView v8), old GitHub tags |
-| MSVC 14 | ~41% | nhiều (ISO 159) | GitHub OSS release (có ký), đã dư |
-| MSVC 11-12 | ~5% | ~0 | GitHub tag 2012-2015, Scoop Versions |
-| GNU/MinGW | ~1-3% | ít | Scoop (busybox/gawk/make/jq…) |
-| Delphi / Go / khác | nhỏ | ~0 | HeidiSQL/IssRC (Delphi), Go CLI |
+| toolchain-bin | benign v1 hiện có | nguồn phù hợp (đã loại Scoop GNU khỏi bin ≤10) |
+|---|---|---|
+| MSVC≤10 (bin lớn) | ~rất ít (ISO toàn v14) | PA app cũ (IrfanView v8), old GitHub release tags (2008-2012), Scoop **Versions** (bản cũ) |
+| MSVC 14 (bin lớn) | nhiều (ISO 159) | GitHub OSS release (có ký), đã dư |
+| MSVC 11-12 | ~0 | GitHub tag 2012-2015, Scoop Versions |
+| **GNU/MinGW/Go/Rust (bin RIÊNG)** | ít | Scoop (busybox/gawk/make/jq…), Go/Rust CLI |
+| Delphi / khác | ~0 | HeidiSQL/IssRC (Delphi) |
 
-Báo cáo thu thập v2 **theo từng bin** (yield + đếm cuối mỗi bin), không chỉ tổng.
+**GNU/MinGW/Go/Rust là một bin RIÊNG, KHÔNG dùng để lấp bin MSVC≤10** (toolchain khác hẳn về cấu trúc PE/CRT). Malware chỉ có **18 mẫu GNU** (và ~0 Go/Rust tin cậy) → **cap bin GNU/Go/Rust ở ≤10% tổng benign** để không tạo confound ngược (benign toàn GNU trong khi malware toàn MSVC).
 
 ### Quy tắc dedup & gán holdout (bắt buộc)
-- Mẫu v2 có **`ppdeep.compare ≥ 90`** với **bất kỳ** mẫu hiện có → gán **CÙNG split** với mẫu đó (giữ ràng buộc cụm near-dup). Đặc biệt: trùng một mẫu `holdout_source_chocolatey` → **bắt buộc vào holdout**, KHÔNG vào train (giữ tính một-chiều của holdout). *(Pilot Scoop: 6/19 trùng đúng holdout_chocolatey — fd/graphviz/nasm/putty/ripgrep/upx; nếu thu thật phải route chúng vào holdout, không train.)*
-- Mẫu trùng một mẫu **đã fail lift / không có JSON** (vd wget ↔ 6136e66e) → loại, không đưa vào bất kỳ split.
+- **`ppdeep = 100` HOẶC trùng sha256** với một mẫu **holdout** (hoặc mẫu đã fail/không-JSON) → **LOẠI** (không đưa vào bất kỳ split). *(Pilot Scoop: fd/graphviz/nasm/putty/ripgrep/upx trùng khít holdout_chocolatey; wget trùng sha mẫu đã fail → đều LOẠI.)*
+- **`90 ≤ ppdeep < 100`** với một mẫu hiện có → **kế thừa split** của mẫu đó (giữ ràng buộc cụm near-dup; nếu mẫu đó ở holdout thì mẫu mới cũng vào holdout, không train).
 - **Cap ≤3 payload/app** và **cap theo vendor** (tránh một vendor/nguồn chiếm ưu thế như ISO-65% ở v1). Ưu tiên exe chính (bỏ DLL bundle phụ của bên thứ ba).
 
 ### Nguồn (ngoài Chocolatey — đã là holdout)
-- **Scoop** (yield 86%, 0 .NET, phủ <12) — chủ lực cho bin thấp; dedup chống trùng holdout_chocolatey.
-- **GitHub Releases OSS MSVC** (có ký, nhưng ~toàn MSVC14) — cho bin MSVC14.
-- **PortableApps.com** (có ký, có app cũ <12, 0 trùng) — bổ sung; cần trích URL tốt hơn (yield tự động thấp).
+- **Scoop** (0 .NET, phủ nhiều toolchain) — nhưng cho **bin GNU/Go/Rust** và (qua Versions) bin MSVC cũ; dedup chống trùng holdout.
+- **GitHub Releases OSS MSVC** (có ký, ~toàn MSVC14) — cho bin MSVC14.
+- **PortableApps.com** (có ký, có app cũ <12, 0 trùng) — bổ sung bin MSVC≤10; cần trích URL tốt hơn (yield tự động thấp).
 - Lưu timeout: Rust/Go static + app nhiều hàm cần `--timeout 900` (pilot timeout@300 rớt fd/ripgrep).
+
+> **Cảnh báo ngoại suy:** pilot Scoop (22 app) **chọn tay công cụ GNU/C** nên yield (86%), tỉ lệ .NET (0%) và tỉ lệ near-dup (37%) **KHÔNG ngoại suy** cho Scoop nói chung — cần pilot ngẫu nhiên (seed cố định) để có số đại diện. Xem `experiments/dataset/pilots/`.
 
 ### global_features trong classification head — CHƯA định nghĩa
 Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `num_global_features=4`, nhưng loader `src/training/` chưa viết và Eq.16 chỉ nêu **2** đặc trưng (entropy toàn cục, has_any_external_call). **Khuyến nghị: BỎ global_features khỏi head** (`num_global_features=0`) để không nạp entropy vào head — vì probe Phần A cho thấy entropy/size là confound nguồn (AUC metadata=1.0, FPR choco 53%; Task 2 bỏ entropy+packed giảm FPR 18→9%). Giữ entropy **chỉ như một ablation** riêng, không phải input mặc định. Chốt khi viết loader.
+
+### Kết quả kiểm chứng classifier + pilot ngẫu nhiên (2026-10-07)
+- **Classifier toolchain:** kiểm chứng 30 mẫu phân tầng (heuristic vs ground-truth bằng chuỗi compiler/section/CRT) → **24/30 đúng (80%)**. **Nhãn "Rust?" (heuristic bcrypt+api-ms-crt) sai 4/4 (100%) → ĐÃ BỎ** (fold vào MSVC14; chỉ nhận Rust khi có chuỗi `rustc`). Lỗi phụ: luật GNU quá rộng gọi nhầm 2 MSVC≤10 (upx/busybox import msvcrt) → bộ đã kiểm chỉ gọi GNU khi có `.eh_frame`/chuỗi GCC/mingw-dll. Dùng bộ đã kiểm cho binning v2. Code: `experiments/dataset/pilots/validate_tc.py`.
+- **Pilot ngẫu nhiên (seed 20261007, `pilot_random.py`):** Scoop Main 25 → yield **11/25 (44%)** (so với 86% chọn tay → **không ngoại suy được**), đa dạng toolchain (MSVC14/≤10/Go/GNU/Rust). Nirsoft 25 → yield **23/25 (92%), toolchain 100% MSVC≤10 (linker 6-8)**, native, 0 near-dup, 0 timeout.
+- **Hệ quả nguồn:** Nirsoft là nguồn lý tưởng cho **bin MSVC≤10** đang thiếu, NHƯNG là **một vendor duy nhất** (Nir Sofer) → áp **cap theo vendor** mạnh để không lặp confound kiểu ISO-65%. Scoop Main (random) bổ sung đa vendor nhưng yield thấp (44%) và lẫn Go/Rust (→ bin GNU/Go/Rust riêng, cap ≤10%).
