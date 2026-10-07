@@ -34,3 +34,10 @@ Báo BFBG cạnh hai baseline đã đo, trên CÙNG holdout:
 | **graph-feature** (RF, num_func/api/imports/size/entropy/packed/nodes) | 0.976 | 18% (bỏ entropy+packed: 9%) | FPR NirSoft 35% |
 | **BFBG (đề xuất)** | *đo khi train* | *mục tiêu < graph-probe* | *đo trên bumblebee/choco/nirsoft* |
 - **Claim chỉ đứng vững nếu BFBG đạt FPR chéo-nguồn THẤP HƠN graph-probe** (tức học cấu trúc BFBG, không chỉ lặp lại confound toolchain/entropy mà baseline đã khai thác). Nếu không hơn → phải hedge claim (xem 3 phương án trong DATASET.md).
+
+## 7. Hiệu chỉnh (Task 4, 2026-10)
+- **Clip trọng số theo ô (bin × nhãn):** weight = nghịch tần suất ô, nhưng **clip** vào [0.25, 4.0] (tránh ô hiếm như benign-MSVC≤10 n=13 làm nổ gradient). Ghi rõ hệ số clip.
+- **Loại ô thiếu lực khỏi loss:** ô có **< N benign** (đề xuất N=30) **không đưa vào loss train** và được đánh dấu **"không đủ lực (underpowered)"** trong báo cáo thay vì cho điểm. (Hiện benign-MSVC≤10 train=13 < 30 → underpowered.)
+- **LOFO 5 family:** thay holdout BumbleBee đơn lẻ bằng **leave-one-family-out** (train 4 family, test family thứ 5; lặp 5 lần), báo 5 kết quả — vì toolchain-bin ≈ proxy family (DATASET.md), một holdout đơn lẫn tín hiệu.
+- **Tiêu chí THẮNG ghi trước (pre-registered):** BFBG "thắng" nếu **FPR@TPR=0.95 trên holdout_source_chocolatey (và trung bình LOFO) THẤP HƠN graph-probe ≥ 5 điểm phần trăm tuyệt đối** (khoảng cluster-bootstrap không chồng), đo trên **cùng split/CV**. Nếu không → hedge claim (3 phương án DATASET.md). Test chính: `holdout_source_chocolatey` (FPR) + LOFO (recall@FPR).
+- **Chẩn đoán đường tắt (shortcut):** (i) **train-trong-bin** (chỉ MSVC14): nếu BFBG vẫn tách được malware/benign trong một bin thì không chỉ học toolchain; (ii) **dự đoán toolchain từ embedding**: train một linear probe trên embedding BFBG để đoán toolchain-bin — nếu đoán tốt (acc cao) thì embedding đang mã hóa toolchain (đường tắt), phải báo và điều chỉnh.
