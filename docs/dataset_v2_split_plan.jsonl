@@ -1,51 +1,46 @@
-{"sha256": "0078824ff64bdbc2640a654e0c0e0392534d146749ded592a150e64354ed280e", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "0078824ff64bdbc2640a654e0c0e0392534d146749ded592a150e64354ed280e", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "0140f2dcce3f795352e37b76b8354f2f3d717d77678370e9fe4e2067f0d58b53", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "018e6833088b3fc7d9a97c3f45abb5f9f947f7c46de4f17fddf423f430fa70fa", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "01ce15921fc4969233196bcfa7fe7765b55d92d5e4f9eaa60612cb40eef8425e", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "03e11bd01bc4b3ba12c19ce7baef21ecbe4767bba2d41aa69bbc8f984e027f70", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "050c2ad53f3fe031e7884f7a48f9a70b78c1ff5d7e79198247fa1755a1b49563", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "051ad3f19a80d3e4362c1c5037217a38cbad399792ad1ae0dc9f5c72841af622", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "05a9bacbe032a7adf82831039a979d6cf2abc9b834d2d85f247eb4d0b7d34ec1", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "06c186ce306b75920b90ec70b54554891b81ae4946b4b5d4803e91765756f234", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "06dd67bb2385b958d01f2e3196226f3b1c3b2e0c23735ad27ffc12ab29039063", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "06c186ce306b75920b90ec70b54554891b81ae4946b4b5d4803e91765756f234", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "06dd67bb2385b958d01f2e3196226f3b1c3b2e0c23735ad27ffc12ab29039063", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "0749e8e0b1691464ec49eb853dda831e7650e0204998bb58947fc0e7912f4e14", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "087d7d8d9aa7d7fa9da9c52d3f7d803ebdb8a99e229ac2650890a22ab6dd7525", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "091dbab6b28ea9cae37431a65573823a85e4fb010f99fc047c8a41851ad56126", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "0d3b5f214c0c601fee4752840e9c17af6f9affebf877b555ec864d38e431caa7", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "091dbab6b28ea9cae37431a65573823a85e4fb010f99fc047c8a41851ad56126", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
+{"sha256": "0d3b5f214c0c601fee4752840e9c17af6f9affebf877b555ec864d38e431caa7", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "0df0f4186074804f10ddaf49f8fea7c526c004e40d5316e6fd15d57402a083d4", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "0e33d18809a20ab305cdf88936f5e539e16528e2970920c6db25c8bbed9627ef", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "0e8abac36474cf8efb9b11c0dfee58399f6239f58f392637269b76c124615d97", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "0f36a409277f3933b7857db63ac71c3bc3f5246e52479235aaf464a42929a7a4", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
-{"sha256": "0fbcaa65ada37326741259d2ebc96d52e61d38cd6c28823194f2ffb4bf906ebe", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "0fec65da399172f889b67c3ec320aa30cb43ac23ce87ccf1e4f93c6302315ac3", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "0fbcaa65ada37326741259d2ebc96d52e61d38cd6c28823194f2ffb4bf906ebe", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
+{"sha256": "0fec65da399172f889b67c3ec320aa30cb43ac23ce87ccf1e4f93c6302315ac3", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "11b4dbcb35a947f688fa5514740669c6b9cb565973f1e46e4315ea3275b9e558", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "11d0576359f3cbd63bf43a5e831333a861239f4fa871002733cc7d9bbc4d0515", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "11d98cf43ee1c3ef4287b8195bf14981fbaffac0fbf706a3cd04a9ff481da104", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "12942b15d84d74bde121b216954f106f285d4aa2e8e2842723b1173f4aab6315", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
-{"sha256": "14727d3edb7989326ba1deea1246e2eb26fb5fcac2629749862d5b84667c0ab5", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "1679bfcd3aca075fbe220bcae4cd411f0c59a0ef6cd9cbc3b6b6999c2212dc15", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "11d0576359f3cbd63bf43a5e831333a861239f4fa871002733cc7d9bbc4d0515", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
+{"sha256": "12942b15d84d74bde121b216954f106f285d4aa2e8e2842723b1173f4aab6315", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "1679bfcd3aca075fbe220bcae4cd411f0c59a0ef6cd9cbc3b6b6999c2212dc15", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "175b4ced7a789be2cbb687f0e1bccabaccf3811ab84dd5aac0019aa9bb49c94f", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "183905d574ad301fa8625cf971a0cf95b60fa5ab15167d9e9995a9322edef5d6", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "187ffc081a7a6c38f7ca0fc4a8ddaadbbf11fc545a023e2c8c89912df8457b46", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "187ffc081a7a6c38f7ca0fc4a8ddaadbbf11fc545a023e2c8c89912df8457b46", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "18bcb9affbf8c128495b93ad3847f29cf7913d80ab280005100c273eb51bbbbd", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "191eead82d953d82f89f0c0fe6c961083cf1e31d0eb8467a72408b2fa9ce7498", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "1a1b04fc35081416dff73399d39f767028f970c4604643b61ec29602790e1f4b", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "1ac28b748404d58b9f0c62d1ee65e3b444c9ad3ac0abea299238090b764bc25b", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "1ac28b748404d58b9f0c62d1ee65e3b444c9ad3ac0abea299238090b764bc25b", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "1e28349bf342dd176ff7a899b73e7a1b5792c95e099212a72d7dfe9e75836695", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "1ebf9391505aeb7993afe615e6808b2c0f7113275fc09a52843aa47b14f1a051", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "1f34d15eef9fffd1122904310c42de2131b8bcd1b830e3f2c26c71535d6f1722", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "1fcfc602fb5cd1a16b8f66d06e1dded5900f412d2e899c55b5a73f9a64b34205", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "2081fb24a7b8a89d068b58e7d9353647d5fc1512a68bb6a37f71fc60ca84d943", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "1f34d15eef9fffd1122904310c42de2131b8bcd1b830e3f2c26c71535d6f1722", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "1fcfc602fb5cd1a16b8f66d06e1dded5900f412d2e899c55b5a73f9a64b34205", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "2081fb24a7b8a89d068b58e7d9353647d5fc1512a68bb6a37f71fc60ca84d943", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "218b3e2048584804e2a2e508355e114dd4cee6f4e7201631d1f8224c12c9d4fb", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
 {"sha256": "21be3eb991509c2d7e7461282597161c6b33de1cce6667c92c08227652e93589", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "22279965263d0429395d0ca917566320d1462ae2f74cfb7508ba5e3fb9a59664", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
+{"sha256": "22279965263d0429395d0ca917566320d1462ae2f74cfb7508ba5e3fb9a59664", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "23c45c2d54cfd5cf8898b98f9e18461b78a3e067e5777bcca051d1ee400cc488", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "23cc20071e53fbd562ca556784f65836941f262fd3de51e8078dd4112d6e7787", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "248ea6e24a4921a9e80e729d8ed2428af864a07d88536b8b0ef500bd807f1d00", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "2679847d7ccce383fede04a91ab86841333700af549547e5a526212ab480e3de", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "2679847d7ccce383fede04a91ab86841333700af549547e5a526212ab480e3de", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "26f74cda155523b8b4ce5e21f5fccd7342e88ba863931a1fcbdd179ca12efb99", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "2821a4ed191da07372acd302e5f6feae7a7985e285e1417765ebe74025af45f0", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "28ae1122ba9b4f1ad77e3a9c38c728dd49f26de1b1953f982cd3c22da0964119", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "29870093d3e4de3ae486057184d8aa8437d86b8c955502384d31bbe28403e01c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "2ac1cc1b844d2fb2c59b9b149a1e78327894d9f10b58feed761ed064f9c18026", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "2b7634cc1d7473d0cc7623773762b541023454f22bce0906a90a5bb2c2a52644", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
@@ -53,88 +48,81 @@
 {"sha256": "2bf39f2aadafdc59a90b260f582a8fccebc5b89eb94175fdbaa9148c1e1f084d", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "2c02944d8eeb8ce082af24c674a067ec4678aba4301d0ae71e29851e96f24189", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "2e2a0e4a27b246593c7d9803a1f9e69a5da413049f5e15341d9ea7c6ab836b9c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "2e5fb14b7bf8540278f3614a12f0226e56a7cc9e64b81cbd976c6fcf2f71cbfb", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "2f027626c5cfe8d21e52c37406f5e23735fa84ecf219993f8fe11d240aac90f3", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "2e5fb14b7bf8540278f3614a12f0226e56a7cc9e64b81cbd976c6fcf2f71cbfb", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "2f027626c5cfe8d21e52c37406f5e23735fa84ecf219993f8fe11d240aac90f3", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "2f7f8fc05dc4fd0d5cda501b47e4433357e887bbfed7292c028d99c73b52dc08", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "30727fb785ea8feedd3b78e5dab7484d48464be939ebeec8d45fe79353d4b4f9", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "3088326cb0fe5b5646e02c7b2de71ae363fcd26a0000cf32209c8bed05a7a866", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "30c6c3dd3cc7fcea6e6081ce821adc7b2888542dae30bf00e881c0a105eb4d11", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "327fe70ed4f6502ebf8f3d4c5f890960eb7a357529c14f078999829b6f78fb9d", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "30c6c3dd3cc7fcea6e6081ce821adc7b2888542dae30bf00e881c0a105eb4d11", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "327fe70ed4f6502ebf8f3d4c5f890960eb7a357529c14f078999829b6f78fb9d", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "3333ba244c97264e3bd19db5953efa80a6e47aaced9d337ac3287ec718162b85", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "354e2c49f5eaa1e4209565b4fb5ddc14f2f0a1b6a60528b02ff80fdf2a1357e7", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "358e7d8b59bf2f544a6a2b495d070abe34c6aeacc91667fdd46572bb19b73cc5", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "35953582429c759f3f0ed31bcd07220f13416887d513de790b04fa420fc6b317", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "3701c06e80431e0b0c63bda2bb7107f48d49e09595fbd2f6c20de9461e7ab41c", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
+{"sha256": "3701c06e80431e0b0c63bda2bb7107f48d49e09595fbd2f6c20de9461e7ab41c", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "387ef78ad8c212a36bb38077e67b51adaec1cee8bbcdc50f35d1107d1fe70705", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "3c866e68c0b3eacd69851ca65e1633488dd5ed2d10233e51026d93522a9e3e56", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "3d661f8703c0f41ec6c324605acc7608cb3babc8a81834363152b9529dbe5b73", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "3e5fcc7a955049d3586b9ed5f6bb5e7cb970b882de9eaf0924d1903250b70cd5", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "3fd0af4607b40e7d9f28e9c9dc39a0490d535181ce19c44f3aecf32c14c16a0e", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "3e5fcc7a955049d3586b9ed5f6bb5e7cb970b882de9eaf0924d1903250b70cd5", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "3fd0af4607b40e7d9f28e9c9dc39a0490d535181ce19c44f3aecf32c14c16a0e", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
 {"sha256": "3fddec21a90602eb0571e6f878fcbd4b68599a53d71fff99ed12bcb7d2e1425e", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "4063403bd69b8fd5efdf4fbbb83f0e0b59104b6036eddf2e36f9d4249766b783", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "40c1a4148aaec3eb11dd0e5d66f3bcde131538cfb755465bffa0d7811216a717", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "40c1a4148aaec3eb11dd0e5d66f3bcde131538cfb755465bffa0d7811216a717", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "433aeac64e4e55fab9223ade88e28443eec332f3ef7b929b43b2241c8e70e387", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "43a522a7394be9cefe241b35fe9e338e65024357abf69abb306012f39e02b2c6", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "4487570bd86e2e1aac29db2a1d0a91eb63361fcaac570808eb327cd4e0e2240d", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "4837950016e7f75f5f5f1380614eb1897b898e4fad4fcc88e5f9dadc5a5bad7e", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "4856d44741fe350e2f8a11b149f8c1910d2d7fe4b039831ba8a57eb6d14cb848", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "4487570bd86e2e1aac29db2a1d0a91eb63361fcaac570808eb327cd4e0e2240d", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "4837950016e7f75f5f5f1380614eb1897b898e4fad4fcc88e5f9dadc5a5bad7e", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "491e3231078d817e437ced31480eff54abc6eee0e09e6fa4529e37ce8e8b0cec", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
 {"sha256": "49e00833ee96c0058e899766f12f9493f19c813eb4ded2807a2706da6c5f4683", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "4ceb3cadc9abaca022e62ecfa6d4ee69b79e4aabdca70bcd6230a0f4f38f2f0a", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "4ceb3cadc9abaca022e62ecfa6d4ee69b79e4aabdca70bcd6230a0f4f38f2f0a", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "4cf13e617a48296a45a5707e3374442facae4eed5011d75a90fc9b4b75b050ce", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
 {"sha256": "4f1653fbfc88a2328f92eb9f856dcf0feb3b303b216d1b573a6d57b21a6e296f", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "4f609448db306a570f7ca135b95c4a63c386f4a986547113cdf516ecccf60870", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "4ff86c8f825af74e96895fdc0d7728dcda61feb400c078cca643741e8c68bd23", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "502dd0e36b6ee13912a6f4b7da43c9fe5236ffd98a63bffe6a5e3c7a553ea9f0", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "502dd0e36b6ee13912a6f4b7da43c9fe5236ffd98a63bffe6a5e3c7a553ea9f0", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "51bee02bcb73b165ab92af75ae15b88aba3f5d99f072e63ef60af92ffdc4d565", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "5262b166fc7b7c599742018e2e4170c9aa17892069b3c2fe6913bfba93bd706a", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "528f61f7342d8de7eaa148280be592f7f3c66180e1c497d61891a30a8ffa7e8e", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "52d52b59561c3ddba7998cfdc82263846691cca7bcca70016ba2e6216e3b5683", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "530cc674a65f76be06b5334f2926226f2b0707f47068204c3181c538ed64faba", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "53be248c41da8fc7ffc9223b9b7825a0a6e825910769cec9faf88e3cbb791183", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "54142770a00e594942ee8923726ea49126303d0c523932886c2417eb66dc07f8", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "52d52b59561c3ddba7998cfdc82263846691cca7bcca70016ba2e6216e3b5683", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
+{"sha256": "530cc674a65f76be06b5334f2926226f2b0707f47068204c3181c538ed64faba", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "53be248c41da8fc7ffc9223b9b7825a0a6e825910769cec9faf88e3cbb791183", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "548ae7115a58acca73d444311ebcf4fc5ec53ad881f6c9fffbb1261dfa7aca0a", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "54a6fcfe38233b5ff1efa69fe796e6638da20a70368d4f79337519c0bc699708", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "54febbd1f0a3875df16a4b88621cc0a10729b3c94b9a68639aab27d36fe39381", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "54a6fcfe38233b5ff1efa69fe796e6638da20a70368d4f79337519c0bc699708", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "54febbd1f0a3875df16a4b88621cc0a10729b3c94b9a68639aab27d36fe39381", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "55580575d0e61f65930600ef552218654025c2b532b1dfee35433fecc1480242", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "5571c273c56763958d357899d97f788f5b71b4525d01594d545431973d42b239", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "55aba23cdcd6484fbb06f4155b8ca75adfce7a881f10afd0c49457165e677164", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "55aba23cdcd6484fbb06f4155b8ca75adfce7a881f10afd0c49457165e677164", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "55f7963b6897e1419f16a34f79dc2e68e89fc08fc02f18dddb6f8c33ffa8143c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "5648e3f5b667f301c9b040f9472d7cd04ef94aed94f3f6b4afb218eaf6563eb0", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "568abfcb474b410f2c06f2f88fc8b7a0510f70c28a8d609c6abbd2b029d37cb1", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "57d9cb6e10ba90a3b8e9c2b2eab2b80937b088123adb482eab71ef550cce7794", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "57d9cb6e10ba90a3b8e9c2b2eab2b80937b088123adb482eab71ef550cce7794", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "5825f03916aadc2d268f376beb29e52bec9b031045bbff728d300164a81e14a2", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "5977b3a17a79821fce32412eb2fb19603a34241592fb21d91eef28f76075da2f", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "5a7667b2520beeea1d09c3e2c76612b1bc961af84889397044fde41191c6972c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "5b579ad9161628387e9815bb4b10dbf5ff1b96fec7ecb30748317190cbe23a73", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "5bdf1abeda9e2fcbda3b07f24049bf39450ad2deca537c222d9237f368b01128", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "5bdf1abeda9e2fcbda3b07f24049bf39450ad2deca537c222d9237f368b01128", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "5d9ceb1ce5f35aea5f9e5a0c0edeeec04dfefe0c77890c80c70e98209b58b962", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "5daa7346489a9def099d7652220e330e63978b91934c0fa8824eed63bcd0f18d", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "5dd9e262e00da660044614288e1ff0d5669ee94079f134eb2e29bfd415fa5dc5", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "5dd9e262e00da660044614288e1ff0d5669ee94079f134eb2e29bfd415fa5dc5", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "5fe9ad33477704968995925f49099fc88934812d268992b4cf287123e5f40f87", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "60dfc137f00aec04fa4c7014d09fe63fa3cd03ee14ccd4f43d199c36f31da377", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "612265f5548653d6585dd623f744a67637f3f09d01f3cb971152ffba8937bd4a", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "60dfc137f00aec04fa4c7014d09fe63fa3cd03ee14ccd4f43d199c36f31da377", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "612265f5548653d6585dd623f744a67637f3f09d01f3cb971152ffba8937bd4a", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "632a4e767c1f78eaff51b142530d7e7029d0fd0726eb1a19061f0f9f5ed57e38", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "63c31e9f79faee8e6ac3919f13be59d293c4fa5f091d200cb683c9f1ea4e6ae7", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "6568697d54dfbcb326537967dde2bd15d3694ea1a94753b77649baa60e7c0303", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "6568697d54dfbcb326537967dde2bd15d3694ea1a94753b77649baa60e7c0303", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "67b00801da2bb2a3af3a6c65b06dfbd8ddfd4ebc1b6a1ffade1d3e8db5612b14", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "68be8f45403afbd5bc2312b39e40689fac9a0f00986f1e5773ba8845b2b050e8", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "68be8f45403afbd5bc2312b39e40689fac9a0f00986f1e5773ba8845b2b050e8", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "69b06922d1b8341bb0909ae83010e4e5c934a1c9f92ffe8d57f34153c0010ff8", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "6a0818a04f70a0ec701af4947c6f331403eae84696835a3df5d02c668cc8baf0", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "6a0dd38db404c4bc2579a0539efbdfbdb04924e52e1ecb6149ac5b54459a9eed", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "6b2fc6e271d2e885e29d025726709f45eeba642f682f7a03072cbb6b641f63bf", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "6b8cfc5768dff3d2ae965ceb7cc0f700ab744b36e282114dd435767db8ce6ab3", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "6bafeab61149af6a607d33c92b001b3798872bd2d6a37acfcd90226c980005f6", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "6d61f877d75f331f6efdf78b79698a2f8a223e92ef47831be3e8ad6436418350", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "6d61f877d75f331f6efdf78b79698a2f8a223e92ef47831be3e8ad6436418350", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "6d6cab59d3cb3838dacd4ab9279969c1c18d92296f59d1521b57106cd80a9308", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "6d71debe569f70190886c5b11ded5bb068f0aa08298de2d7e011020feaac83e6", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "6e6527c56698485412ac06181f24281177aba45dcee2269eced5f92c98ace964", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "6fa10239fde1ef999f1a09d9602f554f01f049467a4a1961043a9a6198688191", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "7071f2795432b5e0419f094155bfdfd72bdaddc783fa8f1f5ef79ef20e5c4b96", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "6fa10239fde1ef999f1a09d9602f554f01f049467a4a1961043a9a6198688191", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "7071f2795432b5e0419f094155bfdfd72bdaddc783fa8f1f5ef79ef20e5c4b96", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "71dba147b6c16d8d0f012b8e657d52e12cb8796a659e1151200d0a6c8b04bce3", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "72f6508478f322f4854e08974e6544ac36f757b69f75fd823da58afb5a4ef595", "source": "scoop", "bin": "khac", "split_planned": "test_indist"}
-{"sha256": "737b66f34e33a991a6f983b5164d800f358376a10a43cd88175259a83b986556", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "74892d9b4028c05debaf0b9b5d9dc6d22f7956fa7d7eee00c681318c26792823", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "737b66f34e33a991a6f983b5164d800f358376a10a43cd88175259a83b986556", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "74892d9b4028c05debaf0b9b5d9dc6d22f7956fa7d7eee00c681318c26792823", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "7527363d8546fd6a9d61d9c118903207cebdb0a8c11290d4f84ba22aa86a8d62", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "75f15a38bab23016abdf179e557675c050d3f97eda67b8e3515ad537e5d8cafa", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "765560b253278a2cbfa88081b7ac43ebe386046106b3b1c061559c52ced53332", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
@@ -144,161 +132,142 @@
 {"sha256": "79ae59d66dde51b66be50505360c5e4571b9cdb36dc4729958c60b99d8bb898a", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "7a22dda0c72822ea98cad2a27268b02f53f449ffb2de8660d2ad39db2f62e343", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "7a494ce2336591b3f711149be65ca0b1ae7472f58295f924c022ebd53fdf42e6", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "7abaa3b7753d4bf42ba4d828a5641f7f74a2dfe3a853ce017b8af1e9b5c46f02", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "7abaa3b7753d4bf42ba4d828a5641f7f74a2dfe3a853ce017b8af1e9b5c46f02", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "7ef2efc4c54e1a963046b3a9b0aee6bca5b1487a7c907373035a10f4187a733d", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "7f2465151b785c4e089cd0fed18465e4bd7ae6c922b4f645de9809441d64ef32", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "7fe40ab24cc83555deed61585b20a9d36f7531503840555e584d2ddd341b11ad", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "807d8937de03226fd4af214d8bb70bfd7f13d124c95c100b7a487dfa923612e4", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "7fe40ab24cc83555deed61585b20a9d36f7531503840555e584d2ddd341b11ad", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
 {"sha256": "81e6d19dae611fc6f2d70f073cc4d6f6cb362d5291f32541b7d0945a4fa05079", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "830c273a4670d4366c95b5cd9edbe5bef817675a9629c880992183f97eff2a3f", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "84c8a437f8af89257524478489e5c85f1edf25f761d299e2bcde46ac0afbe106", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "84f2c4837a318f501d1f3253ab5600f975947f5b5ed3d06729e5031dd556501c", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "84f7ee902d5b10c4a6b639de29ef84e9162e53fc4de3947e96fd77a7a8bb5257", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "86c3f263ae9b4469ab1266c80471087082447eb4a38e6b97bf5e84de15c07a1d", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "84c8a437f8af89257524478489e5c85f1edf25f761d299e2bcde46ac0afbe106", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "84f2c4837a318f501d1f3253ab5600f975947f5b5ed3d06729e5031dd556501c", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
+{"sha256": "84f7ee902d5b10c4a6b639de29ef84e9162e53fc4de3947e96fd77a7a8bb5257", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "86e39b5995af0e042fcdaa85fe2aefd7c9ddc7ad65e6327bd5e7058bc3ab615f", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
 {"sha256": "86febaf2ca137e417808a646b5920cdd10d7093b30a2071abde40b012c923c3d", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "87be41eac82c169584e0b2eb8dbb3c8010889657410d9351f7c0bca80748678c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "87c42ca155473e4e71857d03497c8cbc28fa8ff7f2c8d72e8a1f39b71078f608", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
-{"sha256": "884cbfa510dc79daa99df6f10c7975acaa4aff8f6535bb95b740706677f155ca", "source": "scoop", "bin": "khac", "split_planned": "test_indist"}
-{"sha256": "8ad1084de9a734b2d5c86f472f671cc324632b3a6ca5aaa0c360d93d4d08e148", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "8ad1084de9a734b2d5c86f472f671cc324632b3a6ca5aaa0c360d93d4d08e148", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "8c8c4299ddf503b2c25c0905b0a0820f3e8238c252e9ace37bf25964ef4a8f6f", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "8e2ef3d27822a7c7cb3f92362f393ce617159d6646c9329612fe637ebbaf7455", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "8fb06d96fa88c7af1832aaac3c6e4cf440abdb0fc86e34cc92267bf6956124c3", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "8e2ef3d27822a7c7cb3f92362f393ce617159d6646c9329612fe637ebbaf7455", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
+{"sha256": "8fb06d96fa88c7af1832aaac3c6e4cf440abdb0fc86e34cc92267bf6956124c3", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
 {"sha256": "9038ff36858e99624064f4ec6be2bb666985482aad234a2e38ef72562148aff7", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "90ef016239536772d3e4b684561d6e51bd514371d2a21df2c892c00bd6003de7", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
-{"sha256": "91d027417ff2301b7135e864a5df6693488f8412ff87040f4897e0e03bc2577b", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "920322d57aea5e94cbf937a0b55825c819df7339d65a2e975ee1bdedfbc32fec", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "9258437c6dc71595f5c82abb4261609d4a40339cd694f7275685dc5a0dd0625a", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "91d027417ff2301b7135e864a5df6693488f8412ff87040f4897e0e03bc2577b", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "920322d57aea5e94cbf937a0b55825c819df7339d65a2e975ee1bdedfbc32fec", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
+{"sha256": "9258437c6dc71595f5c82abb4261609d4a40339cd694f7275685dc5a0dd0625a", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "931a6e9c3844b90ccdb1467ccacd8dd72457e308d2709d624a3c5880d835ac3c", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "93221683c9e5f6bee0d67ffbb01bed1820c1185d3531c15f15f61c4c45d62115", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "93804ef36b53f1dfc15a6d71b83bf5d3365f4cbbc29864e43263b121470edc70", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "94e5cfb9468e597cb513fb7a8bf26499c9315ebd505d960c74e2d4849167bd31", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "95e3e9a86da6de563340b419962fc05f59038f32924b79d59e121bdd5e260a3a", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "96e297c4f1f5c4cce7546e775c665af5977c5eddb45e7007d98542db2104ba8c", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "983634058790eb63df79775c60add959a3cbed11bab8ed905b2868aed10fb4c6", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "98c0af01b4257e12679aaba3c148cdc95c9168f95ad17add25287a584d9070bf", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "9911e0e65221485e2a2f6d439ca2f0187d23e829327797fdaee55f8751e32849", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
+{"sha256": "96e297c4f1f5c4cce7546e775c665af5977c5eddb45e7007d98542db2104ba8c", "source": "scoop", "bin": "khac", "split_planned": "test_indist"}
+{"sha256": "983634058790eb63df79775c60add959a3cbed11bab8ed905b2868aed10fb4c6", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "98c0af01b4257e12679aaba3c148cdc95c9168f95ad17add25287a584d9070bf", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "9911e0e65221485e2a2f6d439ca2f0187d23e829327797fdaee55f8751e32849", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "9961d03725124cfb7b0c9092610946b01683f066876fe095525aef9bd1bf4912", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "996a259e53ca18b89ec36d038c40148957c978c0fd600a268497d4c92f882a93", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "9be85b986ea66a6997dde658abe82b3147ed2a1a3dcb784bb5176f41d22815a6", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "9cdd65bc8e2f11c17f5eadfaeed92f168afda326d6ec9ea9a8a8a071777ea491", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
-{"sha256": "9cea6cf72824eb66cc1ee602cf9818704ed0c336441f52b83f4fd7ee1afc98b9", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "9cdd65bc8e2f11c17f5eadfaeed92f168afda326d6ec9ea9a8a8a071777ea491", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "9fc1d0c6e209b4b2654a8242c51516ac5c4463d624bcaa5a216a65dc6c7da346", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "9fc35f295b46f8fbc4b9e51010d6add95f8c6aaa2bc44746b5926970a2c3aa71", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "a22e5fc9f52b71b622574ec850ec57d68265d35297cb98224f1f9daba38df010", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "a24b887122a503874da43f71c0457c51d2bc9a355aa8975deb3be2c50b2cd3be", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "a2d070be0817745bb4287a90cb3764614456b19d8976d83cbdfe4563b2f6235a", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "a3079151f45622db27db2560dccda2c6210276d22e854400f34da891a554afd0", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "a3079151f45622db27db2560dccda2c6210276d22e854400f34da891a554afd0", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "a3a9534d2adecabc4861acf632d0f64741f56e2050d52032a5307bebb4fbdcc9", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "a44e172faed0e0a364ead4f57da73050e867874da192641e8fb08e4a62f81baa", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "a530478237dad9dc5efb414977c97ff8da6567528b7e3d96c0b6866abea368ad", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "a5bdd33675629ca88cf05cd08150a19a69bc20b21cbe1d1e5e55fe63a332062a", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "a5e15a6b84c938c23816ed78475294bc28994582c3659965abc6ca3dceac8fed", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "a5fa660cac0bbb2fdc6f46a987dc4b4ceb60592d95b1de42c23806a7c2ae1136", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "a640f111221c2c4e78371b5f75736f663313a71281c81411c109e832a4180f9d", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "a6925689b34a0af827e1f9df5ca0e090357b9583d1afbd030f4d0b381ae9522a", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
+{"sha256": "a6925689b34a0af827e1f9df5ca0e090357b9583d1afbd030f4d0b381ae9522a", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "test_indist"}
 {"sha256": "a745831032340b3f68d3171c150e3f176a59cd6c633d90d843de8d205e426e71", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "a7a0d6436c60fbdf59084983d8df38409d567e37b4250c5ac33538f0ae6dd938", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "a7eadf0436b0b44ce94babb90ff0a75ca5db414412cbb0e7849f2ddac2541142", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "aa5082af2593a39f1eee849d77f6c81f8827d2c4cad3cbe8b374150338979f76", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "ab114a45d2f96c10596628133a16eb04293145c6c5e8baf387021283a075c595", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "abb2e53af9729556296dbc17b7ca0f5a9cceb4ca54de99b39101daac5cd12b07", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "abb2e53af9729556296dbc17b7ca0f5a9cceb4ca54de99b39101daac5cd12b07", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "ace852841d33438dc610f87995b72cacafb1fbde6a5320412b1462cf0afb0e8f", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "ad0cc5a4d4a6aae06ee360339c851892b74b8a275ce89c1b48185672179f3163", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "adcfece6db8cb2e0a77c46def9380522c643ac19610b4dab334ad7f0d6c5a546", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "adcfece6db8cb2e0a77c46def9380522c643ac19610b4dab334ad7f0d6c5a546", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
 {"sha256": "adf02b7da22d13974414c813a89958118681deb03971479edd10a693b2b7d646", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "aecd2d2fe766f6d439acc2bbf1346930ecc535012cf5ad7b3273d2875237b7e7", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "b08bad15f0497ae383e9db02cc548a323692cc77dccdf9166392f7f528231f64", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "b1d1a1676a23f80910ff88400e5fe399ce7d08bc1807ed9cbf2e4b1fc3dd0cd7", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "b2af144ca1c3b0b25f5bab91c498944121988fe5cb8151dcc27f94da40026a28", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "b1d1a1676a23f80910ff88400e5fe399ce7d08bc1807ed9cbf2e4b1fc3dd0cd7", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "b2af144ca1c3b0b25f5bab91c498944121988fe5cb8151dcc27f94da40026a28", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "b37740a72a7a9706216df9f0134894bb7a850b356fd149398c67d874cbcfacb4", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "b39867324cd9f23b3177e81948c28930646ead0208cef8cf2bdad2807b05fa1f", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "b39c68751077a95dffd3531e3e9be4b335010ff8df98d9ff2b51958c301eac55", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "b455e5bf587a03ae3e4703ec2ac130a7f31d905d59f2b50c5f6a7efb58bd77b4", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "b455e5bf587a03ae3e4703ec2ac130a7f31d905d59f2b50c5f6a7efb58bd77b4", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "b4a6b455702684652cccf7b46258b29e653538904359a58fd4931cf3ef286b3f", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
 {"sha256": "b65d9151fb4c82c35bfa60e9b437f25b7f5b51ca9da0efd181e80f23c4ef508a", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "b9dba35ec85d49c0186332c19a01601ae598ede701b79dcc70de50d4dba36fa6", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "b9f5da599c534d6a9504f67470b0cdf380a5116e2ee7914440811d2214b7a713", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "bb01317076711bf8acef8568ad50f1c94f733dd39f569aa89b5513683df0b07b", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "bbcc8c0a47e8a379b85567d362e03376f673d34daccb1e2496dff7a24a134cf8", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "bcefe7fe78b6391a560cd20c144d545426cd6d068d87999fd4d3b4ebfb85110d", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "bcf656fe9f53676cc19948ac2bbdc79f796469ed32b7d83e4e462b4672606960", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "bd16e6f88c85db66535c6b6bd44cf3a69fe425a2005b804db07791fe871002d3", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "bd5bae13a883965efb15bdc8041a884c6948a3a220a282f98d58735f8a513f62", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "bd5bae13a883965efb15bdc8041a884c6948a3a220a282f98d58735f8a513f62", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
 {"sha256": "be17d4ec00448a70b2fd5c109b4452368366dcad1b533457c62b92846e319b60", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "be2356c40469631fe1613edb4f93a39df871f34c59d2fbba8331fb10e26a8fb7", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "be3bb3de22a8b85db2f05e1e91097b36bb9283b162c93ac9b52ff152b8947789", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
+{"sha256": "be3bb3de22a8b85db2f05e1e91097b36bb9283b162c93ac9b52ff152b8947789", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "be58679866ae82a831bedb34840bc767e3bb10fad76779d8cabf9cac6d43e3a1", "source": "scoop", "bin": "Delphi", "split_planned": "train_pool"}
 {"sha256": "c045a358c7bd25c72b9191e46de631ec8c4c0799512f79b8b10d3675d1ce7819", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "c1f21e925096b94a6fea25b4d5d46297289bc6eea54b553ff9e78ba789c33c29", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "c34c13bb02a11fc92db5cda050eaab39b23d90ef378adfc263480cc2384909ed", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "c4242f4f1ba575bac7be6b673537e1af6f05846b96dd13fae2b4d64a271bb867", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "c49560f7a206b6b55d89c205a4631dfedd2b4a78ab81fea8706989a5627f95a1", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "c4242f4f1ba575bac7be6b673537e1af6f05846b96dd13fae2b4d64a271bb867", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
+{"sha256": "c49560f7a206b6b55d89c205a4631dfedd2b4a78ab81fea8706989a5627f95a1", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "c4e6b277b0caa092e431c45ea5d3d5d465fbdbdd8607fd219f1999e83af91ca3", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "c509cc9c3a35234c686a9d0c4e3fdeaf2506ea6b192e5080b418e4b13a9d50d0", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "c524e625311e0e2712dc218382b3cf8bad46b5a167a4e552f001838eec85f991", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
+{"sha256": "c509cc9c3a35234c686a9d0c4e3fdeaf2506ea6b192e5080b418e4b13a9d50d0", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "c524e625311e0e2712dc218382b3cf8bad46b5a167a4e552f001838eec85f991", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
 {"sha256": "c6100f8a606dbe421ffc29a216ec07ba7345d2b53ce8299508250ae03ebec891", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "c635af64af8b4ed05e197de07e909ed64e55544d053069f39d15e4b12ecd240c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "c6e3ff4148526e2f5f41ecc1b1a8c85c9a8c312a708d75eff3cc401322dbe2e3", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "c8c138022012e577aa4d3d3808079e017c8746d876ceaf10decefdc0645508cb", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
+{"sha256": "c8c138022012e577aa4d3d3808079e017c8746d876ceaf10decefdc0645508cb", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "c8f0a6bc45a19b33541501e57f6f7cd972ab18453743266339d495cbbe846643", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "caa209a0573a8c0e9e9af162670ad6649fe448508249004e0c7c8ad059a580c3", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "cc7130e654ca4a2aefddbaad4056fc9739229e81e79840b3285274e07df3e922", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "cded7325d752a838fd6fee7c66a7c9931192940f99a5c25446c4c60380384dfe", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "cf283e16797bc6151e5f90c74d9ab96c622b47b844062b3ee46a917b3dc5a6c3", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "d111e12ff0c42f4d6e797cd0b5a7b0f7a7697894ce6b4c722a383f2124281140", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "cded7325d752a838fd6fee7c66a7c9931192940f99a5c25446c4c60380384dfe", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
+{"sha256": "cf283e16797bc6151e5f90c74d9ab96c622b47b844062b3ee46a917b3dc5a6c3", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "d177f5af5fb74f11a88f5d75db63ee177dbe35b748399b17a329a49bcc7deab2", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "d1b90ef0ea417351e4a2f8ba62bdc1838e89d484a910e8aa6eeeac72c6ad1d7b", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "d1cffbb2c9fb2f5cfa9958af74c8dfb33033d24882a083bd41a66cefea0a6c7d", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "d41ad502046e40250ec4a39c4cfe552001c2ffe8fa2f1a02a06f2401f8f49b19", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "d45c2667a1052de37667bb2957d753a5966b134e923cf5594e92089f76c747cc", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
-{"sha256": "d48936e817d62076d37a843a3b820e1bccbeff7e3d8fded1fcd0508a9924029a", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "d48936e817d62076d37a843a3b820e1bccbeff7e3d8fded1fcd0508a9924029a", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "d5249a08f76092c4b05a3c3295426fe2f481eaa3c11d2ca1dc50c6b323bb6002", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "d7543a03a69f14ca1e302aa2bbb09777200b72e0c6db0d0eb7614593f5c33e0f", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "d84e3c28532245568267b6ca0aed0c7f6c233902da31573e6ae40dadc4aff752", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "d8d05c4e063e3eb4b90412e57eb274caa8669e2458aeda2eaa2f4725541e86be", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "dc4c47f0fcb835e604f2a1bbfb9973178386f621d72f0a6f804a4210ddf715d6", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "dc4c47f0fcb835e604f2a1bbfb9973178386f621d72f0a6f804a4210ddf715d6", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "dc4e44b8afe572b87e9056bb6ff46f0b97f90ebff4cd46aa75494699528fe362", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
-{"sha256": "dcb3f9e6243af32fd864d3e2bb00971e6090b4df340f001da85e22f278a89c16", "source": "scoop", "bin": "khac", "split_planned": "test_indist"}
+{"sha256": "dcb3f9e6243af32fd864d3e2bb00971e6090b4df340f001da85e22f278a89c16", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "dccbabb2bc7e7d4302c44d9ce41b70721a7d0914fa4d289e2f340d39766ad102", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "de38efc712e94efbf9a84ffb71c7052f8c7eb1e4142c8cc7b2eeedbd79bc4bca", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "e09d4a718e26e49186e43ae0ee9145646f79bd4cb287097bce6ee9208f994c1b", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "e1181c0ee31fb49e19038081c111387fc70be880fa1e3a783e6ec62004c5b4e0", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "e1dbf4d46d4ba165d744887e21165fc55e84399c46f2d168e71975e45d10f9a2", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "e1dbf4d46d4ba165d744887e21165fc55e84399c46f2d168e71975e45d10f9a2", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "e1e9857a02ad7b461c03526aa58a086ae5b03b90e41c635c72373025a4d09d07", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "e22afd680ce7b8f23fad799fa3beef2dbce66e42e8877a9f2f0e3fd0b55619c9", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "e22afd680ce7b8f23fad799fa3beef2dbce66e42e8877a9f2f0e3fd0b55619c9", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "e2a8bfc062bbef782206c6bfc5e542ad4a12902afd40787d95df96a535a24b96", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "e4d6ff6bbb297eca38b19364dac1bfc7eed74724f5e0cd69bb9b53eefe9b9b79", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "e4d6ff6bbb297eca38b19364dac1bfc7eed74724f5e0cd69bb9b53eefe9b9b79", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "test_indist"}
 {"sha256": "e5d12a5ec7a898f2c5802fb6689c7768ebf8244c2c8e4bc555f19b05cbb27175", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
 {"sha256": "e64ebfbfdd5fe2c1a5d3da413129fddc584475494a9e6bcf38ad2f5044f44c0e", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "e6826b5435cfc93b606328e4111f930154f535fdf642baf6a49274a0d8832c0c", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "e6906eb4d36e2d0f4a5850bba4f1fd4178091cded4671e020320aba62d89d321", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "e6906eb4d36e2d0f4a5850bba4f1fd4178091cded4671e020320aba62d89d321", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "e7930797eb8bcafbb22aecfefdf01a77527ec46069b8a8491215d33dabb9c2db", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "eab1f4bcb222c50f26268bb53fc271897e6d22a354d0acc221be7e9246442124", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "eb5270d5de9a96f294c9632c27208ce76cbf1801f92f575bcb9d7428b43e0d19", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "test_indist"}
-{"sha256": "ed8b939d444d957816c2576ea4e712216a176759611e74036571471cf1b2d0f0", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
+{"sha256": "eb5270d5de9a96f294c9632c27208ce76cbf1801f92f575bcb9d7428b43e0d19", "source": "scoop", "bin": "MSVC 11-12", "split_planned": "train_pool"}
+{"sha256": "ed8b939d444d957816c2576ea4e712216a176759611e74036571471cf1b2d0f0", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
 {"sha256": "ee66c9c3f7d721efe057bbb6d0f9d3457a1a35b47444004ba9e0acdfd0c01a4d", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
-{"sha256": "ef92fc661e8d7ba8ec4d39a7cdfcdba41f14cb327f0d24fe79d0b5bb428899b5", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "efae650c68883249f54ef7877fe6ff8ca0770b5d032c91acdb8c9945699e961c", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "efc13e659bdf66ecb7be78cbd364e63414d30ebe357dd4ceb76af1047c6ebe77", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "efc13e659bdf66ecb7be78cbd364e63414d30ebe357dd4ceb76af1047c6ebe77", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "test_indist"}
 {"sha256": "f02569b2251faa8a7e6fe20ffe274e80125e8dc75120b97587440aa28688e8ec", "source": "nirsoft", "bin": "MSVC<=10", "split_planned": "holdout_source_nirsoft"}
 {"sha256": "f02ffd91ef0fdb7983c27b237888c433bd6ba9f420e57752a41755eeda08387e", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "f06afa872faf642f8a4881b44d668b59df0b9c785f45160652af87d335d21b3a", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "f379e7a77d4fdadf0deec661529a8b4a72764db75c2298ee57545856fa22c67b", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "f3e4179db955a5d8a22cfb7dd453c93ca3e1216cd45cf4fa56f2fc40515b843f", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
+{"sha256": "f379e7a77d4fdadf0deec661529a8b4a72764db75c2298ee57545856fa22c67b", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "f3e4179db955a5d8a22cfb7dd453c93ca3e1216cd45cf4fa56f2fc40515b843f", "source": "scoop", "bin": "Go", "split_planned": "test_indist"}
 {"sha256": "f4012d9e850411b903c1e16418ff3e77b9abf2537ede248f8b5394c78e2e4b60", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "f40e020b4657304e8ff55f53aab7265a3eac0c1c63e1586d4009f3cd02827ef3", "source": "scoop", "bin": "khac", "split_planned": "test_indist"}
-{"sha256": "f61fdd007189a1e1991327c1982a3d1eeb97cab73105909bbb99e462e45a579b", "source": "scoop", "bin": "Delphi", "split_planned": "test_indist"}
-{"sha256": "f7728a928299cf4a18f8c30a5cbdefac16ee6b68a37f200b701aee4336ce2bd2", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
+{"sha256": "f61fdd007189a1e1991327c1982a3d1eeb97cab73105909bbb99e462e45a579b", "source": "scoop", "bin": "Delphi", "split_planned": "train_pool"}
+{"sha256": "f7728a928299cf4a18f8c30a5cbdefac16ee6b68a37f200b701aee4336ce2bd2", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "f7d840b312738d52a19274604c4ce6fa872f097b764ee4c24f2217f0651825e8", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "f7ed1227df8c30a1b195265d049ebceddba4c13cd972377dabad95708d9482a1", "source": "scoop", "bin": "Go", "split_planned": "train_pool"}
-{"sha256": "f8db024b61c36e5d45ca5b485bf855dbfe1d0523333158e873d7deb4d86ec0e4", "source": "scoop", "bin": "MSVC<=10", "split_planned": "test_indist"}
-{"sha256": "f93499172875fc2c0df80b57086f32e3f39e835283952ee2a59a3d4ffb097644", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "train_pool"}
+{"sha256": "f7ed1227df8c30a1b195265d049ebceddba4c13cd972377dabad95708d9482a1", "source": "scoop", "bin": "Go", "split_planned": "holdout_lowfreq_toolchain"}
+{"sha256": "f8db024b61c36e5d45ca5b485bf855dbfe1d0523333158e873d7deb4d86ec0e4", "source": "scoop", "bin": "MSVC<=10", "split_planned": "train_pool"}
+{"sha256": "f93499172875fc2c0df80b57086f32e3f39e835283952ee2a59a3d4ffb097644", "source": "scoop", "bin": "GNU/MinGW", "split_planned": "holdout_lowfreq_toolchain"}
 {"sha256": "fa60ae65da98ce7f0c1257477b858fbb5af442d1a1c2c80148db580205cfd130", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
 {"sha256": "fb61e52fa48c321bbbb6d899dd06abf1705e3dbd74f07813bd2784279766ff6f", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "fe51698ee7d3774f12cc5baedc513a3b50bf606ed870d4d564364bcd4e46dcd5", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}
-{"sha256": "fe9c8756ee346c300f90b21f55cc5253a9e7a2e27db75e3069fa062da64c30f7", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
-{"sha256": "feb9f7d0145a8ee80866b7d4fb996666adfd26a6270a770127c1c50ed08ecef6", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
+{"sha256": "fe51698ee7d3774f12cc5baedc513a3b50bf606ed870d4d564364bcd4e46dcd5", "source": "scoop", "bin": "MSVC 14", "split_planned": "test_indist"}
 {"sha256": "ff23d9cbc11d18c02f262c3ee455830ea13fbe8d9876249f0bdf101e3ad66709", "source": "scoop", "bin": "khac", "split_planned": "train_pool"}
 {"sha256": "ff63bcd2155156bd101def7205b294ae2c34a83eaa08aa37d85d27d6e520bcaf", "source": "scoop", "bin": "MSVC 14", "split_planned": "train_pool"}

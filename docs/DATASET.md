@@ -186,6 +186,19 @@ Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `n
 
 ## Làm rõ 2 (2026-10): Emotet, cap ISO, within-bin, NirSoft
 - **Emotet (sửa):** fold yếu nhất (AUC-vs-choco graph 0.81) nhưng **NGUYÊN NHÂN CHƯA RÕ** — ablation bỏ từng scalar giữ AUC 0.78-0.87 (bỏ file_size còn tăng 0.869), không scalar đơn nào giải thích; phân phối Emotet phổ rộng, chồng lấn TrickBot/IcedID. (Bỏ các lập luận "profile tách bạch" và "packed" trước đó.)
-- **Within-MSVC14 (giao thức LOFO out-of-fold, malicious chấm điểm bởi mô hình KHÔNG train trên family của nó; choco-MSVC14 n=21, 1 vendor=chocolatey):** metadata-full 0.976 [.913,1.0] ≈ graph 0.969 [.947,.985] → full-vs-graph **CHƯA PHÂN BIỆT ĐƯỢC (CI [−0.060,+0.022], n=21)**. Lý do metadata cross-source cao hơn: **CHƯA XÁC ĐỊNH** chắc chắn, nhưng ablation cho tín hiệu — **metadata tụt còn 0.627 khi bỏ linker+year** (trong khi graph giữ 0.969), tức sức mạnh within-bin của metadata chủ yếu từ linker+year (đặc trưng compile-time). **Within-MSVC14 chỉ kiểm được NON-INFERIORITY** (graph không thua metadata); **claim SUPERIORITY phải đặt ở fold khó (Emotet, IcedID)** và ở thiết lập **bỏ đặc trưng đường tắt** (linker/year/entropy), KHÔNG ở within-MSVC14. *(Số 0.980/0.988 ở phiên trước là bản non-LOFO bị rò rỉ cùng-family; thay bằng LOFO ở đây.)*
+- **Within-MSVC14 (giao thức LOFO out-of-fold — malicious chấm điểm bởi mô hình KHÔNG train trên family của nó; choco-MSVC14 n=21, 1 vendor=chocolatey, tên app KHÔNG lưu nên không kiểm được đa dạng app):**
+  - metadata-full 0.976 [.913,1.0] ≈ graph 0.969 [.947,.985] → full-vs-graph **CHƯA PHÂN BIỆT ĐƯỢC (CI [−0.060,+0.022], n=21)** → within-MSVC14 chỉ kiểm được **NON-INFERIORITY**.
+  - **Bằng chứng linker+year (thay cho "chưa xác định"):** metadata **tụt còn 0.627** khi bỏ linker+year, trong khi graph giữ 0.969 → sức mạnh within-bin của metadata **chủ yếu từ linker+year** (đặc trưng compile-time/toolchain), graph không phụ thuộc.
+  - **(a) graph bỏ size-feats** (num_functions/file_size/total_nodes) vẫn **0.930**; **(b) giới hạn khoảng file_size chồng lấn** [604K,7.6M] vẫn **0.975** → graph **KHÔNG phải shortcut kích thước**.
+  - **SUPERSEDED:** số 0.980/0.948 (và 0.988) phiên trước là bản **non-LOFO bị rò rỉ cùng-family** — thay bằng các số LOFO ở trên.
+  - **claim SUPERIORITY đặt ở fold khó (Emotet, IcedID)** + thiết lập **bỏ đặc trưng đường tắt**, KHÔNG ở within-MSVC14.
 - **Cap ISO ≤35% train v2 — số học + CÁCH THỰC HIỆN:** v1 train benign = 176 (ISO 141, non-ISO **35**). **Quyết định (ii): GIỮ nguyên thành viên/split v1 (bất biến); cap ISO ÁP Ở LOADER** (subsample ngẫu nhiên seed cố định xuống ≤35% mỗi epoch, hoặc inverse-weight theo nguồn) — **KHÔNG di chuyển mẫu, KHÔNG đẩy ISO sang test_indist**. v2 = v1 (giữ assignment) + benign mới (append). Con số non-ISO/ISO cụ thể lấy từ script gán split v2 trên import_batch1 THẬT (xem dưới), không dùng ước lượng ~150/185.
 - **NirSoft trong mọi bảng AUC:** đánh dấu **"chưa có (v1)"** — NirSoft chỉ ở pilot, chưa vào v1; cột AUC-vs-NirSoft chỉ có từ v2.
+
+## Đợt 1 — kết quả THẬT (dry-run split v2, sau loại .NET + cap; 2026-10)
+Funnel: harvest 381 → 370 trên đĩa (11 trùng tên) → **304** sau loại 66 DLL bên-thứ-ba lặp (Qt/vk_swiftshader ×10app/libglesv2 ×11…) → **loại 31 .NET (out-of-scope, phát hiện qua COM descriptor; hand-check "khác" lộ EntityFramework/Newtonsoft/OpenAI/OpenTK managed)** → **273 native**.
+- **train-eligible non-ISO = 195** (scoop 176 + nirsoft 19); **test_indist += 41**; **holdout_source_nirsoft = 20**; **holdout_lowfreq_toolchain = 17** (GNU/Go/Rust dư >10% cap); **dual-use = 0**.
+- **Cap GNU/Go/Rust ≤10% benign train:** giữ 30 (v1 đã có 7), dư **17 → holdout_lowfreq** (không vào train).
+- **MSVC≤10 train = 55** (v1 13 + scoop 23 + **NirSoft 19**); NirSoft cap 35% → 19 train / 20 holdout.
+- **NirSoft holdout trùng pilot:** 5/46 NirSoft batch1 trùng sha256 với 23 mẫu pilot NirSoft (pilot chỉ exploratory, không train → không rò rỉ train; ghi nhận).
+- train benign theo bin (mới): MSVC14 98, MSVC≤10 42, GNU 17, Go 13, khác 16, MSVC11-12 7, Delphi 2. Plan hash `7f33cfc2ef10e839529a8fe71210b6ff7950e5fa48fbedabac38adc6641c3667`.
