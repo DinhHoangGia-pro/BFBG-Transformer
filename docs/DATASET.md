@@ -65,4 +65,22 @@ Hệ quả: **Dridex tuy có 377 mẫu nhưng chỉ 68 khác biệt** (cụm l�
 
 ## Phía benign
 
-Hiện **44** mẫu (native, ≤12MB) từ 5 nguồn portable chính thức: 7-Zip, Python embeddable, Notepad++, FFmpeg, Git for Windows (6 mẫu .NET của Git for Windows đã bị loại out-of-scope). Có 2 cụm near-duplicate benign (Python embeddable). SOREL-20M đã khảo sát và **loại**: binaries là malware đã "disarmed" (trường Machine = 0, angr không nạp được) và không có benign binaries. Benign hiện **mất cân bằng mạnh** so với malicious (44 vs 708 khác biệt) — kế hoạch mở rộng benign còn đang cân nhắc nguồn.
+Hiện **255 mẫu JSON dùng được** (native, ≤12MB), từ 3 nhóm nguồn (cập nhật 2026-10-07, hết Giai đoạn 1-2 mở rộng benign):
+
+| Nguồn | JSON dùng được |
+|---|---|
+| Windows 11 Enterprise Eval ISO (System32/SysWOW64) | 166 |
+| Chocolatey (payload nhúng, 28 vendor khác nhau) | 45 |
+| Cũ (7-Zip, Python embeddable, Notepad++, FFmpeg, Git for Windows) | 44 |
+| **Tổng** | **255** |
+
+- **Thu thập ISO:** tải Win11 26H2 Enterprise Eval x64 (7,7GB), trích `install.wim` bằng 7z, chọn có kiểm soát ~180 PE top-level System32/SysWOW64 phân tầng kích thước (seed 42), loại trước `api-ms-win-*`/`ext-ms-*` (forwarder rỗng code) theo tên. 180 → 166 JSON / 2 .NET out-of-scope / 12 Timeout.
+- **Thu thập Chocolatey:** tải `.nupkg` qua `api/v2/package/<id>` (không cần CLI), giải nén đệ quy archive lồng, lấy **payload PE** bên trong (không lấy installer gốc — xem memory `benign-installer-payload-only`), phân biệt payload/installer bằng `7z -slt Type=`. 28/90 package có nhúng binary (62 chỉ có URL vendor → bỏ qua). 48 → 45 JSON / 1 .NET / 2 Timeout.
+- **Near-duplicate benign:** `check_sample_similarity.py` chạy trên **278 file thô** (255 có JSON + 23 không: 9 .NET + 14 Timeout) → chỉ **2 cụm** (đều 2 phần tử, đều là Python-embeddable cũ), 276/278 khác biệt (**0,7% trùng**). Payload Chocolatey **không tạo cụm mới** → rủi ro "installer-stub trùng lặp" KHÔNG xảy ra.
+
+> **CẢNH BÁO nguồn benign mất cân bằng — cần source-holdout.**
+> Windows-ISO chiếm **166/255 = 65%** benign, **vượt mức trần 30-40%** đã đặt cho nguồn Microsoft đơn nhất. Rủi ro đúng như MalConv Group A đã ghi: model có thể **"học nguồn thay vì học nhãn"** (nhận ra "từ Microsoft/System32" thay vì "benign"). Khi train/đánh giá PHẢI dùng **source-holdout** (giữ một nguồn benign hoàn toàn ngoài train để kiểm tra generalize), không chỉ chia ngẫu nhiên. Cần bổ sung benign đa vendor (mở rộng Chocolatey/winget) để kéo tỉ lệ ISO xuống.
+
+- **Selection effect tỉ lệ Timeout:** benign **14 Timeout** (ISO 12 + choco 2, trên 228 lần thử ≈ 6,1%) cao hơn hẳn malicious (**4 Timeout thật**, 6 lần chạm thô trên 1.416 ≈ 0,4%). Nguyên nhân đã biết: DLL hệ thống Windows và dev-tool thường là binary **rất nhiều hàm** (vd DLL System32 14.250 hàm) → CFGFast dễ vượt budget hơn malware banking vốn nhỏ gọn. Đây là thiên lệch chọn mẫu cần lưu ý khi so tỉ lệ build giữa hai lớp.
+
+SOREL-20M đã khảo sát và **loại**: binaries là malware đã "disarmed" (trường Machine = 0, angr không nạp được) và không có benign binaries. Benign (255) vẫn **mất cân bằng** so với malicious (1.382 thô / 708 khác biệt) — tiếp tục mở rộng.
