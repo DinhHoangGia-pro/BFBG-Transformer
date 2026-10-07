@@ -176,3 +176,10 @@ Head (`bfbg_transformer.py`) nối `pooled_program ⊕ global_features` với `n
 - **Benign mới chia:** group-aware — phần lớn vào train_pool bin tương ứng; trích ~15% (theo cụm) bổ sung test_indist để tăng mẫu âm (đặc biệt MSVC≤10).
 - **dual-use (sniffer/recovery)** → tập **stress riêng** (chỉ FPR), KHÔNG vào train/test/holdout chính; nhãn chưa xác minh.
 - **v1 bất biến:** mọi mẫu/split v1 giữ nguyên; v2 = v1 + benign mới (+ manifest/hash mới).
+
+## Làm rõ v2 + Emotet (2026-10)
+- **Emotet:** 92 mẫu fetch → **13 .NET loại out-of-scope → 79 native (JSON)**. Emotet là fold LOFO yếu nhất (AUC-vs-choco graph 0.81, metadata 0.91); lý do: **profile 7-scalar KHÁC HẲN 4 family train** (num_functions median 2285 vs TrickBot 1593 / Dridex 104 / IcedID 744 / BumbleBee 394), KHÔNG phải vì giống benign. **BỎ lập luận dựa trên cờ `is_likely_packed`** (gần như luôn =1 ở malware, ubiquitous → không phân biệt).
+- **(a) "~15% test_indist" ≠ holdout nguồn:** test_indist là mẫu **CÙNG phân phối** với train (đo in-distribution, AUC ở cột này KHÔNG dùng làm tiêu chí thắng); **holdout_source_*** (choco, NirSoft-dư) là **nguồn KHÁC** (đo generalization chéo-nguồn, mới là tiêu chí thắng).
+- **(b) Cap ISO ≤35% benign train v2:** ISO (Microsoft, một nguồn) áp **cùng cap vendor ≤35%** như NirSoft, để train benign không bị một nguồn chi phối (v1 ISO ~80% train benign — phải kéo xuống ở v2).
+- **(c) Dedup 90-99 kế thừa split TRỪ khi mẫu khớp thuộc holdout:** `90≤ppdeep<100` bình thường kế thừa split của mẫu khớp; NHƯNG nếu mẫu khớp nằm trong **holdout** (choco/NirSoft/bumblebee) → **LOẠI mẫu mới** (không để near-dup của holdout lọt vào train/test → rò rỉ).
+- **(d) Manifest v2 sinh bằng SCRIPT + commit hash:** v2 manifest/split tạo bằng script tất định (như `make_v1.py`), ghi **SHA256 vào docs và commit TRƯỚC khi chạy BFBG** trên v2.
