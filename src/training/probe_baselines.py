@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
 from src.utils.path_resolver import REPO_ROOT
 from src.training.splits import load_manifest, by_split, group_kfold, group_key
-from src.training.metrics import pr_auc, balanced_acc, fpr_at_tpr, cluster_bootstrap_ci
+from src.training.metrics import pr_auc, balanced_acc, fpr_at_tpr, cluster_bootstrap_ci, wilson_ci
 
 CACHE = os.path.expanduser('~/bfbg_benign_work/feat_cache.jsonl')
 SECDIR = pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_SECURITY']
@@ -106,10 +106,12 @@ def run():
             ap=pr_auc(yy,s); ba=balanced_acc(yy,(s>=thr).astype(int))
             fpr=float((s[yy==0]>=thr).mean()) if (yy==0).any() else float('nan')
             rec=float((s[yy==1]>=thr).mean()) if (yy==1).any() else float('nan')
-            boot=[{'cluster':r['cluster'],'y':r['label'],'score':sc} for r,sc in zip(recs,s)]
+            boot=[{'cluster':group_key(r),'y':r['label'],'score':sc} for r,sc in zip(recs,s)]
             lo,hi=cluster_bootstrap_ci(boot, lambda a,b: float((b[a==0]>=thr).mean()) if (a==0).any() else float('nan'))
+            nben=int((yy==0).sum()); fpk=int((s[yy==0]>=thr).sum()); wlo,whi=wilson_ci(fpk,nben)
+            ndc=len(set(group_key(r) for r in recs))
             print(f"  {tag:24s} n={len(recs):4d} AUC={auc:.3f} PR-AUC={ap:.3f} balAcc={ba:.3f} "
-                  f"FPR@TPR95={fpr*100 if fpr==fpr else float('nan'):.1f}% [boot {lo*100:.0f},{hi*100:.0f}] rec={rec*100 if rec==rec else float('nan'):.1f}%")
+                  f"FPR@TPR95={fpr*100 if fpr==fpr else float('nan'):.1f}% boot[{lo*100:.1f},{hi*100:.1f}] Wilson[{wlo*100:.1f},{whi*100:.1f}] cl={ndc} rec={rec*100 if rec==rec else float('nan'):.1f}%")
         evalset(ti,'test_indist')
         evalset(sp.get('holdout_source_chocolatey',[]),'holdout_choco(FPR)')
         evalset(sp.get('holdout_family_bumblebee',[]),'holdout_bumblebee(rec)')

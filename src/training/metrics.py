@@ -50,3 +50,10 @@ def cluster_bootstrap_ci(records, metric_fn, B=2000, seed=1, lo=2.5, hi=97.5):
         return (float('nan'), float('nan'))
     vals.sort()
     return (float(np.percentile(vals, lo)), float(np.percentile(vals, hi)))
+
+def wilson_ci(k, n, z=1.96):
+    import math
+    if n == 0: return (float('nan'), float('nan'))
+    ph = k/n; d = 1+z*z/n; c = (ph+z*z/(2*n))/d
+    h = (z/d)*math.sqrt(ph*(1-ph)/n + z*z/(4*n*n))
+    return (max(0.0, c-h), min(1.0, c+h))
