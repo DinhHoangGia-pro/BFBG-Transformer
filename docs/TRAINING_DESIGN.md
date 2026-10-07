@@ -51,3 +51,13 @@ metadata — choco FPR **8.9%** [3.5,20.7], BumbleBee recall **53%**; graph — 
 - **(c) NirSoft dư làm source-holdout THỨ HAI:** NirSoft cap ≤35% bin MSVC≤10 cho train; **phần dư giữ nguyên làm holdout nguồn thứ 2** (song song choco) → hai phép FPR chéo-nguồn độc lập (choco=đa-vendor, NirSoft=một-vendor cũ).
 - **(d) Đặc tả LOFO:** 5 fold, mỗi fold train 4 family + toàn bộ benign train; **ngưỡng @TPR95 đặt trên validation của CÁC family train** (không nhìn family test); **negative mỗi fold = benign test_indist** (ghi caveat phân phối). Báo recall@ngưỡng cho family bị giữ + trung bình 5 fold.
 - **(e) Phân tích CHÍNH = train TRONG bin MSVC14** (mal-MSVC14 vs ben-MSVC14, loại confound toolchain ở gốc; n mal 565 / ben 204, ben-non-ISO 42 kèm CI); **phân tích PHỤ = train toàn bộ** (reweight theo bin). **Báo CẢ HAI** — nếu chỉ thắng ở "toàn bộ" mà thua "trong bin MSVC14" thì tín hiệu là toolchain, không phải hành vi.
+
+## 9. Sửa về kiểm định & phân tích chính (2026-10, sau khi xem lực mẫu)
+- **(a) Vế recall — kiểm định GHÉP CẶP trên CÙNG mẫu (paired bootstrap theo cụm)** thay cho "~800 mẫu âm" (vốn là two-proportion độc lập). Hai model dự đoán trên **cùng** tập dương (BumbleBee n=262 / LOFO) → so **hiệu recall per-sample**, resample theo CỤM near-dup (B≥2000), báo phân phối hiệu + CI. Ghép cặp mạnh hơn nhiều: **MDE recall ở n=262 ≈ ~5pp** (so ~12pp nếu không ghép), tùy mức đồng thuận hai model (ghi kèm số cặp bất đồng).
+- **(b) Vế FPR chéo-nguồn — UNDERPOWERED:** holdout_choco n=45 (+ NirSoft-holdout), **chỉ báo FPR kèm khoảng tin cậy (bootstrap+Wilson), KHÔNG dùng làm tiêu chí pass/fail**; chỉ để quan sát xu hướng cho tới khi v2 tăng benign holdout.
+- **(c) LOFO chỉ báo RECALL** (family giữ ra chỉ có mẫu dương); **FPR đo RIÊNG trên holdout benign** (choco + NirSoft), không trộn vào LOFO.
+- **(d) Phân tích CHÍNH = train TRONG bin MSVC14 (số thật, ĐÁNH DẤU underpowered):**
+  - train: malicious MSVC14 `train_pool` = **274** vs benign MSVC14 **non-ISO** `train_pool` = **15** (python-embeddable 10, notepad++ 5).
+  - test: test_indist MSVC14 — malicious **40** / benign non-ISO **3**.
+  - negative = benign MSVC14 non-ISO (loại ISO để bỏ confound một-nguồn).
+  - ⚠️ **benign non-ISO MSVC14 quá ít (train 15 / test 3) → phân tích chính hiện UNDERPOWERED**; chỉ chạy được khi v2 bổ sung benign non-ISO MSVC14. Trước đó dùng phân tích phụ (train toàn bộ + reweight) làm tham chiếu, luôn báo kèm cảnh báo lực.
