@@ -135,3 +135,15 @@ Chưa loại bỏ mẫu nào; đây chỉ là ràng buộc cho bước sau.
 - **(b) Dedup trước khi train, chỉ dùng 708 mẫu khác biệt** (giữ 1 đại diện/cụm). Đơn giản hơn, cân bằng biến thể tốt hơn, loại nguy cơ model học thuộc biến thể đông bản; nhưng **vứt bỏ thông tin tần suất xuất hiện thật** và giảm mạnh số mẫu (nhất là Dridex 377→68).
 
 **Trạng thái.** TREO — chưa tự quyết, giống cách xử lý cụm `{4bec…, ef66…}` ở mục 4 (ghi nhận, chưa loại mẫu nào). Hai điều kiện ràng buộc dù chọn hướng nào: (1) `near_duplicate_clusters.jsonl` là nguồn chân lý cho cụm, loader đọc file này, **không hard-code sha256**; (2) nếu chọn (a), ràng buộc cùng-phía của mục 4 là bắt buộc, không tùy chọn. Quyết định cuối sẽ chốt khi viết `src/training/` và phải ghi lại kèm lý do tại đây.
+
+## 12. angr để lại cache `_angr_rtdb` cạnh mỗi mẫu — rò rỉ ~22GB nếu không dọn
+
+**Chuyện đã xảy ra** (ghi nhận 2026-10-07, khi dựng benign Giai đoạn 1-2). Mỗi lần `angr.Project()` + `CFGFast` lift một mẫu, angr ghi một **thư mục cache `<path>_angr_rtdb*`** (có dạng `<sha>_angr_rtdb` và `<sha>_angr_rtdb_<uuid>`) NGAY CẠNH file mẫu gốc trong `data/raw/...`. Mỗi thư mục có thể >100MB. Tích luỹ qua cả dataset: **~22GB** rác (1.219 thư mục ở `data/raw/malicious` ≈ 8,9GB + 155 ở `data/raw/benign` ≈ 13GB), không được tham chiếu ở `features_graph/` hay manifest. Phát hiện tình cờ khi thư mục benign lẫn file lạ làm nhiễu `check_sample_similarity.py`.
+
+**Cách sửa** (chỉ `scripts/build_graphs.py`, không đụng builder/lifter). Thêm `cleanup_rtdb(path)`: `glob(glob.escape(path) + '_angr_rtdb*')` rồi `shutil.rmtree` **CHỈ các thư mục** khớp pattern. Gọi ở hai nơi:
+- Trong `_worker` (khối `finally`) — dọn ngay sau lift cho các ca ok/skip/fail-exception (worker tự dọn).
+- Trong `run_one` (khối `finally`) — dọn ở phía CHA cho ca Timeout/ProcessCrash, khi worker bị `proc.kill()` không kịp tự dọn.
+
+An toàn: pattern `<path>_angr_rtdb*` không bao giờ khớp chính file mẫu (`path`, không hậu tố) hay JSON (ở `out_dir` khác); chỉ xoá thư mục (`os.path.isdir`).
+
+**Kiểm chứng.** (B) unit `cleanup_rtdb` với rtdb giả → xoá đúng, mẫu gốc nguyên. (C) `--timeout 1` ép Timeout (worker bị kill) → CHA dọn rtdb giả, mẫu nguyên, vẫn báo Timeout. (D) mẫu thật 1.013 hàm → rtdb thật được tạo khi lift, 0 thư mục còn lại sau build, JSON hợp lệ, mẫu gốc nguyên. Dataset hiện tại đã được dọn thủ công 22GB trước khi thêm fix này; từ nay build tự dọn.

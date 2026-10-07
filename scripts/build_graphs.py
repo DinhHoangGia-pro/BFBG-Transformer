@@ -30,12 +30,14 @@ Chay:  python scripts/build_graphs.py [--input-dir data/raw/malicious] [--label 
 
 import argparse
 import datetime
+import glob
 import hashlib
 import json
 import logging
 import multiprocessing as mp
 import os
 import pickle
+import shutil
 import sys
 import tempfile
 import time
@@ -74,6 +76,16 @@ def describe_exception(exc):
     }
 
 
+def cleanup_rtdb(path):
+    """Xoa thu muc cache '<path>_angr_rtdb*' ma angr ghi CANH mau goc khi lift
+    (moi mau mot thu muc, co the >100MB - tung ro ri ~22GB cho ca dataset, xem
+    docs/LESSONS_LEARNED.md). CHI xoa THU MUC khop pattern nay; KHONG bao gio
+    dong toi file mau goc (= path, khong co hau to) hay JSON (o out_dir khac)."""
+    for d in glob.glob(glob.escape(path) + '_angr_rtdb*'):
+        if os.path.isdir(d):
+            shutil.rmtree(d, ignore_errors=True)
+
+
 def _worker(path, label, out_dir, vocab_path, result_path):
     # Tra ket qua qua FILE TAM (pickle), KHONG qua multiprocessing.Queue:
     # Queue + feeder-thread/pipe giua ThreadPool va tien trinh con tung gay
@@ -88,6 +100,8 @@ def _worker(path, label, out_dir, vocab_path, result_path):
                       'num_api_calls': bfbg['num_api_calls']})
     except BaseException as exc:   # noqa: BLE001 - ghi lai MOI loi, ke ca KeyboardInterrupt/SystemExit trong angr
         res = ('error', describe_exception(exc))
+    finally:
+        cleanup_rtdb(path)   # don cache ngay sau khi lift xong (ok/skip/fail-exception)
     with open(result_path, 'wb') as f:
         pickle.dump(res, f)
 
@@ -145,6 +159,7 @@ def run_one(path, args, ctx):
     finally:
         if os.path.exists(result_path):
             os.unlink(result_path)
+        cleanup_rtdb(path)   # Timeout/ProcessCrash: worker bi kill khong kip tu don -> cha don o day
 
 
 def collect_inputs(args):
