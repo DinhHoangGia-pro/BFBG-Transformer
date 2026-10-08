@@ -105,3 +105,18 @@ chỉ do đổi seed (graph/metadata probe ổn định). Do đó:
 - **Báo cáo bắt buộc:** trung bình ± độ lệch chuẩn qua các seed; VÀ hiệu ghép đôi (BFBG−probe) tính RIÊNG TỪNG seed rồi tổng hợp (trung bình ± std, hoặc khoảng), không gộp điểm.
 - CI cho mỗi seed vẫn là cluster-bootstrap; nhưng kết luận dựa trên phân bố qua seed, không dựa tron một seed may/rủi.
 - Seed cố định, ghi trước danh sách seed TRƯỚC khi chạy; không chọn seed sau khi xem kết quả.
+
+## 17. Lịch huấn luyện có early-stopping (POST-HOC, thay §15 cho RUN MỚI; 2026-10-09)
+Nhãn POST-HOC: áp cho các run mới sau freeze-v2, KHÔNG sửa design đã khóa. Thay §15 (epoch cố định 20)
+cho những run dùng lịch này; các kết quả §15 cũ giữ nguyên.
+- **max_epochs = 40** (trần, KHÔNG phải 20 cố định).
+- **Theo dõi val_loss** trên **validation theo cụm trong train_pool** (cross-entropy). KHÔNG dùng choco,
+  KHÔNG dùng holdout_nirsoft. val-AUC chỉ ghi kèm (không dùng để dừng).
+  - Tách validation: 15% theo cụm (group_key near-dup), seed 20261008. Với v2 (sau ISO cap 113):
+    val n=189, **benign=58 (≥40 → không cần tăng)**. Train còn 1049.
+    Nếu một cấu hình khác cho <40 benign thì tăng dần phần validation (theo cụm, cùng seed) tới ≥40.
+- **Cải thiện** = val_loss giảm ≥ **min_delta=0.002** so với tốt nhất từ trước.
+- **ReduceLROnPlateau**: 5 epoch liên tiếp không cải thiện → lr *= 0.5; **tối đa 2 lần** giảm.
+- **Early stop**: 10 epoch liên tiếp không cải thiện → dừng, **nạp lại checkpoint tốt nhất theo val_loss**.
+- **Bỏ cosine**; giữ **grad-clip 1.0**.
+- Log mỗi epoch: val_loss, val_auc, lr, bộ đếm (no_improve, số lần giảm lr).

@@ -51,3 +51,6 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 
 ## Cập nhật 2026-10-09 (§16 min-5-seed)
 - TRAINING_DESIGN.md SHA256 `aa155abea4704cd86f0ae9fd3af504230c3b1746cc981a4cefe571b6992121dc` (thêm §16: tối thiểu 5 seed cho mọi so sánh BFBG; báo trung bình±std + hiệu ghép đôi theo seed).
+
+## Cập nhật 2026-10-09 (§17 early-stopping, thay §15 cho run mới)
+- TRAINING_DESIGN.md SHA256 `c5a948dadef4aa1f534f85c41bfdaa5646cc50343287e45edf95ee1d04b479dc` (thêm §17; §15 giữ cho kết quả cũ). Pre-reg cosine 6fe7331 bị thay thế bởi §17.

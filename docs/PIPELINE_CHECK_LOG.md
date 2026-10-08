@@ -76,3 +76,8 @@ Mục tiêu: xem cosine LR schedule có giảm nhiễu seed của BFBG không. G
 - **Seed ghi trước = {101, 202, 303}** (không đổi sau khi xem kết quả).
 - Nhãn: **POST-HOC** (phân tích sau khi đóng băng design freeze-v2); KHÔNG dùng để chỉnh design đã khóa.
 - Ngoài ra chạy lại v2dev gốc (seed 20261008, KHÔNG cosine) để lấy per-sample score cho Task 3 (cắt hàm).
+
+## Ghi chú 2026-10-09: pre-registration 6fe7331 BỊ THAY THẾ
+Pre-registration cosine LR (commit 6fe7331, seed {101,202,303}) **bị thay thế bởi §17**
+(early-stopping + ReduceLROnPlateau, bỏ cosine). Các run cosine KHÔNG chạy (driver bị dừng
+trước khi ra JSON). TRAINING_DESIGN.md sau §17: SHA256 `c5a948dadef4aa1f534f85c41bfdaa5646cc50343287e45edf95ee1d04b479dc`.
