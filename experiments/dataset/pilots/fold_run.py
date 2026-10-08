@@ -27,8 +27,11 @@ ap.add_argument("--es", type=int, default=0)            # section 17 early-stopp
 ap.add_argument("--max-epochs", type=int, default=40)
 ap.add_argument("--min-delta", type=float, default=0.002)
 ap.add_argument("--smoke", type=int, default=0)         # plumbing test, not real training
+ap.add_argument("--resume", type=int, default=0)        # resume from last checkpoint
+ap.add_argument("--max-hours", type=float, default=8.0) # wall-clock ceiling
 ap.add_argument("--tag", default="run")
 A = ap.parse_args()
+WALL0 = time.time()
 SPLIT_SEED = 20261008; MS = A.model_seed
 random.seed(MS); np.random.seed(MS); torch.manual_seed(MS)
 dev = "cuda" if torch.cuda.is_available() else "cpu"
@@ -122,12 +125,20 @@ def val_loss_auc(recs):
     va = roc_auc_score(yy, ss) if len(set(yy)) > 1 else float("nan")
     return vl, va
 
-CKPT = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}.pt")
+CKPT = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}.pt")        # best (by val_loss)
+LAST = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}_last.pt")   # last (every epoch, for --resume)
 # section 17 early-stopping state
 best_vl = float("inf"); best_ep = -1; no_improve = 0; lr_cuts = 0; stop_reason = "max_epochs"
 val_y = np.array([r["label"] for r in val]) if val else None
 val_curve = []; val_loss_curve = []; losses = []; fail_train = []; fail_oom = []
-for ep in range(EP):
+start_ep = 0
+if A.resume and os.path.exists(LAST):
+    st = torch.load(LAST, map_location=dev)
+    model.load_state_dict(st["model"]); opt.load_state_dict(st["opt"])
+    best_vl = st["best_vl"]; best_ep = st["best_ep"]; no_improve = st["no_improve"]; lr_cuts = st["lr_cuts"]
+    losses = st["losses"]; val_curve = st["val_curve"]; val_loss_curve = st["val_loss_curve"]; start_ep = st["epoch"] + 1
+    print(f"RESUME from ep{start_ep} (best_ep{best_ep} best_vl={best_vl:.4f} no_improve={no_improve} lr_cuts={lr_cuts})", flush=True)
+for ep in range(start_ep, EP):
     model.train(); t0 = time.time(); tl = 0.0; nb = 0; bad = 0; oom = 0
     opt.zero_grad(); acc_i = 0
     for batch in dl:
@@ -168,8 +179,14 @@ for ep in range(EP):
                 lr_cuts += 1; es_note = f"lr_halved(#{lr_cuts})"
     print(f"epoch {ep:2d}: tr_loss={losses[-1]:.4f} val_loss={vl:.4f} val_auc={vauc:.4f} lr={lr_now:.2e} "
           f"no_improve={no_improve} lr_cuts={lr_cuts} GPU={gtemp}C nb={nb} bad={bad} oom={oom} t={time.time()-t0:.0f}s VRAM={pk:.2f}GB {es_note}", flush=True)
+    # last checkpoint EVERY epoch (model+opt+lr+counters+epoch+curves) for --resume
+    torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "epoch": ep,
+                "best_vl": best_vl, "best_ep": best_ep, "no_improve": no_improve, "lr_cuts": lr_cuts,
+                "losses": losses, "val_curve": val_curve, "val_loss_curve": val_loss_curve}, LAST)
     if A.es and no_improve >= 10:
         stop_reason = f"early_stop@ep{ep}(no_improve>=10)"; print(f"EARLY STOP: {stop_reason}, reloading best ep{best_ep}", flush=True); break
+    if time.time() - WALL0 > A.max_hours * 3600:
+        stop_reason = f"wall_clock@ep{ep}(>{A.max_hours}h)"; print(f"WALL-CLOCK CEILING hit: {stop_reason}, reloading best ep{best_ep}", flush=True); break
 if A.es and os.path.exists(CKPT):
     model.load_state_dict(torch.load(CKPT)); print(f"reloaded best checkpoint ep{best_ep} val_loss={best_vl:.4f}", flush=True)
 
