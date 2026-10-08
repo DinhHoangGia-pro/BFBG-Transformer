@@ -68,3 +68,11 @@ toolchain/linker/năm của benign mới rất tốt (xác nhận confound toolc
 - **CHƯA push** (môi trường thiếu credential GitHub): cần chạy
   `git push origin restructure-bfbg && git push origin freeze-v2.1`.
 - Kết quả thô: `~/bfbg_benign_work/foldrun_{seedA,seedB,v2dev}.json`, `fold_consolidated.json`.
+
+## PRE-REGISTRATION (ghi trước 2026-10-09, trước khi chạy) — cấu hình ổn định hóa
+Mục tiêu: xem cosine LR schedule có giảm nhiễu seed của BFBG không. Ghi TRƯỚC khi xem kết quả.
+- Cấu hình: grad clipping 1.0 (đã là baseline) + **CosineAnnealingLR(T_max=20)** trên Adam lr 2e-4→0.
+- 20 epoch cố định, v2 train (ISO cap 113), BumbleBee fold, num_global_features=0.
+- **Seed ghi trước = {101, 202, 303}** (không đổi sau khi xem kết quả).
+- Nhãn: **POST-HOC** (phân tích sau khi đóng băng design freeze-v2); KHÔNG dùng để chỉnh design đã khóa.
+- Ngoài ra chạy lại v2dev gốc (seed 20261008, KHÔNG cosine) để lấy per-sample score cho Task 3 (cắt hàm).
