@@ -44,3 +44,7 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 - **Fold BumbleBee (pipeline-check)**: lần OOM 06:44; lần chạy hợp lệ **bắt đầu 07:11, kết thúc 09:56 (+07)**, 20 epoch.
 - **Tag tạo ~12:40 (+07) ngày 2026-10-08.**
 - **Minh bạch:** kết quả pipeline-check (AUC/recall/FPR/loss curve) ĐÃ được xem TRƯỚC khi tạo tag này. Đây là pipeline-check, KHÔNG phải kết quả, và KHÔNG dùng để chọn/điều chỉnh thiết kế đã khóa (design khóa ở freeze-v2/0a3de27 trước khi fold chạy).
+
+## Cập nhật 2026-10-08 (§14 loại num_functions=0, §15 quy tắc epoch)
+- TRAINING_DESIGN.md SHA256 `b9ff151793f3802b8ae38d007134ae91f0b517545726cad425ba4391371b3bbe` (thêm §14 quy tắc loại num_functions=0 áp chung hai phía; §15 epoch cố định=20, không dùng choco/validation chọn epoch).
+- Kiểm kê num_functions=0: v1=2 (label0: choco1,iso1), v2=4 (label0: choco1,scoop2,iso1); 0 malicious.

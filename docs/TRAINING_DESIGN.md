@@ -84,3 +84,16 @@ v2 train benign = 351 (ISO 141 = 40% > cap 35%). **Cap ÁP Ở LOADER, không s�
 - Mỗi epoch: giữ **K=113 ISO** (để K/(non_ISO 210 + K) ≤ 0.35), **drop 28 ISO** còn lại.
 - **Seed cố định** cho phép chọn: `random.Random(20261008 + epoch)` (tái lập, nhưng đổi tập drop mỗi epoch để không bỏ hẳn 28 mẫu). Tùy chọn thay bằng **inverse-weight** nguồn (ISO weight = 113/141) nếu không muốn drop.
 - Số thật tính từ v2 manifest `e2e2c67a` (không ước lượng). Non-ISO train = 210; MSVC≤10 train 55.
+
+## 14. Quy tắc loại mẫu num_functions=0 (áp CHUNG hai phía, 2026-10-08)
+Mẫu có `num_functions==0` (angr/CFGFast không trích được hàm → đồ thị rỗng) **bị loại ở loader cho CẢ benign lẫn malicious**, không phân biệt nhãn, để tránh thiên lệch một phía.
+- Kiểm kê hiện tại (chỉ benign bị dính, 0 malicious):
+  - v1: 2 mẫu (label0): chocolatey 1, windows11-eval-iso 1.
+  - v2: 4 mẫu (label0): chocolatey 1, scoop 2, windows11-eval-iso 1.
+- Loại ở loader (BFBGDataset→collate trả None→bỏ batch), KHÔNG sửa manifest; đếm số bị loại ghi vào log mỗi lần chạy. Áp cho mọi split khi dùng BFBG. Probe RF vẫn có vector đặc trưng cho các mẫu này; khi so sánh ghép đôi thì bỏ chúng khỏi tập chung để 3 model cùng mẫu.
+
+## 15. Quy tắc chọn số epoch (ghi trước, 2026-10-08)
+- **Số epoch CỐ ĐỊNH = 20** (ghi trong config, `training.epochs`). KHÔNG early-stopping, KHÔNG dùng validation/choco để chọn epoch.
+- Validation theo cụm (carve từ train_pool, seed 20261008) chỉ để **chẩn đoán overfit** (vẽ val-AUC theo epoch); tuyệt đối không dùng để chọn epoch, tune siêu tham số, hay chọn mô hình.
+- choco (holdout_source_chocolatey) là tập đánh giá cuối, KHÔNG dùng cho bất kỳ lựa chọn nào.
+- Nếu sau này đổi sang chọn epoch theo validation: phải ghi trước quy tắc (vd. epoch có val-AUC cao nhất trong 20, tie-break epoch nhỏ hơn) TRƯỚC khi nhìn kết quả, và đóng băng lại.
