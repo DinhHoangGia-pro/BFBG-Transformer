@@ -97,3 +97,11 @@ Mẫu có `num_functions==0` (angr/CFGFast không trích được hàm → đồ
 - Validation theo cụm (carve từ train_pool, seed 20261008) chỉ để **chẩn đoán overfit** (vẽ val-AUC theo epoch); tuyệt đối không dùng để chọn epoch, tune siêu tham số, hay chọn mô hình.
 - choco (holdout_source_chocolatey) là tập đánh giá cuối, KHÔNG dùng cho bất kỳ lựa chọn nào.
 - Nếu sau này đổi sang chọn epoch theo validation: phải ghi trước quy tắc (vd. epoch có val-AUC cao nhất trong 20, tie-break epoch nhỏ hơn) TRƯỚC khi nhìn kết quả, và đóng băng lại.
+
+## 16. Số seed tối thiểu & tiêu chí báo cáo cho mọi so sánh BFBG (2026-10-08)
+Bằng chứng pipeline-check cho thấy AUC(BumbleBee vs choco) của BFBG dao động 0.680–0.884
+chỉ do đổi seed (graph/metadata probe ổn định). Do đó:
+- **Mọi so sánh liên quan BFBG PHẢI dùng ≥5 seed** (model init + shuffle). Một-seed bị CẤM làm cơ sở kết luận.
+- **Báo cáo bắt buộc:** trung bình ± độ lệch chuẩn qua các seed; VÀ hiệu ghép đôi (BFBG−probe) tính RIÊNG TỪNG seed rồi tổng hợp (trung bình ± std, hoặc khoảng), không gộp điểm.
+- CI cho mỗi seed vẫn là cluster-bootstrap; nhưng kết luận dựa trên phân bố qua seed, không dựa tron một seed may/rủi.
+- Seed cố định, ghi trước danh sách seed TRƯỚC khi chạy; không chọn seed sau khi xem kết quả.

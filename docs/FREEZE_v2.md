@@ -48,3 +48,6 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 ## Cập nhật 2026-10-08 (§14 loại num_functions=0, §15 quy tắc epoch)
 - TRAINING_DESIGN.md SHA256 `b9ff151793f3802b8ae38d007134ae91f0b517545726cad425ba4391371b3bbe` (thêm §14 quy tắc loại num_functions=0 áp chung hai phía; §15 epoch cố định=20, không dùng choco/validation chọn epoch).
 - Kiểm kê num_functions=0: v1=2 (label0: choco1,iso1), v2=4 (label0: choco1,scoop2,iso1); 0 malicious.
+
+## Cập nhật 2026-10-09 (§16 min-5-seed)
+- TRAINING_DESIGN.md SHA256 `aa155abea4704cd86f0ae9fd3af504230c3b1746cc981a4cefe571b6992121dc` (thêm §16: tối thiểu 5 seed cho mọi so sánh BFBG; báo trung bình±std + hiệu ghép đôi theo seed).
