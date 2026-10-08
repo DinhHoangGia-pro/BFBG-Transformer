@@ -38,3 +38,9 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 - **holdout_nirsoft:** 20 mẫu, phân loại theo NGUỒN; **1 mẫu trùng pilot NirSoft** (pilot chỉ exploratory → không rò rỉ train; GIỮ NGUYÊN holdout theo lệnh, ghi nhận caveat).
 - **ISO cap @loader:** giữ 113/141 ISO (seed 20261008+epoch), drop 28 — xem TRAINING_DESIGN §13.
 - **app provenance:** orig_name (app/base) đã lưu cho benign mới; mẫu v1 không có (giữ nguyên v1).
+
+## Tag freeze-v2.1 (2026-10-08) — mốc thời gian & minh bạch pipeline-check
+- Tag `freeze-v2` cũ trỏ 0a3de27 (FREEZE còn hash `4f438bcf`, CHƯA có quy tắc subsample ISO). Commit đúng = 65b57f6 (hash `e2e2c67…` + §13). Tạo tag chú thích **freeze-v2.1** trên commit chứa ghi chú này.
+- **Fold BumbleBee (pipeline-check)**: lần OOM 06:44; lần chạy hợp lệ **bắt đầu 07:11, kết thúc 09:56 (+07)**, 20 epoch.
+- **Tag tạo ~12:40 (+07) ngày 2026-10-08.**
+- **Minh bạch:** kết quả pipeline-check (AUC/recall/FPR/loss curve) ĐÃ được xem TRƯỚC khi tạo tag này. Đây là pipeline-check, KHÔNG phải kết quả, và KHÔNG dùng để chọn/điều chỉnh thiết kế đã khóa (design khóa ở freeze-v2/0a3de27 trước khi fold chạy).
