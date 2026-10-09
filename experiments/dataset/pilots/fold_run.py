@@ -125,10 +125,12 @@ def val_loss_auc(recs):
     va = roc_auc_score(yy, ss) if len(set(yy)) > 1 else float("nan")
     return vl, va
 
-CKPT = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}.pt")        # best (by val_loss)
+CKPT = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}.pt")        # best (by val_loss) — primary
+CKPT_A = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}_vauc.pt") # best (by val_auc) — secondary
 LAST = os.path.expanduser(f"~/bfbg_benign_work/ckpt_{A.tag}_last.pt")   # last (every epoch, for --resume)
 # section 17 early-stopping state
 best_vl = float("inf"); best_ep = -1; no_improve = 0; lr_cuts = 0; stop_reason = "max_epochs"
+best_vauc = -1.0; best_vauc_ep = -1
 val_y = np.array([r["label"] for r in val]) if val else None
 val_curve = []; val_loss_curve = []; losses = []; fail_train = []; fail_oom = []
 start_ep = 0
@@ -169,6 +171,8 @@ for ep in range(start_ep, EP):
     gtemp = os.popen("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader 2>/dev/null").read().strip() if dev == "cuda" else "NA"
     # section 17 early-stopping bookkeeping
     es_note = ""
+    if A.es and val and vauc == vauc and vauc > best_vauc:   # track peak val-AUC checkpoint (secondary)
+        best_vauc = vauc; best_vauc_ep = ep; torch.save(model.state_dict(), CKPT_A)
     if A.es:
         if vl < best_vl - A.min_delta:
             best_vl = vl; best_ep = ep; no_improve = 0; torch.save(model.state_dict(), CKPT); es_note = "*best"
@@ -267,5 +271,33 @@ for grp, name in ((1, "truncated"), (0, "non-truncated")):
     R.setdefault("trunc_auc", {})[name] = [a, int((yy == 1).sum()), int((yy == 0).sum())]
     print(f"  BFBG AUC {name:14s}: {a:.3f}  (mal={int((yy==1).sum())} ben={int((yy==0).sum())})", flush=True)
 print(f"  val_fin={val_curve[-1]} val_max={max([x for x in val_curve if x==x], default=float('nan'))} loss_fin={losses[-1]:.3f}", flush=True)
+print(f"  best_val_loss_ep={best_ep}(vl={None if best_vl==float('inf') else round(best_vl,4)}) peak_val_auc_ep={best_vauc_ep}(va={best_vauc:.4f})", flush=True)
+
+# SECONDARY: metrics at peak val-AUC checkpoint (model currently holds best val_loss ckpt)
+if A.es and os.path.exists(CKPT_A):
+    print("\n----- SECONDARY: at peak val-AUC checkpoint -----", flush=True)
+    model.load_state_dict(torch.load(CKPT_A, map_location=dev))
+    sb2 = np.r_[scores(bb), scores(ch)]
+    v2 = np.isfinite(sb2) & np.isfinite(S["graph"]) & np.isfinite(S["metadata"])
+    y2 = y[v2]; cl2 = cl[v2]; B2 = sb2[v2]; G2 = S["graph"][v2]; M2 = S["metadata"][v2]
+    def cb2(fn, n=2000):
+        uc = np.unique(cl2); rng = np.random.RandomState(SPLIT_SEED); idx = {c: np.where(cl2 == c)[0] for c in uc}; vv = []
+        for _ in range(n):
+            ii = np.concatenate([idx[c] for c in rng.choice(uc, len(uc), replace=True)])
+            try: vv.append(fn(ii))
+            except Exception: pass
+        vv = np.array([x for x in vv if np.isfinite(x)]); return float(np.percentile(vv, 2.5)), float(np.percentile(vv, 97.5))
+    aB = auc(B2, y2); lo, hi = cb2(lambda ii: auc(B2[ii], y2[ii]))
+    dG = aB - auc(G2, y2); dglo, dghi = cb2(lambda ii: auc(B2[ii], y2[ii]) - auc(G2[ii], y2[ii]))
+    dM = aB - auc(M2, y2); dmlo, dmhi = cb2(lambda ii: auc(B2[ii], y2[ii]) - auc(M2[ii], y2[ii]))
+    sec = {"auc_BFBG": [aB, lo, hi], "dAUC_graph": [dG, dglo, dghi], "dAUC_metadata": [dM, dmlo, dmhi], "recall_at_fpr": {}}
+    print(f"  AUC BFBG(peak-vauc)={aB:.3f} [{lo:.3f},{hi:.3f}]  dAUC-graph={dG:+.3f} [{dglo:+.3f},{dghi:+.3f}]  dAUC-metadata={dM:+.3f} [{dmlo:+.3f},{dmhi:+.3f}]", flush=True)
+    bm2 = y2 == 1; cmk2 = y2 == 0
+    for fpr in (0.01, 0.05, 0.10):
+        thr = np.quantile(np.sort(B2[cmk2]), 1 - fpr); rec = float((B2[bm2] >= thr).mean()); sec["recall_at_fpr"][str(fpr)] = rec
+        print(f"  recall@FPR{int(fpr*100)}%(peak-vauc)={rec*100:.1f}", flush=True)
+    R["secondary_peak_vauc"] = sec
+    R["best_val_loss_ep"] = best_ep; R["peak_val_auc_ep"] = best_vauc_ep; R["peak_val_auc"] = best_vauc
+
 print(f"  fail_oom={[[e,len(s)] for e,s in fail_oom]} fail_eval={fail_eval}", flush=True)
 json.dump(R, open(OUT, "w")); print(f"DONE {A.tag}", flush=True)
