@@ -127,3 +127,25 @@ Script: experiments/dataset/pilots/shortcut_probe_emb.py. Nhãn: analysis (infer
 - **Gate:** CHÍNH 0.891 ∈ [0.85,0.90) → KHÔNG <0.85 (không fail), KHÔNG ≥0.90 (không kích hoạt "hỏi chạy thêm"). Dừng, không tự chạy run khác.
 - **Hai seed §17 (post-hoc):** best-val_loss AUC = {s101 0.891, s202 0.950}, spread ~0.06 → nhiễu seed vẫn còn dù dùng §17.
   KHÔNG quy cho §17 việc "khử 0.68" (điểm 0.68 ở v1/fixed-epoch khác cả dữ liệu lẫn quy tắc). Mới 2 seed < 5 (§16) → KHÔNG kết luận.
+
+## Tổng hợp 4 seed §17 (post-hoc, v2, BumbleBee fold) — 2026-10-09
+Seed {101,202,303,404}, cùng split/val (carve seed 20261008), §17 (early-stop, nạp best-val_loss). Đều early-stop ep17–19.
+
+| seed | best_ep | AUC_choco (best-val_loss) [CI cụm] | dAUC−graph | dAUC−metadata | peak-val-AUC AUC | recall@FPR 1/5/10% |
+|---|---|---|---|---|---|---|
+| 101 | 9 | 0.891 [0.816,0.955] | −0.012 | −0.093 | 0.926 | 23/27/55 |
+| 202 | 9 | 0.950 [0.910,0.984] | +0.046 | −0.035 | (n/a*) | 51/70/79 |
+| 303 | 8 | 0.934 [0.886,0.976] | +0.030 | −0.051 | 0.911 | 49/56/62 |
+| 404 | 7 | 0.848 [0.767,0.921] | −0.055 | −0.136 | 0.919 | 2/19/75 |
+
+(*s202 chạy trước khi thêm tính năng lưu peak-val-AUC checkpoint → không có.)
+
+**Tổng hợp (trung bình ± std, n=4):**
+- AUC_BFBG = **0.906 ± 0.046** (min 0.848, max 0.950). graph ref 0.904, metadata ref 0.985.
+- dAUC BFBG−graph = **+0.002 ± 0.046** (straddle 0) → BFBG ≈ graph probe.
+- dAUC BFBG−metadata = **−0.079 ± 0.046** → BFBG **dưới** metadata nhất quán (mọi seed âm).
+
+**Đọc trung thực (post-hoc, chưa đủ 5 seed theo §16):**
+- Nhiễu seed VẪN còn dù §17: AUC 0.85–0.95 (±0.046); recall@FPR dao động rất mạnh theo seed (vd s404 2% vs s202 51% @FPR1%).
+- BFBG ngang graph probe, **thua metadata** (metadata mạnh do confound toolchain≈family — xem Task 2 đường tắt).
+- Mới 4 seed (§18 danh sách {101,202,303,404}); §16 cần ≥5, **chưa chốt seed thứ 5** → KHÔNG tuyên bố đủ bộ/kết luận.
