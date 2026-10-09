@@ -95,3 +95,24 @@ trước khi ra JSON). TRAINING_DESIGN.md sau §17: SHA256 `c5a948dadef4aa1f534f
 - Mốc so sánh (theo yêu cầu) = dev run v2 seed20261008 (0.879) + graph 0.906 + metadata 0.985, KHÔNG phải 0.68 của v1.
 - **Bước 4:** AUC 0.950 ≥0.85 → đề xuất thêm seed (§16 cần ≥5). Người dùng chọn CHƯA CHẠY. Chưa đủ 5 seed nên KHÔNG kết luận.
 - File: ~/bfbg_benign_work/foldrun_v2es202.json; checkpoint best/last ckpt_v2es202{,_last}.pt.
+
+## Task 2 — chẩn đoán đường tắt trên embedding checkpoint §17 (seed202, 2026-10-09)
+Linear probe (LogReg) dự đoán toolchain-bin / family từ embedding (dim 128), CV theo cụm (k=5).
+Tập = train_pool + bumblebee + test_indist + choco (KHÔNG đụng holdout_nirsoft), n=1846.
+
+| | toolchain-bin (CV-acc) | family (CV-acc, malicious n=1382) |
+|---|---|---|
+| **trained-emb** (ckpt §17) | 0.693 | 0.691 |
+| **untrained-emb** (random init) | **0.797** | **0.791** |
+| 7-scalar (graph feats) | 0.687 | 0.773 |
+| from-label (nhãn→bin) | 0.532 | — |
+| majority-class | 0.470 | 0.287 |
+
+**Đọc trung thực:**
+- Embedding mã hóa MẠNH toolchain/family: trained 0.69 (bin) & 0.69 (family) >> majority 0.47/0.29 và from-label 0.53.
+  → confound toolchain≈family nằm NGAY trong biểu diễn, khớp phát hiện toàn dự án.
+- **untrained > trained** (0.797 vs 0.693 bin; 0.791 vs 0.691 family): shortcut nằm ở đặc trưng đầu vào/kiến trúc
+  (random projection giữ cấu trúc), KHÔNG do training tạo ra. Training thậm chí GIẢM nhẹ tính đoán-được
+  toolchain/family của embedding — nhưng vẫn cao (không khử hết shortcut).
+- 7-scalar cũng đoán family tốt (0.773) → đặc trưng đồ thị thô cũng confound.
+Script: experiments/dataset/pilots/shortcut_probe_emb.py. Nhãn: analysis (inference), không train BFBG.
