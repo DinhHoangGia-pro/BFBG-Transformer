@@ -149,3 +149,24 @@ Seed {101,202,303,404}, cùng split/val (carve seed 20261008), §17 (early-stop,
 - Nhiễu seed VẪN còn dù §17: AUC 0.85–0.95 (±0.046); recall@FPR dao động rất mạnh theo seed (vd s404 2% vs s202 51% @FPR1%).
 - BFBG ngang graph probe, **thua metadata** (metadata mạnh do confound toolchain≈family — xem Task 2 đường tắt).
 - Mới 4 seed (§18 danh sách {101,202,303,404}); §16 cần ≥5, **chưa chốt seed thứ 5** → KHÔNG tuyên bố đủ bộ/kết luận.
+
+## 4 phép thử rẻ H1–H4 (CPU, post-hoc, dev set=choco) — 2026-10-10
+Tập ghép đôi bb+choco n=306 (như trước). Tham chiếu: BFBG 4-seed 0.906±0.046, graph 0.904, metadata 0.985.
+
+**H1 — cắt hàm / kích thước (confound):**
+- num_functions (median): choco benign **4255** vs BumbleBee **394** → benign LỚN hơn malware ~10×. Cắt giữ 150 hàm đầu → với benign mất ~97% chương trình.
+- AUC(label từ MỖI num_functions, eval) = 0.175 → định hướng đúng (benign lớn) = **0.825** → num_functions là shortcut xuyên-họ mạnh.
+- Probe AUC truncated vs non-trunc: meta 0.980/0.987, graph 0.907/0.797 (non-trunc chỉ 3 ben → không đáng tin). Cắt không rõ làm hại probe.
+
+**H2 — ensemble/calibration 4 checkpoint (best-val_loss):**
+| | AUC | Brier | recall@FPR 1/5/10 |
+|---|---|---|---|
+| s101/202/303/404 | 0.891/0.950/0.934/0.848 | 0.106/0.118/0.062/0.158 | (xem log) |
+| **ENSEMBLE mean4** | **0.932** | **0.077** | **25/33/97** |
+→ Ensemble ≈ top-single AUC, Brier tốt, **recall@FPR10 nhảy lên 97** (vs 55–79 từng seed) + ổn định. Không cần GPU.
+
+**H3 — bag-of-tokens TF-IDF + RF (train_pool→eval):** vocab 1361, **AUC 0.972, recall@FPR 90/90/95** → **vượt BFBG (0.906) và graph (0.907), gần metadata**. Token thô một mình đã rất mạnh.
+
+**H4 — thêm API histogram vào probe graph:** graph-only 0.907 → **graph+APIhist 0.950** (recall@FPR5 39→88). API histogram giúp mạnh.
+
+**Đọc tổng (trung thực):** nhiều baseline ĐƠN GIẢN không-GNN (metadata 0.985, bag-of-tokens 0.972, graph+API 0.950) **ngang/vượt BFBG 0.906**. Kết hợp Task 2 (embedding mã hóa toolchain/family, untrained≥trained) + H1 (benign lớn gấp ~10× malware) → tác vụ BumbleBee-vs-choco **bị chi phối bởi confound (kích thước họ, toolchain, tần suất token/API)**; cấu trúc GNN KHÔNG phải yếu tố quyết định. Mọi số là dev-set choco, post-hoc, chưa đụng holdout kiểm định cuối.
