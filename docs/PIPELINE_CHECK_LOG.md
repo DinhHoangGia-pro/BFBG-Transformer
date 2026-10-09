@@ -81,3 +81,17 @@ Mục tiêu: xem cosine LR schedule có giảm nhiễu seed của BFBG không. G
 Pre-registration cosine LR (commit 6fe7331, seed {101,202,303}) **bị thay thế bởi §17**
 (early-stopping + ReduceLROnPlateau, bỏ cosine). Các run cosine KHÔNG chạy (driver bị dừng
 trước khi ra JSON). TRAINING_DESIGN.md sau §17: SHA256 `c5a948dadef4aa1f534f85c41bfdaa5646cc50343287e45edf95ee1d04b479dc`.
+
+## Bước 3 — dev run post-hoc §17 (v2, seed 202, 1 seed, KHÔNG kết luận) 2026-10-09
+- Early-stop @ep19 (no_improve≥10), nạp best ep9 (val_loss 0.382). lr giảm 2 lần (ep14, ep19). ~600s/ep, ~3h20, VRAM 4.5GB, GPU 53–56°C, 0 OOM/0 bad.
+- AUC(BumbleBee vs choco): **BFBG 0.950 [0.910,0.984]**, graph 0.904, metadata 0.985.
+  dAUC BFBG−graph +0.046 [−0.016,+0.115]; BFBG−metadata −0.035 [−0.077,+0.001].
+  recall@FPR 1/5/10%: BFBG 51/70/79, graph 31/39/87, metadata 74/96/98.
+- **Phát hiện then chốt:** thảm họa seed 202 = 0.680 (fixed-20-epoch trước đây) PHẦN LỚN là hiện vật
+  "lấy epoch cuối" — ep19 có val_loss đã vọt 0.73. §17 nạp best-by-val_loss (ep9) → cùng seed 202 lên 0.950.
+  Không phải BFBG thất bại chuyển miền cố hữu; val_loss nhiễu (0.38–0.77).
+- **Task 3 (cắt hàm):** BFBG AUC truncated 0.950 (211 mal/41 ben) vs non-truncated 0.974 (51 mal/**chỉ 3 ben → không đáng tin**).
+  Cắt hàm không thấy hại rõ; non-truncated quá ít benign để kết luận.
+- Mốc so sánh (theo yêu cầu) = dev run v2 seed20261008 (0.879) + graph 0.906 + metadata 0.985, KHÔNG phải 0.68 của v1.
+- **Bước 4:** AUC 0.950 ≥0.85 → đề xuất thêm seed (§16 cần ≥5). Người dùng chọn CHƯA CHẠY. Chưa đủ 5 seed nên KHÔNG kết luận.
+- File: ~/bfbg_benign_work/foldrun_v2es202.json; checkpoint best/last ckpt_v2es202{,_last}.pt.
