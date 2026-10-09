@@ -116,3 +116,12 @@ Tập = train_pool + bumblebee + test_indist + choco (KHÔNG đụng holdout_nir
   toolchain/family của embedding — nhưng vẫn cao (không khử hết shortcut).
 - 7-scalar cũng đoán family tốt (0.773) → đặc trưng đồ thị thô cũng confound.
 Script: experiments/dataset/pilots/shortcut_probe_emb.py. Nhãn: analysis (inference), không train BFBG.
+
+## Seed 101 — dev run post-hoc §17 (v2, 2026-10-09)
+- Early-stop @ep19 (no_improve≥10), nạp best val_loss ep9 (vl 0.3715). lr 2e-4→1e-4(@ep8)→5e-5(@ep14). 0 OOM/0 bad, GPU 54–60°C, ~605s/ep.
+- **CHÍNH (best val_loss, ep9):** AUC(BumbleBee vs choco) **0.891 [0.816,0.955]**; graph 0.904, metadata 0.985.
+  dAUC BFBG−graph −0.012 [−0.096,+0.070]; BFBG−metadata −0.093 [−0.166,−0.029]. recall@FPR 1/5/10 = 23/27/55.
+- **PHỤ (peak val-AUC, ep19):** AUC 0.926 [0.865,0.978]; dAUC−graph +0.023; dAUC−metadata −0.058 [−0.118,−0.005]. recall@FPR 1/5/10 = 28/40/88.
+- Cắt hàm: truncated 0.890 (41 ben) vs non-truncated 0.882 (3 ben → không đáng tin).
+- **Gate:** CHÍNH 0.891 ∈ [0.85,0.90) → KHÔNG <0.85 (không fail), KHÔNG ≥0.90 (không kích hoạt "hỏi chạy thêm"). Dừng, không tự chạy run khác.
+- **So với seed 202 §17 (0.950):** 2 seed §17 = {0.891, 0.950}, spread ~0.06 — §17 (nạp best-val_loss) đã khử thảm họa 0.68, nhưng nhiễu seed vẫn còn. Mới 2 seed, <5 (§16) → KHÔNG kết luận.
