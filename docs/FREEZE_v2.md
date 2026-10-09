@@ -57,3 +57,6 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 
 ## Cập nhật 2026-10-09 (§18 danh sách seed + gate seed 101)
 - TRAINING_DESIGN.md SHA256 `41d762e72a75796398d3430df450d8fe7eaa4d725e4bd7a81076b161c2928e2e` (thêm §18).
+
+## Sửa 2026-10-09 (§18 làm rõ mâu thuẫn seed list)
+- TRAINING_DESIGN.md SHA256 `f57706598369556324cd427eea35c85f9d90ba0e45d045c8b116676261e09ee9` (sửa §18: danh sách 4 seed duy nhất {101,202,303,404}, nêu rõ chưa chốt seed thứ 5).

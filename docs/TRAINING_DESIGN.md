@@ -122,10 +122,12 @@ cho những run dùng lịch này; các kết quả §15 cũ giữ nguyên.
 - Log mỗi epoch: val_loss, val_auc, lr, bộ đếm (no_improve, số lần giảm lr).
 
 ## 18. Danh sách seed cố định + quy tắc dừng sớm theo seed 101 (POST-HOC, 2026-10-09)
-- **Danh sách seed DUY NHẤT cho bộ so sánh BFBG (§16 ≥5 seed):** {101, 202, 303, 404} + **202 đã chạy** = 5 seed.
-  (202 chạy trước dưới §17; 101/303/404 + 20261008? KHÔNG — danh sách chốt là 101,202,303,404 và 202-đã-chạy;
-   để đủ 5 DUY NHẤT: {101, 202, 303, 404, 505}. 202 đã có kết quả §17; còn lại 101,303,404,505.)
-  Ghi trước, không đổi sau khi xem kết quả.
+- **Danh sách seed DUY NHẤT (ghi trước, không đổi sau khi xem kết quả):** {101, 202, 303, 404}.
+  - **Lưu ý mâu thuẫn trong lệnh gốc:** lệnh ghi "(101,202,303,404 + 202 đã chạy = 5)", nhưng 202 đã nằm
+    trong tập này → {101,202,303,404} chỉ là **4 seed duy nhất**. §16 yêu cầu ≥5. **CHƯA chốt seed thứ 5**
+    (không tự ý bịa); cần người dùng xác nhận seed thứ 5 (vd. 505) trước khi tuyên bố đủ bộ ≥5.
+  - 202 đã chạy dưới §17 (AUC choco 0.950). Còn lại trong danh sách 4: 101, 303, 404.
 - **Quy tắc dừng sớm theo seed 101 (gate):** chạy seed 101 TRƯỚC (1 run, §17). Chỉ chạy các seed còn lại
-  (303,404,505) NẾU **AUC(choco) của seed 101 ≥ 0.90** VÀ người dùng duyệt. Nếu <0.90: dừng, báo, không chạy tiếp.
+  (303, 404, và seed-thứ-5 nếu chốt) NẾU **AUC(choco) của seed 101 ≥ 0.90** VÀ người dùng duyệt.
+  Nếu <0.90: dừng, báo, không chạy tiếp.
 - Nhãn: **POST-HOC** (sau freeze-v2), không dùng chỉnh design đã khóa. Mọi run dùng §17.
