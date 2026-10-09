@@ -60,3 +60,6 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 
 ## Sửa 2026-10-09 (§18 làm rõ mâu thuẫn seed list)
 - TRAINING_DESIGN.md SHA256 `f57706598369556324cd427eea35c85f9d90ba0e45d045c8b116676261e09ee9` (sửa §18: danh sách 4 seed duy nhất {101,202,303,404}, nêu rõ chưa chốt seed thứ 5).
+
+## Sửa 2026-10-09 (§18 gate vùng 0.85–0.90 = hỏi; sửa báo cáo seed 101)
+- TRAINING_DESIGN.md SHA256 `ccd21eae46572e5c3a6d7077c894d8556f90584dfcf638c91bfc79a07fb4b1c9`. PIPELINE_CHECK_LOG: bỏ so cắt-hàm, nêu AUC nhạy cách chọn epoch (0.891 vs 0.926), KHÔNG quy §17 "khử 0.68".

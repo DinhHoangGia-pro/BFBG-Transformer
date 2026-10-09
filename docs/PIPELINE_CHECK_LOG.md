@@ -87,11 +87,10 @@ trước khi ra JSON). TRAINING_DESIGN.md sau §17: SHA256 `c5a948dadef4aa1f534f
 - AUC(BumbleBee vs choco): **BFBG 0.950 [0.910,0.984]**, graph 0.904, metadata 0.985.
   dAUC BFBG−graph +0.046 [−0.016,+0.115]; BFBG−metadata −0.035 [−0.077,+0.001].
   recall@FPR 1/5/10%: BFBG 51/70/79, graph 31/39/87, metadata 74/96/98.
-- **Phát hiện then chốt:** thảm họa seed 202 = 0.680 (fixed-20-epoch trước đây) PHẦN LỚN là hiện vật
-  "lấy epoch cuối" — ep19 có val_loss đã vọt 0.73. §17 nạp best-by-val_loss (ep9) → cùng seed 202 lên 0.950.
-  Không phải BFBG thất bại chuyển miền cố hữu; val_loss nhiễu (0.38–0.77).
-- **Task 3 (cắt hàm):** BFBG AUC truncated 0.950 (211 mal/41 ben) vs non-truncated 0.974 (51 mal/**chỉ 3 ben → không đáng tin**).
-  Cắt hàm không thấy hại rõ; non-truncated quá ít benign để kết luận.
+- **Quan sát (KHÔNG quy nhân quả):** seed 202 có 0.680 ở cấu hình cũ (v1, fixed-20-epoch, lấy model epoch cuối)
+  và 0.950 ở cấu hình này (v2, §17, nạp best-val_loss ep9). Hai điểm này khác NHAU cả **dữ liệu (v1→v2)** lẫn
+  **quy tắc chọn epoch (last→best-val_loss)** → KHÔNG tách được đóng góp của riêng §17; không kết luận §17 "khử 0.68".
+  (Phần cắt hàm đã bỏ khỏi báo cáo: non-truncated chỉ 3 benign.)
 - Mốc so sánh (theo yêu cầu) = dev run v2 seed20261008 (0.879) + graph 0.906 + metadata 0.985, KHÔNG phải 0.68 của v1.
 - **Bước 4:** AUC 0.950 ≥0.85 → đề xuất thêm seed (§16 cần ≥5). Người dùng chọn CHƯA CHẠY. Chưa đủ 5 seed nên KHÔNG kết luận.
 - File: ~/bfbg_benign_work/foldrun_v2es202.json; checkpoint best/last ckpt_v2es202{,_last}.pt.
@@ -121,7 +120,10 @@ Script: experiments/dataset/pilots/shortcut_probe_emb.py. Nhãn: analysis (infer
 - Early-stop @ep19 (no_improve≥10), nạp best val_loss ep9 (vl 0.3715). lr 2e-4→1e-4(@ep8)→5e-5(@ep14). 0 OOM/0 bad, GPU 54–60°C, ~605s/ep.
 - **CHÍNH (best val_loss, ep9):** AUC(BumbleBee vs choco) **0.891 [0.816,0.955]**; graph 0.904, metadata 0.985.
   dAUC BFBG−graph −0.012 [−0.096,+0.070]; BFBG−metadata −0.093 [−0.166,−0.029]. recall@FPR 1/5/10 = 23/27/55.
-- **PHỤ (peak val-AUC, ep19):** AUC 0.926 [0.865,0.978]; dAUC−graph +0.023; dAUC−metadata −0.058 [−0.118,−0.005]. recall@FPR 1/5/10 = 28/40/88.
-- Cắt hàm: truncated 0.890 (41 ben) vs non-truncated 0.882 (3 ben → không đáng tin).
+- **PHỤ (peak val-AUC = argmax val_auc @ep19, TRÙNG epoch cuối run này):** AUC 0.926 [0.865,0.978];
+  dAUC−graph +0.023; dAUC−metadata −0.058 [−0.118,−0.005]. recall@FPR 1/5/10 = 28/40/88.
+  Vì ep19 vừa là peak-val-AUC vừa là epoch cuối, run này KHÔNG phân biệt được "peak-val-AUC" với "last-epoch".
+- **AUC nhạy với cách chọn epoch:** 0.891 (best-val_loss ep9) vs 0.926 (peak-val-AUC/last ep19) — cùng 1 seed.
 - **Gate:** CHÍNH 0.891 ∈ [0.85,0.90) → KHÔNG <0.85 (không fail), KHÔNG ≥0.90 (không kích hoạt "hỏi chạy thêm"). Dừng, không tự chạy run khác.
-- **So với seed 202 §17 (0.950):** 2 seed §17 = {0.891, 0.950}, spread ~0.06 — §17 (nạp best-val_loss) đã khử thảm họa 0.68, nhưng nhiễu seed vẫn còn. Mới 2 seed, <5 (§16) → KHÔNG kết luận.
+- **Hai seed §17 (post-hoc):** best-val_loss AUC = {s101 0.891, s202 0.950}, spread ~0.06 → nhiễu seed vẫn còn dù dùng §17.
+  KHÔNG quy cho §17 việc "khử 0.68" (điểm 0.68 ở v1/fixed-epoch khác cả dữ liệu lẫn quy tắc). Mới 2 seed < 5 (§16) → KHÔNG kết luận.

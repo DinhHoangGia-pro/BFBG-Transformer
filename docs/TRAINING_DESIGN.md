@@ -127,7 +127,10 @@ cho những run dùng lịch này; các kết quả §15 cũ giữ nguyên.
     trong tập này → {101,202,303,404} chỉ là **4 seed duy nhất**. §16 yêu cầu ≥5. **CHƯA chốt seed thứ 5**
     (không tự ý bịa); cần người dùng xác nhận seed thứ 5 (vd. 505) trước khi tuyên bố đủ bộ ≥5.
   - 202 đã chạy dưới §17 (AUC choco 0.950). Còn lại trong danh sách 4: 101, 303, 404.
-- **Quy tắc dừng sớm theo seed 101 (gate):** chạy seed 101 TRƯỚC (1 run, §17). Chỉ chạy các seed còn lại
-  (303, 404, và seed-thứ-5 nếu chốt) NẾU **AUC(choco) của seed 101 ≥ 0.90** VÀ người dùng duyệt.
-  Nếu <0.90: dừng, báo, không chạy tiếp.
+- **Quy tắc gate theo seed 101 (cập nhật 2026-10-09, AUC = best-val_loss checkpoint):**
+  - **< 0.85** → DỪNG, báo, không chạy tiếp.
+  - **0.85 ≤ AUC < 0.90** (vùng xám) → **HỎI người dùng** trước khi chạy thêm (không tự chạy).
+  - **≥ 0.90** → **HỎI người dùng** trước khi chạy thêm.
+  → Tóm lại: < 0.85 dừng; ≥ 0.85 hỏi. Không bao giờ tự chạy seed khác mà chưa duyệt.
+  - **Kết quả seed 101 (post-hoc):** best-val_loss AUC = **0.891** ∈ [0.85,0.90) → vùng xám → hỏi (không tự chạy).
 - Nhãn: **POST-HOC** (sau freeze-v2), không dùng chỉnh design đã khóa. Mọi run dùng §17.
