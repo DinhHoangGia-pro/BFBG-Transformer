@@ -134,3 +134,11 @@ cho những run dùng lịch này; các kết quả §15 cũ giữ nguyên.
   → Tóm lại: < 0.85 dừng; ≥ 0.85 hỏi. Không bao giờ tự chạy seed khác mà chưa duyệt.
   - **Kết quả seed 101 (post-hoc):** best-val_loss AUC = **0.891** ∈ [0.85,0.90) → vùng xám → hỏi (không tự chạy).
 - Nhãn: **POST-HOC** (sau freeze-v2), không dùng chỉnh design đã khóa. Mọi run dùng §17.
+
+## 19. Quy tắc so sánh BFBG (POST-HOC, 2026-10-10)
+- **≥4 seed mỗi cấu hình** cho mọi con số BFBG đem so sánh (nới từ "≥5 lý tưởng" của §16 xuống sàn thực thi ≥4;
+  báo trung bình ± std qua seed + hiệu ghép đôi theo seed, như §16). Một-seed vẫn CẤM làm cơ sở kết luận.
+- **MỘT thay đổi mỗi lần** (one-change-at-a-time): mỗi thí nghiệm chỉ đổi đúng một yếu tố so với baseline đã khóa,
+  ghi trước tiêu chí thắng/thua, để quy được nhân quả. Không gộp nhiều thay đổi.
+- **choco (holdout_source_chocolatey) = tập PHÁT TRIỂN** (development set): được phép nhìn để chọn hướng/so sánh
+  post-hoc; KHÔNG phải tập kiểm định cuối. Kết luận cuối cần tập giữ riêng chưa đụng (vd. holdout_nirsoft — hiện KHÔNG đụng).
