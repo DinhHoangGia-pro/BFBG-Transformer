@@ -170,3 +170,53 @@ Tập ghép đôi bb+choco n=306 (như trước). Tham chiếu: BFBG 4-seed 0.90
 **H4 — thêm API histogram vào probe graph:** graph-only 0.907 → **graph+APIhist 0.950** (recall@FPR5 39→88). API histogram giúp mạnh.
 
 **Đọc tổng (trung thực):** nhiều baseline ĐƠN GIẢN không-GNN (metadata 0.985, bag-of-tokens 0.972, graph+API 0.950) **ngang/vượt BFBG 0.906**. Kết hợp Task 2 (embedding mã hóa toolchain/family, untrained≥trained) + H1 (benign lớn gấp ~10× malware) → tác vụ BumbleBee-vs-choco **bị chi phối bởi confound (kích thước họ, toolchain, tần suất token/API)**; cấu trúc GNN KHÔNG phải yếu tố quyết định. Mọi số là dev-set choco, post-hoc, chưa đụng holdout kiểm định cuối.
+
+## Within-bin / LOFO / cắt-hàm / kích thước (CPU, post-hoc, dev=choco) — 2026-10-10
+Tham chiếu BFBG 4-seed 0.906±0.046 (SE≈0.023 → 2·SE≈0.046).
+
+### #1a WITHIN-MSVC14 (train trong bin; eval MSVC14 mal=252 vs choco MSVC14=21) — AUC [CI cụm]
+| metadata | graph | graph+API | bag-of-tokens | BFBG(4seed, train TOÀN bin, eval-subset) |
+|---|---|---|---|---|
+| **1.000** [1.000,1.000] | 0.974 [0.955,0.990] | 0.994 [0.985,1.000] | 0.976 [0.940,1.000] | 0.998 [0.993,1.000] |
+→ Khử confound toolchain (cùng bin MSVC14) **KHÔNG làm bài toán khó đi**: mọi model vẫn ~0.97–1.00. metadata vẫn 1.000 → tách nhờ **size/linker-minor/year**, không chỉ bin. (choco MSVC14 n=21 nhỏ.)
+
+### #1b LOFO 5-family (test = family giữ lại vs choco; train = 4 family + benign) — AUC
+| family | metadata | graph | graph+API | bag-of-tokens |
+|---|---|---|---|---|
+| TrickBot | 0.977 | 0.898 | 0.932 | 0.922 |
+| Dridex | 0.995 | 0.953 | 0.948 | 0.945 |
+| IcedID | 0.955 | 0.929 | 0.943 | 0.747 |
+| Emotet | 0.954 | 0.853 | 0.914 | 0.842 |
+| BumbleBee | 0.977 | 0.908 | 0.938 | 0.924 |
+| **mean±std** | **0.972±0.017** | 0.908±0.037 | 0.935±0.013 | 0.876±0.082 |
+→ **metadata tổng quát hóa tốt & ổn định nhất** qua họ. **bag-of-tokens tụt mạnh & nhiễu** (IcedID 0.747) → tín hiệu token mang tính đặc-thù-họ, KHÔNG tổng quát. graph+API > graph.
+
+### #2 bag-of-tokens bỏ idiom compiler (chỉ call/API) — eval bb vs choco
+tokens(full, cắt theo model-view) 0.930 [0.867,0.980]; **call/API-only 0.941** [0.898,0.975] → bỏ idiom compiler KHÔNG giảm (còn tăng nhẹ) → tín hiệu token là **call/API** chứ không phải chỉ dấu-vân compiler.
+
+### #3 seed-evidence (ATT&CK) nằm SAU điểm cắt
+| nhóm | seed_tot | bị bỏ do hàm>150 | bị bỏ do token>512 |
+|---|---|---|---|
+| benign (train+choco) | 574 | **95.8%** | 0.2% |
+| malicious (all) | 657 | **76.6%** | 0.0% |
+| TrickBot/IcedID/Emotet/BumbleBee | 21/217/401/14 | 52%/39%/**97%**/**100%** | 0% |
+→ **Cắt 150 hàm đầu (theo địa chỉ) vứt 77–96% bằng chứng seed; BumbleBee mất 100%, Emotet 97%.** Cắt 512 token gần như vô hại. Nhánh ngữ nghĩa của model gần như **bị bỏ đói seed**.
+
+### #4 probe kích thước (khoảng chồng lấn num_functions [47,17653], n=283: mal239/choco44)
+num_functions một mình (oriented) **0.821**; metadata 0.983, graph+API 0.936, BFBG 0.929, bag-of-tokens 0.924, graph 0.905.
+→ Kiểm soát lỏng kích thước KHÔNG khử tín hiệu; metadata vẫn ~0.98. (Khoảng chồng lấn quá rộng để kiểm soát chặt.)
+
+## KẾT LUẬN (post-hoc, dev-set; chưa đụng holdout kiểm định cuối)
+1. **metadata (PE cơ bản) thống trị mọi lát cắt** (within-bin 1.000, LOFO 0.972±0.017, size-overlap 0.983) — benign set hiện tại (choco/scoop/nirsoft/iso) **tách khỏi các họ banking-trojan bằng metadata thô** (signed/linker/year/size/entropy). BFBG/GNN KHÔNG vượt metadata.
+2. **Cắt 150 hàm đầu bỏ 77–100% seed evidence** → nhánh ngữ nghĩa bị đói; đây là lỗi INPUT WINDOW, không phải kiến trúc.
+3. Tín hiệu token = call/API (không phải idiom compiler) nhưng **không tổng quát qua họ** (LOFO).
+→ Vấn đề lớn nhất có lẽ là **DỮ LIỆU** (benign quá khác phân phối) + **cửa sổ đầu vào**, không phải kiến trúc model.
+
+## Task 5 — ĐỀ XUẤT LẠI GT GPU (tiêu chí >2·SE ≈ +0.046 AUC trên trung bình ≥4 seed; ghi trước, CHƯA chạy)
+| Ưu tiên | GT (một thay đổi) | Vì sao (bằng chứng) | Tiêu chí thắng (>2·SE) | VRAM/thời gian |
+|---|---|---|---|---|
+| **1 (mạnh nhất)** | **H1: chọn 150 hàm theo seed/API-density/spread thay vì 150 đầu-theo-địa-chỉ** | #3: 77–100% seed bị cắt; BumbleBee 100% | (a) seed-coverage trong cửa sổ từ ~0–23% → **>80%**; VÀ (b) BFBG choco AUC (≥4 seed) **> 0.952** (0.906+2SE) HOẶC LOFO-mean tăng >2·SE | ~4.5GB · ~2h30–3h20/seed ×4 ≈ 10–13h |
+| 2 | H4: global_features = API histogram top-K (hiện=0) | graph+API 0.935 vs graph 0.908 (LOFO, ổn định) | BFBG+API choco AUC (≥4 seed) **>0.952** | ~4.5GB · 10–13h |
+| — (0 GPU) | H2: ensemble 4 checkpoint sẵn có | recall@FPR10 97 | đã đạt; dùng ngay | 0 GPU |
+| Bỏ | H3: nhánh bag-of-tokens | LOFO 0.876±0.082, không tổng quát | — | — |
+| Hướng DỮ LIỆU (không phải GPU) | Thu benign KHÓ: cùng toolchain/size/signed với malware (giảm confound metadata) | metadata thống trị mọi lát cắt | metadata AUC tụt về <0.90 trên benign-khó | thu thập dữ liệu |
