@@ -151,3 +151,11 @@ cho những run dùng lịch này; các kết quả §15 cũ giữ nguyên.
 - **Phụ (bắt buộc báo):** (a) seed-coverage thực tế trong cửa sổ (kỳ vọng ~72%); (b) **train-trong-bin MSVC14** (so cột BFBG đã bỏ ở #1a); (c) **LOFO tối thiểu 2 family** (Emotet + IcedID — hai family seed-nhiều); (d) **theo dõi lệch kích thước** (nodes-kept ben/mal, #3 cảnh báo 2.83) để biết có đổi confound.
 - **choco = dev set (§19)**; kết luận cuối vẫn cần holdout chưa đụng. Nhãn POST-HOC.
 - **Ước tính:** ~2h30–3h20/seed (có thể chậm hơn vì api-density giữ hàm lớn) × 6 ≈ **15–22h** (dừng sớm) đến ~48h/trần. Train-in-bin + 2 LOFO fold thêm ~3–4 run ≈ +8–12h.
+
+## 20b. Quy tắc dừng dãy seed cho H1 api-density (GHI TRƯỚC 2026-10-10, trước khi xem kết quả api-density)
+Chạy 2 seed đầu {101, 202}. Sau khi CẢ HAI xong, áp quy tắc (AUC = choco, best-val_loss, chính):
+- **DỪNG dãy** (không chạy seed tiếp) nếu **cả 2 seed có AUC ≤ 0.906** (không vượt baseline trung bình first-150).
+- **TIẾP TỤC** (được phép chạy các seed còn lại trong danh sách ghi trước) nếu **≥1 trong 2 seed có AUC ≥ 0.95**.
+- **Ở GIỮA** (max 2 seed ∈ (0.906, 0.95)) → **HỎI người dùng**, không tự quyết.
+- **KHÔNG thêm seed mới** sau khi thấy kết quả; chỉ dùng danh sách ghi trước (§18/§20). Không đổi tiêu chí sau khi xem.
+- Seed baseline để so ghép đôi (first-150 §17): {101:0.891, 202:0.950, 303:0.934, 404:0.848}. Hiệu tính THEO TỪNG seed (api−first cùng seed).
