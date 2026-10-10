@@ -29,6 +29,7 @@ ap.add_argument("--min-delta", type=float, default=0.002)
 ap.add_argument("--smoke", type=int, default=0)         # plumbing test, not real training
 ap.add_argument("--resume", type=int, default=0)        # resume from last checkpoint
 ap.add_argument("--max-hours", type=float, default=8.0) # wall-clock ceiling
+ap.add_argument("--select", choices=["first", "apidensity"], default="first")  # section 20 H1
 ap.add_argument("--tag", default="run")
 A = ap.parse_args()
 WALL0 = time.time()
@@ -79,7 +80,7 @@ EP = cfg["epochs"]; LR = cfg["learning_rate"]; MF = cfg["max_functions_per_sampl
 if A.es: EP = A.max_epochs
 if A.smoke: EP = 4
 BS = cfg["batch_size"]; MICRO = 2; ACC = max(1, BS // MICRO)
-def mkds(recs): return BFBGDataset(recs, stoi, max_funcs=MF, feat_dir=FEAT)
+def mkds(recs): return BFBGDataset(recs, stoi, max_funcs=MF, feat_dir=FEAT, select=A.select)
 dl = DataLoader(mkds(train), batch_size=MICRO, shuffle=True, num_workers=0, collate_fn=collate,
                 generator=torch.Generator().manual_seed(MS))
 model = BFBGTransformer.from_config(vsz, num_global_features=0).to(dev)
