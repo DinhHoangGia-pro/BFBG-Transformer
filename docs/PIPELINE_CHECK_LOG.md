@@ -175,10 +175,13 @@ Tập ghép đôi bb+choco n=306 (như trước). Tham chiếu: BFBG 4-seed 0.90
 Tham chiếu BFBG 4-seed 0.906±0.046 (SE≈0.023 → 2·SE≈0.046).
 
 ### #1a WITHIN-MSVC14 (train trong bin; eval MSVC14 mal=252 vs choco MSVC14=21) — AUC [CI cụm]
-| metadata | graph | graph+API | bag-of-tokens | BFBG(4seed, train TOÀN bin, eval-subset) |
-|---|---|---|---|---|
-| **1.000** [1.000,1.000] | 0.974 [0.955,0.990] | 0.994 [0.985,1.000] | 0.976 [0.940,1.000] | 0.998 [0.993,1.000] |
-→ Khử confound toolchain (cùng bin MSVC14) **KHÔNG làm bài toán khó đi**: mọi model vẫn ~0.97–1.00. metadata vẫn 1.000 → tách nhờ **size/linker-minor/year**, không chỉ bin. (choco MSVC14 n=21 nhỏ.)
+| metadata | graph | graph+API | bag-of-tokens |
+|---|---|---|---|
+| **1.000** [1.000,1.000] | 0.974 [0.955,0.990] | 0.994 [0.985,1.000] | 0.976 [0.940,1.000] |
+
+**BFBG train-trong-bin MSVC14: CHƯA đo** (cần train GPU trong bin, không chạy) → **bỏ cột** (cột cũ "BFBG train toàn bin, eval-subset" **không so được** vì train khác phân phối: toàn-bin vs trong-bin). Sẽ đo ở §20 nếu chạy.
+
+**Xác minh (sửa 2026-10-10):** choco MSVC14 = **21 cụm riêng biệt** (21 singleton); BumbleBee MSVC14 = 244 cụm/252. **train∩eval overlap sha=0, cụm=0** (tách tuyệt đối, không rò rỉ). metadata AUC=1.0000 là **held-out thật**. **Không feature đơn nào** tách hẳn (linker/year/size/nonstd/max_ent đều chồng lấn pos/neg) → RF tách bằng **tổ hợp đa biến**. Bootstrap [1.000,1.000] suy biến vì AUC đúng =1.0 ở mọi cluster-resample; **n_neg=21 quá nhỏ → AUC=1.0 KHÔNG phải bằng chứng mạnh**, cần nhiều benign MSVC14 hơn.
 
 ### #1b LOFO 5-family (test = family giữ lại vs choco; train = 4 family + benign) — AUC
 | family | metadata | graph | graph+API | bag-of-tokens |
@@ -220,3 +223,15 @@ num_functions một mình (oriented) **0.821**; metadata 0.983, graph+API 0.936,
 | — (0 GPU) | H2: ensemble 4 checkpoint sẵn có | recall@FPR10 97 | đã đạt; dùng ngay | 0 GPU |
 | Bỏ | H3: nhánh bag-of-tokens | LOFO 0.876±0.082, không tổng quát | — | — |
 | Hướng DỮ LIỆU (không phải GPU) | Thu benign KHÓ: cùng toolchain/size/signed với malware (giảm confound metadata) | metadata thống trị mọi lát cắt | metadata AUC tụt về <0.90 trên benign-khó | thu thập dữ liệu |
+
+## #3 (sạch) — chọn 150 hàm KHÔNG dùng seed: first / spread-địa-chỉ / api-density (2026-10-10)
+Đo trên malicious (5 family) + choco + 200 benign train. "Seed coverage" = % seed-edge nằm trong 150 hàm được chọn.
+
+| policy | seed coverage (tổng) | malicious | benign(train) | median nodes KEPT mal/ben (ratio ben/mal) |
+|---|---|---|---|---|
+| first-150 (hiện tại, theo địa chỉ) | **17.6%** | 24% | 5% | 4834 / 7131 (1.48) |
+| spread đều theo địa chỉ | 15.9% | 21% | 5% | 4844 / 7393 (1.53) |
+| **api-density (top-150 hàm nhiều call/API)** | **71.7%** | 74% | 68% | 14781 / 41798 (**2.83**) |
+
+→ **api-density giữ 72% seed evidence (vs 18% first-150) mà KHÔNG dùng nhãn seed** — ứng viên cho H1. spread-địa-chỉ KHÔNG giúp (16%).
+⚠️ **Đánh đổi:** api-density giữ các hàm lớn → **tăng lệch kích thước** benign/malware (ratio nodes-kept 1.48→2.83). Có thể đổi confound "đói seed" lấy confound "kích thước". Cần theo dõi khi chạy H1.

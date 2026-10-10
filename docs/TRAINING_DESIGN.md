@@ -142,3 +142,12 @@ cho những run dùng lịch này; các kết quả §15 cũ giữ nguyên.
   ghi trước tiêu chí thắng/thua, để quy được nhân quả. Không gộp nhiều thay đổi.
 - **choco (holdout_source_chocolatey) = tập PHÁT TRIỂN** (development set): được phép nhìn để chọn hướng/so sánh
   post-hoc; KHÔNG phải tập kiểm định cuối. Kết luận cuối cần tập giữ riêng chưa đụng (vd. holdout_nirsoft — hiện KHÔNG đụng).
+
+## 20. H1 SẠCH — chọn 150 hàm theo api-density (POST-HOC, ghi trước 2026-10-10, CHƯA chạy)
+Động cơ: §#3 cho thấy first-150-theo-địa-chỉ chỉ giữ 17.6% seed evidence; **api-density giữ 71.7% mà KHÔNG dùng nhãn seed**.
+- **MỘT thay đổi:** loader đổi `list(ipg.values())[:150]` → **chọn 150 hàm có mật độ call/API cao nhất** (đếm node có `api` hoặc `mnemonic=="call"`), tie-break theo địa chỉ. **KHÔNG dùng seed_edges** để chọn (tránh rò rỉ nhãn/mạch seed). Mọi thứ khác giữ nguyên §17 (early-stop, best-val_loss, grad-clip 1.0, global_features=0).
+- **Số seed & lực:** **6 seed** {101,202,303,404,505,606}, ghi trước.
+- **Tiêu chí thắng (ghi trước):** mean choco AUC (6 seed) tăng **≥ +0.07** so baseline first-150 (0.906 → **≥0.976**); VÀ hiệu ghép đôi api-density−first **theo từng seed** có CI (cluster-bootstrap) loại trừ 0 ở ≥5/6 seed. Thua nếu không đạt.
+- **Phụ (bắt buộc báo):** (a) seed-coverage thực tế trong cửa sổ (kỳ vọng ~72%); (b) **train-trong-bin MSVC14** (so cột BFBG đã bỏ ở #1a); (c) **LOFO tối thiểu 2 family** (Emotet + IcedID — hai family seed-nhiều); (d) **theo dõi lệch kích thước** (nodes-kept ben/mal, #3 cảnh báo 2.83) để biết có đổi confound.
+- **choco = dev set (§19)**; kết luận cuối vẫn cần holdout chưa đụng. Nhãn POST-HOC.
+- **Ước tính:** ~2h30–3h20/seed (có thể chậm hơn vì api-density giữ hàm lớn) × 6 ≈ **15–22h** (dừng sớm) đến ~48h/trần. Train-in-bin + 2 LOFO fold thêm ~3–4 run ≈ +8–12h.

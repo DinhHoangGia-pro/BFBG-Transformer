@@ -66,3 +66,6 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 
 ## Cập nhật 2026-10-10 (§19 quy tắc so sánh BFBG)
 - TRAINING_DESIGN.md SHA256 `69ebae82fb3f5ea5d44dd486354fd3e61134b3ad25decebbb6004bc90c4a0b3c` (§19: ≥4 seed/cấu hình, một thay đổi mỗi lần, choco = tập phát triển).
+
+## Cập nhật 2026-10-10 (§20 H1-sạch api-density, ghi trước)
+- TRAINING_DESIGN.md SHA256 `1ee638d2f1121940f6c523c32f233c1abbbd047e8b1a93ac74428b552f948d8e` (§20: chọn 150 hàm theo api-density; 6 seed; thắng nếu +0.07 AUC; kèm train-in-bin + LOFO ≥2 family). PIPELINE_CHECK_LOG: sửa #1a (bỏ cột BFBG không-so-được, xác minh không rò rỉ) + thêm #3-sạch.
