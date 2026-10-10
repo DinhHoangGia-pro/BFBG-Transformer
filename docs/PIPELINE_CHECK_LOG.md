@@ -235,3 +235,15 @@ num_functions một mình (oriented) **0.821**; metadata 0.983, graph+API 0.936,
 
 → **api-density giữ 72% seed evidence (vs 18% first-150) mà KHÔNG dùng nhãn seed** — ứng viên cho H1. spread-địa-chỉ KHÔNG giúp (16%).
 ⚠️ **Đánh đổi:** api-density giữ các hàm lớn → **tăng lệch kích thước** benign/malware (ratio nodes-kept 1.48→2.83). Có thể đổi confound "đói seed" lấy confound "kích thước". Cần theo dõi khi chạy H1.
+
+## H1 api-density — 2 seed thử (§20/§20b, v2 BumbleBee fold, best-val_loss) 2026-10-10
+Loader đổi first-150 → api-density (top-150 hàm nhiều call/API, KHÔNG dùng seed). Cùng §17, cùng split/val. n ghép đôi 306.
+
+| seed | api AUC [CI cụm] | first-150 AUC | **paired dAUC (api−first, cùng seed)** [CI cụm] | stop | val_auc cuối/đỉnh |
+|---|---|---|---|---|---|
+| 101 | **0.971** [0.949,0.988] | 0.891 | **+0.080 [+0.012,+0.152]** (loại trừ 0) | ep15, best ep5 | 0.863 / 0.906 |
+| 202 | 0.942 [0.890,0.978] | 0.950 | −0.007 [−0.043,+0.026] (chứa 0) | ep24, best ep14 | 0.960 / 0.967 |
+
+**Đọc trung thực:** tín hiệu **phụ thuộc seed** — seed 101 tăng mạnh +0.080 (CI loại trừ 0), seed 202 **không đổi** (−0.007). Mean 2 seed api = 0.957 vs baseline 2 seed {0.891,0.950}=0.920 (+0.037); so mốc first-150 4-seed 0.906±0.046 thì +0.051 nhưng chỉ 2 seed, mixed. val_auc và choco-AUC không bám sát nhau (s101 val thấp hơn nhưng choco cao hơn).
+
+**§20b gate:** max(0.971, 0.942) = **0.971 ≥ 0.95 → ĐỦ ĐIỀU KIỆN TIẾP** (được phép chạy seed còn lại trong danh sách ghi trước). Theo lệnh: **ÁP quy tắc, CHƯA chạy seed 303** — chờ người dùng duyệt. Không thêm seed mới ngoài danh sách.
