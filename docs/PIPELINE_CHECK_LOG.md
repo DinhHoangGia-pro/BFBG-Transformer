@@ -247,3 +247,25 @@ Loader đổi first-150 → api-density (top-150 hàm nhiều call/API, KHÔNG d
 **Đọc trung thực:** tín hiệu **phụ thuộc seed** — seed 101 tăng mạnh +0.080 (CI loại trừ 0), seed 202 **không đổi** (−0.007). Mean 2 seed api = 0.957 vs baseline 2 seed {0.891,0.950}=0.920 (+0.037); so mốc first-150 4-seed 0.906±0.046 thì +0.051 nhưng chỉ 2 seed, mixed. val_auc và choco-AUC không bám sát nhau (s101 val thấp hơn nhưng choco cao hơn).
 
 **§20b gate:** max(0.971, 0.942) = **0.971 ≥ 0.95 → ĐỦ ĐIỀU KIỆN TIẾP** (được phép chạy seed còn lại trong danh sách ghi trước). Theo lệnh: **ÁP quy tắc, CHƯA chạy seed 303** — chờ người dùng duyệt. Không thêm seed mới ngoài danh sách.
+
+## H1 api-density — 4 seed {101,202,303,404} (§20/§20c, v2 BumbleBee fold, best-val_loss) 2026-10-11
+| seed | api AUC [CI cụm] | first-150 AUC | best_ep | val_auc cuối | val_loss cuối |
+|---|---|---|---|---|---|
+| 101 | 0.971 [0.949,0.988] | 0.891 | 5 | 0.863 | 1.727 |
+| 202 | 0.942 [0.890,0.978] | 0.950 | 14 | 0.960 | 0.306 |
+| 303 | 0.961 [0.933,0.984] | 0.934 | 15 | 0.973 | 0.545 |
+| 404 | 0.931 [0.868,0.981] | 0.848 | 7 | 0.969 | 0.299 |
+
+**So phân phối (KHÔNG ghép cặp), 4 seed:**
+- api-density: **mean 0.951 ± 0.018** (vals 0.971/0.942/0.961/0.931)
+- first-150:   mean 0.906 ± 0.046 (vals 0.891/0.950/0.934/0.848)
+- **Δmean = +0.046**; std **0.046 → 0.018** (api-density ỔN ĐỊNH hơn qua seed).
+- Mann-Whitney U two-sided **p=0.200** (n=4 vs 4, lực rất thấp → không có ý nghĩa thống kê).
+
+**Đọc trung thực:**
+- api-density **tăng mean +0.046 VÀ giảm nhiễu seed một nửa** (std 0.046→0.018) — tín hiệu tích cực & nhất quán hơn.
+- NHƯNG **KHÔNG đạt tiêu chí §20 "thắng" (+0.07 ≈ ≥0.976)**: mean 0.951 < 0.976. Unpaired test p=0.200 (n=4, underpowered).
+- Ghép cặp (log trước): seed 101 +0.080 (CI loại trừ 0) nhưng seed 202 −0.007 (null) → lợi ích **phụ thuộc seed**.
+- choco là dev-set; chưa đụng holdout kiểm định cuối. Vẫn trong khuôn khổ confound (metadata 0.985 vẫn cao hơn).
+
+**§20c:** mean 4-seed = 0.951 ≥ 0.95 → quy tắc là HỎI. Theo lệnh người dùng: **DỪNG, KHÔNG chạy 505/606.**
