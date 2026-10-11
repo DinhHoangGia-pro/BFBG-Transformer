@@ -275,3 +275,14 @@ Loader đổi first-150 → api-density (top-150 hàm nhiều call/API, KHÔNG d
 - **std 0.046 → 0.018**: chỉ là **xu hướng** (n=4, không kiểm định được); so phân phối không ghép cặp **p=0.20** (Mann-Whitney, lực rất thấp) → **chưa có ý nghĩa thống kê**.
 - **mean 0.951 chỉ vượt ngưỡng-hỏi (0.95) đúng 0.001** → sát mép, không nên diễn giải như một mốc vững.
 - Kết: api-density cho **tín hiệu dương yếu + ổn định hơn**, nhưng **chưa đủ chuẩn ghi-trước để tuyên bố cải thiện**. Cần 6 seed (§20) + holdout cuối.
+
+## Quyết định 2026-10-12: CHƯA chạy (a) train-in-bin, (b) chạm nirsoft — lý do (post-hoc)
+- **(a) train-trong-bin MSVC14:** n_neg=21 → gần như chắc chắn **CI rất rộng hoặc AUC suy biến** (xem within-MSVC14 AUC=1.0 trước). 6–8h GPU **không tạo kết luận** → đây là **HẠN CHẾ DỮ LIỆU**, không phải thiếu tính toán.
+- **(b) chạm holdout_nirsoft:** holdout **chỉ dùng được MỘT lần**; **chưa có cấu hình cuối đã commit**; nirsoft chỉ **20 mẫu benign-only** → chỉ đo được FPR, hoặc AUC với malware mượn nơi khác, **CI rộng**. **Chỉ chạm sau khi chốt + commit cấu hình cuối** (xem FINAL_CONFIG_PROPOSAL.md).
+
+### Ghi chú phương pháp cho §20 (post-hoc, 2026-10-12)
+- **§20 KHÔNG đạt tiêu chí thắng:** mean 4 seed api-density **0.951 < 0.976** (+0.07). Chỉ vượt ngưỡng-hỏi 0.95 đúng **0.001**.
+- **std 0.046 → 0.018 là XU HƯỚNG** (n=4 so n=4; Mann-Whitney **p=0.20**), KHÔNG phải kết luận.
+- **KHÔNG dùng "cùng seed" làm cặp ghép** khi **cửa sổ đầu vào đã đổi** (first-150 → api-density): đổi loader làm phân phối đầu vào khác hẳn, "cùng seed" không còn là cặp hợp lệ. **Chỉ so phân phối** (unpaired). Con số paired dAUC ghi ở mục trước giữ lại nhưng **đánh dấu là không dùng để suy luận**.
+- **Hai cách đọc api-density CHƯA TÁCH ĐƯỢC:** (i) giữ nhiều seed/hành vi hơn (coverage 18%→72%) HAY (ii) chỉ **đổi confound kích thước** (nodes-kept ben/mal **1.48 → 2.83**). Với n_neg=21/n_choco=45, không phân biệt được hai cơ chế.
+- **Không chạy thêm seed 505/606.**

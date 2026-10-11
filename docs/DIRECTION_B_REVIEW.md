@@ -34,3 +34,14 @@ Mục đích: kiểm kê bằng chứng để biết claim nào đứng được
 2. Thêm ≥1 baseline SOTA ngoài trên cùng split.
 3. Khung hóa là **measurement/cautionary study** (không phải "bộ phát hiện mới"), nhấn mạnh tái lập.
 4. Mọi bảng gắn nhãn dev-set + n + CI; tách rõ "đã xác nhận ngoài-dev" vs "chỉ dev".
+
+## E. Claim bị cấm — bổ sung đích danh (2026-10-12)
+Nhắc lại (a) đã có / (b) còn thiếu ở mục A–D. Các câu dưới đây **tuyệt đối KHÔNG được viết**:
+- ❌ **"BFBG học hành vi (behavior)"** — ta KHÔNG có bằng chứng model học ngữ nghĩa/hành vi; trái lại
+  shortcut-probe cho thấy embedding mã hóa toolchain/family, cắt-hàm bỏ 77–100% seed → nhánh ngữ nghĩa bị đói.
+- ❌ **"BFBG vượt baseline"** — mọi lát cắt cho thấy BFBG ngang graph, **dưới metadata**; api-density KHÔNG đạt §20.
+- ❌ **"kết quả đúng cho mọi family"** — LOFO cho thấy hiệu năng **khác nhau rõ theo family** (vd bag-of-tokens IcedID 0.747 vs Dridex 0.945); chỉ nói theo-từng-family.
+- ❌ **"metadata mạnh VÌ toolchain" như SỰ THẬT** — đây là **giả thuyết** (within-MSVC14 vẫn 1.000 ở n_neg=21; size cũng confound). Phải viết dạng "có khả năng do… (giả thuyết), cần benign khớp-confound để kiểm chứng".
+- ❌ "api-density sửa được cửa-sổ-đầu-vào" — mới là ứng viên; §20 chưa đạt; chưa tách khỏi confound kích thước.
+- ❌ Bất kỳ con số dev-set nào trình như năng lực tổng quát — luôn gắn nhãn dev-set/choco + n + CI.
+**Nguyên tắc:** phát biểu cơ chế (toolchain/size/token) là **giả thuyết**, không phải kết luận nhân quả, cho tới khi có benign khớp-confound + holdout cuối.

@@ -171,3 +171,9 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
 - Tiêu chí §20 (+0.07 ⇒ ≥0.976): **KHÔNG đạt** (0.951 < 0.976).
 - std giảm (0.046→0.018) chỉ là **xu hướng n=4**; unpaired MWU **p=0.20**; mean vượt ngưỡng-hỏi 0.95 chỉ **+0.001**.
 - Không tuyên bố "api-density cải thiện BFBG". Giữ first-150 là baseline; api-density là ứng viên chưa chứng minh.
+
+## 20e. Ghi chú phương pháp + quyết định không chạy (post-hoc, 2026-10-12)
+- §20 KHÔNG đạt (mean 0.951 < 0.976; vượt ngưỡng-hỏi 0.95 chỉ 0.001). std 0.046→0.018 là XU HƯỚNG (n=4, MWU p=0.20).
+- **Khi đổi cửa sổ đầu vào (first-150↔api-density), KHÔNG ghép cặp theo seed** — chỉ so phân phối (unpaired).
+- api-density: không tách được "giữ nhiều hành vi hơn" vs "đổi confound kích thước (1.48→2.83)"; hạn chế vì n_neg=21.
+- KHÔNG chạy (a) train-in-bin (n_neg=21 → vô kết luận, hạn chế DỮ LIỆU) và (b) chạm nirsoft (chưa chốt cấu hình cuối) ở bước này. KHÔNG chạy 505/606.
