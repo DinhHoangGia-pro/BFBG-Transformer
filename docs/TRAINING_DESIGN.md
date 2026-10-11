@@ -159,3 +159,9 @@ Chạy 2 seed đầu {101, 202}. Sau khi CẢ HAI xong, áp quy tắc (AUC = cho
 - **Ở GIỮA** (max 2 seed ∈ (0.906, 0.95)) → **HỎI người dùng**, không tự quyết.
 - **KHÔNG thêm seed mới** sau khi thấy kết quả; chỉ dùng danh sách ghi trước (§18/§20). Không đổi tiêu chí sau khi xem.
 - Seed baseline để so ghép đôi (first-150 §17): {101:0.891, 202:0.950, 303:0.934, 404:0.848}. Hiệu tính THEO TỪNG seed (api−first cùng seed).
+
+## 20c. Quy tắc dừng sau 4 seed (POST-HOC, ghi 2026-10-11 sau khi thấy 2 seed đầu)
+Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 202:0.942}). Chạy thêm {303,404} cho đủ 4 seed api-density, rồi:
+- **DỪNG sau 4 seed** (KHÔNG chạy 505/606) nếu **mean choco AUC (4 seed, best-val_loss) < 0.95**.
+- (≥0.95 thì vẫn hỏi người dùng trước khi chạy tiếp — không tự chạy.)
+- Vì là post-hoc (quyết sau khi thấy 2 seed), KHÔNG dùng để tuyên bố §20 "thắng"; §20 gốc vẫn cần 6 seed + mean +0.07. 20c chỉ giới hạn chi phí.
