@@ -75,3 +75,6 @@ CHƯA build đợt 1, CHƯA train BFBG. Build sẽ tạo manifest v2 THẬT kh�
 
 ## Cập nhật 2026-10-11 (§20c dừng sau 4 seed nếu mean<0.95, post-hoc)
 - TRAINING_DESIGN.md SHA256 `9f7f83fc22726d2668f386bb5f408e5b545e415d4c366b7224b9913467a4f638`.
+
+## Cập nhật 2026-10-11 (§20d verdict: §20 KHÔNG đạt)
+- TRAINING_DESIGN.md SHA256 `bba44c1517da2d79a09bc99233f363abe48a0ae037aeb4a14aed57563f6ea4e0`.

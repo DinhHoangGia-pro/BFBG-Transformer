@@ -269,3 +269,9 @@ Loader đổi first-150 → api-density (top-150 hàm nhiều call/API, KHÔNG d
 - choco là dev-set; chưa đụng holdout kiểm định cuối. Vẫn trong khuôn khổ confound (metadata 0.985 vẫn cao hơn).
 
 **§20c:** mean 4-seed = 0.951 ≥ 0.95 → quy tắc là HỎI. Theo lệnh người dùng: **DỪNG, KHÔNG chạy 505/606.**
+
+## VERDICT §20 (H1 api-density) — 2026-10-11
+- **§20 KHÔNG đạt tiêu chí "thắng":** tiêu chí ghi trước = mean choco AUC (≥4 seed) **≥ 0.976** (baseline 0.906 + 0.07). Đạt **0.951 < 0.976** → **KHÔNG thắng**.
+- **std 0.046 → 0.018**: chỉ là **xu hướng** (n=4, không kiểm định được); so phân phối không ghép cặp **p=0.20** (Mann-Whitney, lực rất thấp) → **chưa có ý nghĩa thống kê**.
+- **mean 0.951 chỉ vượt ngưỡng-hỏi (0.95) đúng 0.001** → sát mép, không nên diễn giải như một mốc vững.
+- Kết: api-density cho **tín hiệu dương yếu + ổn định hơn**, nhưng **chưa đủ chuẩn ghi-trước để tuyên bố cải thiện**. Cần 6 seed (§20) + holdout cuối.

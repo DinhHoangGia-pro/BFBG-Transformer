@@ -165,3 +165,9 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
 - **DỪNG sau 4 seed** (KHÔNG chạy 505/606) nếu **mean choco AUC (4 seed, best-val_loss) < 0.95**.
 - (≥0.95 thì vẫn hỏi người dùng trước khi chạy tiếp — không tự chạy.)
 - Vì là post-hoc (quyết sau khi thấy 2 seed), KHÔNG dùng để tuyên bố §20 "thắng"; §20 gốc vẫn cần 6 seed + mean +0.07. 20c chỉ giới hạn chi phí.
+
+## 20d. Kết luận §20 (2026-10-11): KHÔNG đạt tiêu chí
+- api-density 4 seed: mean choco AUC **0.951 ± 0.018** vs first-150 0.906 ± 0.046 (Δ+0.046).
+- Tiêu chí §20 (+0.07 ⇒ ≥0.976): **KHÔNG đạt** (0.951 < 0.976).
+- std giảm (0.046→0.018) chỉ là **xu hướng n=4**; unpaired MWU **p=0.20**; mean vượt ngưỡng-hỏi 0.95 chỉ **+0.001**.
+- Không tuyên bố "api-density cải thiện BFBG". Giữ first-150 là baseline; api-density là ứng viên chưa chứng minh.
