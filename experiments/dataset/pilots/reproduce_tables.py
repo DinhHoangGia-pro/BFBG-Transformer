@@ -112,13 +112,22 @@ for w in res:
     a = np.array(res[w]); print(f"    {w:10s} mean={a.mean():.3f} ± {a.std(ddof=1):.3f}")
 
 print("="*68); print("BANG 4 — H2 ensemble + H3 tokens + H4 gapi (eval bb vs choco)"); print("="*68)
-# H2 ensemble of first-150 4-seed
+# So goc (experiments_h.py 2026-10-10, TOAN token/api) vs tai lap (bin_parse, model-view cap 150 ham/512 token).
+# Lech vi H3/H4 goc dung TAT CA token+api cua chuong trinh; ban tai lap dung counter da CAT theo goc nhin model
+# (chi 150 ham dau, <=512 node/ham) nen it dac trung hon -> AUC thap hon. Within-MSVC14/LOFO dung cung bin_parse nen khop.
+ORIG = {"tokens": 0.972, "gapi": 0.950, "graph": 0.907, "meta": 0.982}  # so goc tham chieu
+NAME4 = {"tokens": "H3 BoT-full→model-view", "gapi": "H4 graph+API", "graph": "   graph-only", "meta": "   metadata"}
 acc = bfbg_scores(["v2es101","v2es202","v2es303","v2es404"])
 shas = [r["sha256"] for r in EVAL if r["sha256"] in acc]
 ens = np.array([np.mean(acc[s]) for s in shas]); yy = np.array([by_sha[s]["label"] for s in shas])
-print(f"  H2 ensemble(first-150 mean4) AUC={auc(ens,yy):.3f}")
-for which, tag in [("tokens", "H3 bag-of-tokens"), ("gapi", "H4 graph+API"), ("graph", "   graph-only"), ("meta", "   metadata")]:
-    s, y, cl = rf_probe(tp, EVAL, which, topapi); print(f"  {tag:22s} AUC={auc(s,y):.3f}")
+print(f"  {'model':24s} {'so goc (full)':>14s}  {'tai lap (model-view)':>20s}")
+print(f"  {'H2 ensemble first-150':24s} {'—':>14s}  {auc(ens,yy):>20.3f}")
+for which in ("tokens", "gapi", "graph", "meta"):
+    s, y, cl = rf_probe(tp, EVAL, which, topapi)
+    og = ORIG.get(which); ogs = f"{og:.3f}" if og else "—"
+    print(f"  {NAME4[which]:24s} {ogs:>14s}  {auc(s,y):>20.3f}")
+print("  * 'BoT-full' = bag-of-tokens TOAN token (experiments_h.py); 'BoT-model-view' = cat 150ham/512tok (bin_parse).")
+print("    H3: full 0.972 vs model-view ~0.93; H4 graph+API: full 0.950 vs model-view ~0.92. Khac do pham vi token/api.")
 
 print("="*68); print("BANG 5 — seed-evidence bi cat (first-150, tu bin_parse) theo nhan"); print("="*68)
 for lab, recs in [("benign", [r for r in tp+ch if r["label"]==0]), ("malicious", [r for r in man if r["label"]==1])]:

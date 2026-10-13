@@ -36,12 +36,55 @@ def is_forwarder(name):
     n = name.lower()
     return n.startswith("api-ms-win-") or n.startswith("ext-ms-")
 
+def dry_run():
+    """KHONG tai. Chieu so mau du kien theo (nguon x bin) dung PRIOR tu feat_cache (benign v2 da thu
+    tung nguon). Target lay tu HOLDOUT_V3_PLAN.md. Bin chi biet SAU khi tai+phan tich -> day la UOC LUONG
+    theo phan phoi lich su, khong phai so that."""
+    import collections
+    TARGET = {"nirsoft": 40, "scoop": 45, "portableapps": 25}  # HOLDOUT_V3_PLAN muc 1
+    BINS = ["MSVC<=10", "MSVC 11-12", "MSVC 14", "GNU/MinGW", "Go", "Delphi", "khac"]
+    cachep = os.path.expanduser("~/bfbg_benign_work/feat_cache.jsonl")
+    prior = collections.defaultdict(collections.Counter)
+    if os.path.exists(cachep):
+        for l in open(cachep):
+            d = json.loads(l)
+            if d.get("label") == 0 and d.get("source") in ("nirsoft", "scoop", "windows11-eval-iso", "chocolatey"):
+                prior[d["source"]][d.get("tbin")] += 1
+    print("DRY-RUN (chua tai) — chieu holdout v3 theo prior bin tu feat_cache benign v2:")
+    print(f"  (prior nguon co: { {k: sum(v.values()) for k,v in prior.items()} })")
+    print(f"  portableapps: KHONG co prior -> dung phan phoi benign TONG.")
+    tot_prior = collections.Counter()
+    for v in prior.values(): tot_prior.update(v)
+    def dist(src):
+        c = prior.get(src) or tot_prior; n = sum(c.values())
+        return {b: c.get(b, 0) / max(n, 1) for b in BINS}
+    proj = collections.Counter(); hdr = f"{'nguon':14s}{'n':>5s}  " + " ".join(f"{b[:8]:>8s}" for b in BINS)
+    print("  " + hdr)
+    for src, n in TARGET.items():
+        src_key = "windows11-eval-iso" if src == "iso" else src
+        d = dist(src_key if src_key in prior else src)
+        row = {b: n * d[b] for b in BINS}
+        for b in BINS: proj[b] += row[b]
+        print(f"  {src:14s}{n:5d}  " + " ".join(f"{row[b]:8.1f}" for b in BINS))
+    N = sum(TARGET.values())
+    print(f"  {'TONG(projected)':14s}{N:5d}  " + " ".join(f"{proj[b]:8.1f}" for b in BINS))
+    msvc14 = proj['MSVC 14']; nonmsvc = N - msvc14
+    print(f"  => du kien MSVC14≈{msvc14:.0f} ({100*msvc14/N:.0f}%), non-MSVC14≈{nonmsvc:.0f} ({100*nonmsvc/N:.0f}%).")
+    print(f"  LUU Y: >=30 MSVC14 (muc tieu cho within-bin n_neg lon) {'DAT' if msvc14>=30 else 'CHUA DAT — can uu tien them app MSVC14'}.")
+    print("  Day la UOC LUONG theo phan phoi lich su; bin that chi biet sau khi tai + pefile. Chua tai mau nao.")
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--indir", required=True, help="thu muc chua PE benign moi da thu")
+    ap.add_argument("--indir", help="thu muc chua PE benign moi da thu (bat buoc tru khi --dry-run)")
     ap.add_argument("--out", default=os.path.join(REPO, "docs", "dataset_v3_manifest.jsonl"))
     ap.add_argument("--build-feats", action="store_true", help="(tuy) chi lam viec neu feature JSON da build")
+    ap.add_argument("--dry-run", action="store_true", help="KHONG tai: chieu so mau du kien theo bin/nguon tu prior feat_cache")
     A = ap.parse_args()
+    if A.dry_run:
+        dry_run()
+        return
+    if not A.indir:
+        ap.error("--indir bat buoc (tru khi --dry-run)")
     try:
         import ppdeep
     except Exception:
