@@ -61,3 +61,15 @@ Spec tất định: `docs/v3_eval_config.json` (sha256 = CONFIG_HASH ở trên).
 9. **Kế hoạch báo KẾT QUẢ XẤU** (ghi trước): báo FPR/AUC của **CẢ 5 model y như số ra**, kể cả khi: BFBG FPR cao / không bằng metadata / api-density tệ / mọi model FPR cao trên v3. **Không** đổi cấu hình/ngưỡng/model theo kết quả, **không** chạm lại, **không** thêm metric. Kết quả xấu = kết quả (đưa vào Threats-to-Validity + bài).
 
 > Chạy v3 CHỈ khi người dùng nói "chạy". Trước đó eval_v3.py chỉ chạy `--selftest` (dữ liệu giả).
+
+## HẠN CHẾ + QUY TẮC LỖI (ghi trước, 2026-10-14)
+- **Ngưỡng BFBG nhiễu:** ngưỡng BFBG lấy từ **validation §17** (189 mẫu: **~58 benign, N positives = 131**) bằng **TPR95 trên positives** → tập nhỏ nên ngưỡng **nhiễu**. ⇒ **AUC (threshold-free) là SỐ CHÍNH**; FPR@ngưỡng chỉ phụ, báo kèm CI rộng.
+- **Config GIỮ NGUYÊN** (TPR95 trên positives của val) — KHÔNG đổi, KHÔNG khóa lại CONFIG_HASH.
+- **Quy tắc lỗi khi chấm v3:** nếu lỗi GIỮA CHỪNG → `eval_v3.py` **DỪNG**, ghi `~/bfbg_benign_work/eval_v3.FAILED` + traceback, **KHÔNG tự sửa rồi chạy lại**, **KHÔNG ghi lock thành công**; báo người dùng, xử lý lỗi, chỉ chạy lại khi có lệnh "chạy" mới.
+
+## XÁC MINH run_real trên tập thay thế test_indist (2026-10-14, KHÔNG chạm v3)
+- (a) **Chạy HẾT đường**: cả 5 model (meta/graph/bag/BFBG first-150/api-density) + RESULT. negs=test_indist-benign (72), positives=BumbleBee (262).
+- (b) **Độ lệch raw-trích vs cache** trên cùng mẫu: feature-vector meta/graph **max|lệch| = 0.00e+00** (extract() tái lập cache y hệt); AUC: meta cache 0.990 vs raw 0.992 (lệch 0.002), graph 0.938 vs raw 0.941 (0.003) — nhiễu RF, không đáng kể.
+- (c) **Hash kết quả subtest** `eval_test_indist_result.json` = `6545b56a559ebc38db3e70069ae888dced534c6ba5406f484eac35575f213bca`.
+- Số subtest (chỉ xác nhận đường, KHÔNG phải v3): meta AUC 0.992 FPR 0.014 · graph 0.941/0.069 · bag 0.959/0.347 · BFBG first-150 0.886/0.375 · api-density 0.931/0.292.
+- → run_real self-contained hoạt động đúng; v3 vẫn CHƯA chạm (không lock). Chạy v3 chỉ khi người dùng nói "chạy".
