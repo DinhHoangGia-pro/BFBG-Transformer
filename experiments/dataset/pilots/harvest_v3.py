@@ -99,19 +99,24 @@ def url64(m):
     if isinstance(u, list): u = u[0]
     return u.split("#/")[0]
 
+THERM = {"pauses": 0, "pause_secs": 0.0, "peak_cpu": 0.0, "peak_gpu": 0}  # theo doi nhiet toan phien
 def thermal_ok(pauses):
-    """Guard theo CA CPU (package id 0) VA GPU: dung temp cao nhat trong hai."""
-    t, lab = hot_temp()
+    """Guard theo CA CPU (package id 0) VA GPU: dung temp cao nhat trong hai.
+    'pauses' = so tam dung LIEN TIEP (khong co batch hoan tat sach xen giua); main loop reset=0 sau batch sach."""
+    g = gpu_temp(); c = cpu_temp(); THERM["peak_cpu"] = max(THERM["peak_cpu"], c); THERM["peak_gpu"] = max(THERM["peak_gpu"], g)
+    t, lab = (c, f"CPU {c:.0f}C") if c >= g else (g, f"GPU {g}C")
     if t >= TEMP_HARD:
         print(f"[THERMAL] {lab} >= {TEMP_HARD} -> ket thuc phien sach", flush=True); return False, pauses
     if t >= TEMP_WARN:
-        time.sleep(180); t2, lab2 = hot_temp()
+        time.sleep(180); THERM["pause_secs"] += 180
+        g2 = gpu_temp(); c2 = cpu_temp(); THERM["peak_cpu"] = max(THERM["peak_cpu"], c2); THERM["peak_gpu"] = max(THERM["peak_gpu"], g2)
+        t2 = max(c2, g2)
         if t2 >= TEMP_WARN:
-            pauses += 1; print(f"[THERMAL] {lab2} >= {TEMP_WARN} keo dai -> tam dung 10' (pause #{pauses})", flush=True)
-            time.sleep(600)
-            if pauses >= MAX_PAUSES: print(f"[THERMAL] {pauses} tam dung lien tiep -> ket thuc sach", flush=True); return False, pauses
-        else: pauses = 0
-    else: pauses = 0
+            pauses += 1; THERM["pauses"] += 1
+            print(f"[THERMAL] max(CPU {c2:.0f},GPU {g2})>= {TEMP_WARN} keo dai -> tam dung 10' (pause lien tiep #{pauses})", flush=True)
+            time.sleep(600); THERM["pause_secs"] += 600
+            if pauses >= MAX_PAUSES: print(f"[THERMAL] {pauses} tam dung LIEN TIEP (khong batch sach xen giua) -> ket thuc sach", flush=True); return False, pauses
+    # LUU Y: KHONG reset pauses o day; chi reset=0 sau mot batch build sach (main loop)
     return True, pauses
 
 # ---- build a batch with build_graphs --workers 2 ----
@@ -176,16 +181,25 @@ def process_app(bucket, app):
     shutil.rmtree(d, ignore_errors=True)
     return out
 
-# ---- candidate list (deterministic) ----
-cands = []
+# ---- candidate list (deterministic, XEN KE scoop:nirsoft ~3:2 theo seed) ----
+scoop_c = []; nir_c = []
 for bucket in ("Main", "Extras"):
-    for a in bucket_apps(bucket): cands.append(("scoop", bucket, a))
-for a in bucket_apps("Nirsoft"): cands.append(("nirsoft", "Nirsoft", a))
-rnd = random.Random(V3_SEED)
-cands = [c for c in cands if c[2].lower() not in v2_apps and f"{c[1]}:{c[2]}" not in done_apps and c[2].lower() not in done_apps]
-cands.sort(key=lambda c: (c[0], c[2].lower()))
-rnd.shuffle(cands)
-print(f"[cands] {len(cands)} app ung vien (sau loai v2-apps + da-xong)", flush=True)
+    for a in bucket_apps(bucket): scoop_c.append(("scoop", bucket, a))
+for a in bucket_apps("Nirsoft"): nir_c.append(("nirsoft", "Nirsoft", a))
+def _filt(lst):
+    lst = [c for c in lst if c[2].lower() not in v2_apps and f"{c[1]}:{c[2]}" not in done_apps and c[2].lower() not in done_apps]
+    lst.sort(key=lambda c: c[2].lower())              # thu tu on dinh theo ten app
+    random.Random(V3_SEED).shuffle(lst)               # roi shuffle theo seed (moi nguon rieng)
+    return lst
+scoop_c = _filt(scoop_c); nir_c = _filt(nir_c)
+# interleave 3 scoop : 2 nirsoft
+cands = []; i = j = 0
+while i < len(scoop_c) or j < len(nir_c):
+    for _ in range(3):
+        if i < len(scoop_c): cands.append(scoop_c[i]); i += 1
+    for _ in range(2):
+        if j < len(nir_c): cands.append(nir_c[j]); j += 1
+print(f"[cands] scoop={len(scoop_c)} nirsoft={len(nir_c)} -> xen ke 3:2, tong {len(cands)} (sau loai v2-apps + da-xong)", flush=True)
 
 got = {"scoop": 0, "nirsoft": 0}
 for s in kept_shas: pass  # got counted via state below (approx by source not tracked per-sha; dung TARGET tren tong)
@@ -204,20 +218,29 @@ for src, bucket, app in cands:
     if len(batch_paths) >= BATCH:
         print(f"[batch] build {len(batch_paths)} payload (workers=2)...", flush=True)
         build_batch(batch_paths); batch_paths = []
+        pauses = 0   # batch hoan tat sach -> reset chuoi tam dung lien tiep (dinh nghia quy tac 3)
         print(f"[rest] nghi {REST}s", flush=True); time.sleep(REST)
 if batch_paths:
-    print(f"[final batch] build {len(batch_paths)}...", flush=True); build_batch(batch_paths)
+    print(f"[final batch] build {len(batch_paths)}...", flush=True); build_batch(batch_paths); pauses = 0
 
 # ---- summary ----
 from collections import Counter
-steps = Counter()
+steps = Counter(); kept_nir = 0; kept_tot = 0
 for l in open(STATE):
-    try: steps[json.loads(l)["step"]] += 1
-    except: pass
+    try: r = json.loads(l)
+    except: continue
+    steps[r.get("step")] += 1
+    if r.get("step") == "kept":
+        kept_tot += 1
+        if r.get("bucket") == "Nirsoft": kept_nir += 1
+nir_frac = 100 * kept_nir / max(kept_tot, 1)
 summary = (f"stop={stop_reason} apps_xu_ly={n_app} kept_tong={len(kept_shas)} "
            f"dedup_drop={steps.get('dedup_drop',0)} build_ok={steps.get('build_ok',0)} "
            f"nf0_drop={steps.get('nf0_drop',0)} build_fail={steps.get('build_fail',0)} app_fail={steps.get('app_fail',0)} "
-           f"got={got} elapsed={ (time.time()-WALL0)/3600:.2f}h")
+           f"got={got} nirsoft_frac_kept={nir_frac:.0f}% (cap 35%) "
+           f"thermal_pauses={THERM['pauses']} pause_time={THERM['pause_secs']/60:.0f}min "
+           f"peakCPU={THERM['peak_cpu']:.0f}C peakGPU={THERM['peak_gpu']}C "
+           f"elapsed={ (time.time()-WALL0)/3600:.2f}h")
 print("\n=== SESSION SUMMARY ===\n" + summary, flush=True)
 with open(os.path.join(WORK, "v3_session_summary.txt"), "w") as f: f.write(summary + "\n")
 print("DONE harvest_v3 session", flush=True)

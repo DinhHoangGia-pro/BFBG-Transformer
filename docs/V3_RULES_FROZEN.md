@@ -32,3 +32,9 @@ Commit này phải có TRƯỚC mọi lần tải/chấm v3 (quy tắc khóa, HO
   ngưỡng giữ nguyên: >85°C kéo dài → tạm dừng 10′; >90°C hoặc 3 lần tạm dừng liên tiếp → kết thúc phiên sạch.
   (Bản trước chỉ theo GPU; máy nóng chủ yếu ở CPU khi build angr nên bổ sung CPU.)
 - **Xác nhận:** TẤT CẢ bước LỌC mẫu (quy tắc 1–11 ở trên) đã nằm trong file này; harvest_v3.py không có bước lọc nào ngoài file. Thermal/session-cap/batch/rest là tham số vận hành, không loại mẫu.
+
+## Điều chỉnh trước PHIÊN 1 chạy lại (2026-10-14) — vận hành
+- **Xen kẽ nguồn Scoop:NirSoft ~3:2** (không tải hết nguồn này rồi sang nguồn kia); thứ tự app theo seed 20261008 (mỗi nguồn shuffle riêng rồi xen kẽ).
+- **Dedup ppdeep≥90** áp với v1/v2 **VÀ nội bộ v3** (so với mẫu v3 đã giữ); giữ mẫu ĐẦU theo thứ tự seed, mẫu sau trùng bị loại.
+- **"3 lần tạm dừng LIÊN TIẾP"** = 3 lần tạm dừng nhiệt mà **KHÔNG có đợt (batch) nào build hoàn tất sạch xen giữa**. Bộ đếm tạm dừng chỉ reset=0 sau một batch build sạch; nhiệt về bình thường KHÔNG reset.
+- Tóm tắt cuối phiên ghi thêm: số lần tạm dừng nhiệt, tổng thời gian dừng, nhiệt CPU/GPU đỉnh, tỉ lệ NirSoft trong phần đã giữ (cap 35%).
