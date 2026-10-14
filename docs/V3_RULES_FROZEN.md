@@ -45,3 +45,9 @@ Commit này phải có TRƯỚC mọi lần tải/chấm v3 (quy tắc khóa, HO
 - Đo nghỉ 3 lần (30s): 68/56/48°C (đang nguội; idle thật ~48–65°C). KHÔNG dùng số "87°C" (đo lệch ngay sau tải).
 - 15 phút đầu phiên: ghi nhiệt CPU/GPU mỗi 30s → `~/bfbg_benign_work/v3_temps.jsonl` để xác nhận workers=1 giữ CPU<92°C; nếu KHÔNG giữ được thì BÁO (không tự nâng ngưỡng).
 - Tóm tắt cuối phiên: số lần tạm dừng + nhiệt đỉnh (đã có).
+
+## Giảm nhiệt bằng taskset (2026-10-14) — workers=1 vẫn chạm 100°C
+- workers=1/batch15 vẫn ghim CPU ~100°C (guard clean-finish sau ~2 app). → Ghim TOÀN phiên vào **4 core: `taskset -c 0-3`** (cả ppdeep ref + angr build + mọi tiến trình con) để giảm nhiệt tại gốc.
+- Giữ nguyên guard 92/96, workers=1, batch 15, nghỉ 10′, logger nhiệt 15′ đầu.
+- Thử 15′: nếu CPU<92°C → chạy tiếp (đo ~60′/lần); nếu KHÔNG → BÁO (không nâng ngưỡng).
+- State giữ nguyên để resume (2 mẫu phiên trước đã clean-finish vẫn tính).
