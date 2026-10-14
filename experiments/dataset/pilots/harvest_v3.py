@@ -16,9 +16,10 @@ os.chdir("/home/dhgia/Work/Defi/BFBG-Transformer"); sys.path.insert(0, ".")
 V3_SEED = 20261008
 SESSION_CAP = 7.5 * 3600
 CAP_SIZE = 12 * 1024 * 1024
-BATCH = 40
-REST = 300
-TEMP_WARN, TEMP_HARD, MAX_PAUSES = 85, 90, 3
+BATCH = 15                 # batch nho (workers=1)
+REST = 600                 # nghi 10' giua batch
+TEMP_WARN, TEMP_HARD, MAX_PAUSES = 92, 96, 3   # CPU-nong: pause@>=92 keo dai 3', finish@>=96 hoac 3 pause lien tiep
+BUILD_WORKERS = 1
 TARGET = {"scoop": 75, "nirsoft": 50}   # PortableApps hoan phien sau (khong API sach)
 BUCKET = {"Main": "ScoopInstaller/Main", "Extras": "ScoopInstaller/Extras", "Nirsoft": "ScoopInstaller/Nirsoft"}
 WORK = os.path.expanduser("~/bfbg_benign_work"); IMP = os.path.join(WORK, "import_v3")
@@ -30,6 +31,23 @@ def log(**kw):
     kw["ts"] = round(time.time(), 1)
     with open(STATE, "a") as f: f.write(json.dumps(kw) + "\n")
 
+TEMPLOG = os.path.join(WORK, "v3_temps.jsonl")
+def temp_logger():
+    """Ghi nhiet CPU(package)/GPU moi 30s trong 15 phut dau de xac nhan workers=1 giu CPU<92C."""
+    import threading
+    def run():
+        t0 = time.time()
+        while time.time() - t0 < 900:
+            try:
+                import subprocess as sp, re as _re
+                o = sp.run(["sensors"], capture_output=True, text=True, timeout=10).stdout
+                m = _re.search(r"Package id 0:\s*\+?([0-9.]+)", o); c = float(m.group(1)) if m else 0.0
+                g = sp.run(["nvidia-smi","--query-gpu=temperature.gpu","--format=csv,noheader"],capture_output=True,text=True,timeout=10).stdout.strip().split("\n")[0]
+                with open(TEMPLOG, "a") as f: f.write(json.dumps({"ts": round(time.time()-t0,0), "cpu": c, "gpu": g}) + "\n")
+            except Exception: pass
+            time.sleep(30)
+    th = threading.Thread(target=run, daemon=True); th.start()
+
 # ---- resume state ----
 done_apps = set(); kept_shas = set(); dropped = 0; kept = 0
 if os.path.exists(STATE):
@@ -40,6 +58,9 @@ if os.path.exists(STATE):
         if r.get("step") == "kept": kept_shas.add(r["sha"]);
     kept = len(kept_shas)
 print(f"[resume] app xong truoc: {len(done_apps)} | sha giu truoc: {len(kept_shas)}", flush=True)
+try: os.remove(TEMPLOG)
+except OSError: pass
+temp_logger()  # log nhiet 15' dau (moi 30s) -> v3_temps.jsonl
 
 # ---- v1/v2 dedup refs ----
 v_sha = set(); v_h = []
@@ -123,7 +144,7 @@ def thermal_ok(pauses):
 def build_batch(paths):
     if not paths: return
     r = subprocess.run([sys.executable, "scripts/build_graphs.py", *paths, "--label", "0",
-                        "--out-dir", FEAT, "--workers", "2", "--append"],
+                        "--out-dir", FEAT, "--workers", str(BUILD_WORKERS), "--append"],
                        capture_output=True, text=True, timeout=7200)
     for p in paths:
         sha = os.path.basename(p)

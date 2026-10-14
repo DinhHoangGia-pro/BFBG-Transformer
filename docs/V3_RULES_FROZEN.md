@@ -38,3 +38,10 @@ Commit này phải có TRƯỚC mọi lần tải/chấm v3 (quy tắc khóa, HO
 - **Dedup ppdeep≥90** áp với v1/v2 **VÀ nội bộ v3** (so với mẫu v3 đã giữ); giữ mẫu ĐẦU theo thứ tự seed, mẫu sau trùng bị loại.
 - **"3 lần tạm dừng LIÊN TIẾP"** = 3 lần tạm dừng nhiệt mà **KHÔNG có đợt (batch) nào build hoàn tất sạch xen giữa**. Bộ đếm tạm dừng chỉ reset=0 sau một batch build sạch; nhiệt về bình thường KHÔNG reset.
 - Tóm tắt cuối phiên ghi thêm: số lần tạm dừng nhiệt, tổng thời gian dừng, nhiệt CPU/GPU đỉnh, tỉ lệ NirSoft trong phần đã giữ (cap 35%).
+
+## PHIÊN 1 (bản chạy lại 2026-10-14) — cấu hình nhiệt do người dùng chốt
+- **workers=1**, **batch ~15**, **nghỉ 10 phút** giữa batch (giảm tải nhiệt).
+- Thermal guard: **tạm dừng 10 phút khi CPU(Package id 0) ≥ 92°C kéo dài 3 phút**; **kết thúc phiên sạch khi ≥ 96°C HOẶC 3 lần tạm dừng liên tiếp** (liên tiếp = không có batch sạch xen giữa). Lấy max(CPU, GPU).
+- Đo nghỉ 3 lần (30s): 68/56/48°C (đang nguội; idle thật ~48–65°C). KHÔNG dùng số "87°C" (đo lệch ngay sau tải).
+- 15 phút đầu phiên: ghi nhiệt CPU/GPU mỗi 30s → `~/bfbg_benign_work/v3_temps.jsonl` để xác nhận workers=1 giữ CPU<92°C; nếu KHÔNG giữ được thì BÁO (không tự nâng ngưỡng).
+- Tóm tắt cuối phiên: số lần tạm dừng + nhiệt đỉnh (đã có).
