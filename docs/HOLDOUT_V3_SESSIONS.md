@@ -9,3 +9,9 @@
 - Nhiệt: thermal_pauses = 0 (report-only), peak CPU 100°C, peak GPU 48°C.
 - Raw → import_v3/ ; feature → v3_features/ (ngoài data/, chưa vào train).
 - **CHƯA sinh manifest v3** (Task 4: chỉ khi mọi phiên xong + cap vendor trên số thật, commit trước mọi phép chấm).
+
+### Phân tích build_fail PHIÊN 1 (21 mẫu)
+- Nguyên nhân: **14 Timeout angr (>900s, kill)** + **7 dotnet_clr (out-of-scope .NET)**.
+- Bin: khác 11, GNU/MinGW 6, MSVC14 2, MSVC≤10 1, Delphi 1. Size median 7.6MB / max 12.7MB.
+- **Thiên lệch mẫu rơi:** nghiêng về file lớn/nhiều hàm (timeout) + bin khác/GNU → benign built còn lại ĐƠN GIẢN hơn (ít hàm) → ghi Threats-to-Validity.
+- build_ok theo bin: MSVC≤10 64, MSVC14 23, Go 9, khác 6, GNU 4 → **MSVC14=23 (cần ≥40, PHIÊN 2 bù bằng scoop)**.

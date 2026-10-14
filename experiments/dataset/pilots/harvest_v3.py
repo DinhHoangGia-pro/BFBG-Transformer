@@ -16,12 +16,13 @@ os.chdir("/home/dhgia/Work/Defi/BFBG-Transformer"); sys.path.insert(0, ".")
 V3_SEED = 20261008
 SESSION_CAP = 7.5 * 3600
 CAP_SIZE = 12 * 1024 * 1024
-BATCH = 40                 # chay het muc (nguoi dung lo tan nhiet)
+BATCH = 40
 REST = 300                 # nghi 5' giua batch
-TEMP_WARN, TEMP_HARD, MAX_PAUSES = 92, 96, 3   # CHI DE BAO (guard report-only); khong pause/khong dung
-BUILD_WORKERS = 2
-THERMAL_ACTION = False     # False = chi ghi/bao nhiet, KHONG tam dung/ket thuc theo nhiet
-TARGET = {"scoop": 75, "nirsoft": 50}   # PortableApps hoan phien sau (khong API sach)
+TEMP_WARN, TEMP_HARD, MAX_PAUSES = 92, 96, 3   # chi tham chieu; KHONG dung lam guard o phien 2
+BUILD_WORKERS = 1          # PHIEN 2: workers=1
+THERMAL_ACTION = False     # KHONG guard nhiet (nguoi dung lo tan nhiet); chi log nhiet 60'/lan
+SKIP_NIRSOFT = True        # PHIEN 2: bo NirSoft (da du 50 o phien 1)
+TARGET = {"scoop": 90, "nirsoft": 0}   # PHIEN 2: chi scoop (Main+Extras); PortableApps hoan (khong API sach)
 BUCKET = {"Main": "ScoopInstaller/Main", "Extras": "ScoopInstaller/Extras", "Nirsoft": "ScoopInstaller/Nirsoft"}
 WORK = os.path.expanduser("~/bfbg_benign_work"); IMP = os.path.join(WORK, "import_v3")
 FEAT = os.path.join(WORK, "v3_features"); STATE = os.path.join(WORK, "v3_state.jsonl")
@@ -34,19 +35,26 @@ def log(**kw):
 
 TEMPLOG = os.path.join(WORK, "v3_temps.jsonl")
 def temp_logger():
-    """Ghi nhiet CPU(package)/GPU moi 30s trong 15 phut dau de xac nhan workers=1 giu CPU<92C."""
+    """PHIEN 2: KHONG guard. Sample nhiet moi 60s (cap nhat peak + dem >=95C vao THERM),
+    GHI vao log moi ~60 phut. Chay toan phien (daemon)."""
     import threading
     def run():
-        t0 = time.time()
-        while time.time() - t0 < 900:
+        t0 = time.time(); last_write = 0
+        while True:
             try:
                 import subprocess as sp, re as _re
                 o = sp.run(["sensors"], capture_output=True, text=True, timeout=10).stdout
                 m = _re.search(r"Package id 0:\s*\+?([0-9.]+)", o); c = float(m.group(1)) if m else 0.0
-                g = sp.run(["nvidia-smi","--query-gpu=temperature.gpu","--format=csv,noheader"],capture_output=True,text=True,timeout=10).stdout.strip().split("\n")[0]
-                with open(TEMPLOG, "a") as f: f.write(json.dumps({"ts": round(time.time()-t0,0), "cpu": c, "gpu": g}) + "\n")
+                gs = sp.run(["nvidia-smi","--query-gpu=temperature.gpu","--format=csv,noheader"],capture_output=True,text=True,timeout=10).stdout.strip().split("\n")[0]
+                g = int(gs) if gs.isdigit() else 0
+                THERM["peak_cpu"] = max(THERM["peak_cpu"], c); THERM["peak_gpu"] = max(THERM["peak_gpu"], g)
+                if c >= 95: THERM["ge95"] = THERM.get("ge95", 0) + 1
+                if time.time() - last_write >= 3600:   # ghi log moi ~60'
+                    with open(TEMPLOG, "a") as f: f.write(json.dumps({"ts": round(time.time()-t0,0), "cpu": c, "gpu": g}) + "\n")
+                    print(f"[TEMP-60min] CPU {c:.0f}C GPU {g}C peakCPU {THERM['peak_cpu']:.0f} ge95={THERM.get('ge95',0)}", flush=True)
+                    last_write = time.time()
             except Exception: pass
-            time.sleep(30)
+            time.sleep(60)
     th = threading.Thread(target=run, daemon=True); th.start()
 
 # ---- resume state ----
@@ -121,7 +129,7 @@ def url64(m):
     if isinstance(u, list): u = u[0]
     return u.split("#/")[0]
 
-THERM = {"pauses": 0, "pause_secs": 0.0, "peak_cpu": 0.0, "peak_gpu": 0}  # theo doi nhiet toan phien
+THERM = {"pauses": 0, "pause_secs": 0.0, "peak_cpu": 0.0, "peak_gpu": 0, "ge95": 0}  # theo doi nhiet toan phien
 def thermal_ok(pauses):
     """Guard theo CA CPU (package id 0) VA GPU: dung temp cao nhat trong hai.
     'pauses' = so tam dung LIEN TIEP (khong co batch hoan tat sach xen giua); main loop reset=0 sau batch sach."""
@@ -210,7 +218,8 @@ def process_app(bucket, app):
 scoop_c = []; nir_c = []
 for bucket in ("Main", "Extras"):
     for a in bucket_apps(bucket): scoop_c.append(("scoop", bucket, a))
-for a in bucket_apps("Nirsoft"): nir_c.append(("nirsoft", "Nirsoft", a))
+if not SKIP_NIRSOFT:
+    for a in bucket_apps("Nirsoft"): nir_c.append(("nirsoft", "Nirsoft", a))
 def _filt(lst):
     lst = [c for c in lst if c[2].lower() not in v2_apps and f"{c[1]}:{c[2]}" not in done_apps and c[2].lower() not in done_apps]
     lst.sort(key=lambda c: c[2].lower())              # thu tu on dinh theo ten app
@@ -233,8 +242,7 @@ for src, bucket, app in cands:
     if time.time() - WALL0 > SESSION_CAP:
         stop_reason = "session_cap_7h30"; break
     if got.get(src, 0) >= TARGET.get(src, 0): continue
-    ok, pauses = thermal_ok(pauses)
-    if not ok: stop_reason = "thermal"; break
+    # PHIEN 2: KHONG guard nhiet (nguoi dung lo tan nhiet); temp_logger ghi nhiet 60'/lan
     paths = process_app(bucket, app)
     got[src] = got.get(src, 0) + len(paths)
     batch_paths += paths
@@ -264,7 +272,7 @@ summary = (f"stop={stop_reason} apps_xu_ly={n_app} kept_tong={len(kept_shas)} "
            f"nf0_drop={steps.get('nf0_drop',0)} build_fail={steps.get('build_fail',0)} app_fail={steps.get('app_fail',0)} "
            f"got={got} nirsoft_frac_kept={nir_frac:.0f}% (cap 35%) "
            f"thermal_pauses={THERM['pauses']} pause_time={THERM['pause_secs']/60:.0f}min "
-           f"peakCPU={THERM['peak_cpu']:.0f}C peakGPU={THERM['peak_gpu']}C "
+           f"peakCPU={THERM['peak_cpu']:.0f}C peakGPU={THERM['peak_gpu']}C ge95C={THERM.get('ge95',0)}samples "
            f"elapsed={ (time.time()-WALL0)/3600:.2f}h")
 print("\n=== SESSION SUMMARY ===\n" + summary, flush=True)
 with open(os.path.join(WORK, "v3_session_summary.txt"), "w") as f: f.write(summary + "\n")

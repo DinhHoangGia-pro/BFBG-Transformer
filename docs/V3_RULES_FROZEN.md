@@ -56,3 +56,10 @@ Commit này phải có TRƯỚC mọi lần tải/chấm v3 (quy tắc khóa, HO
 - Người dùng chịu trách nhiệm tản nhiệt; guard chuyển **REPORT-ONLY** (`THERMAL_ACTION=False`): chỉ GHI/BÁO nhiệt, **KHÔNG tạm dừng, KHÔNG kết thúc theo nhiệt**.
 - Khôi phục **workers=2, batch 40, nghỉ 5′, BỎ ghim core** (chạy hết mức). Logger nhiệt 15′ đầu + nhiệt đỉnh trong tóm tắt vẫn giữ (chỉ để báo).
 - Trần phiên 7h30 + dedup + cap vendor + các bước lọc 1–11 GIỮ NGUYÊN.
+
+## PHIÊN 2 (2026-10-14) — quyết định người dùng
+- **Nguồn: chỉ Scoop (Main+Extras), BỎ NirSoft** (đã đủ 50 ở phiên 1).
+- **KHÔNG guard nhiệt** (người dùng tự lo tản nhiệt): chỉ GHI nhiệt CPU(Package id 0)+GPU **mỗi ~60 phút** vào log; cuối phiên báo **nhiệt đỉnh + số mẫu ≥95°C**. Không tạm dừng/kết thúc theo nhiệt.
+- workers=1, nice 19, cgroup 8G, trần phiên 7h30; không tắt máy.
+- **Mục tiêu: ≥40 MSVC14 VÀ tổng ≥120 sau cap**; dừng khi đủ (theo dõi thủ công vì cap tính ở manifest).
+- **Cap vendor** (NirSoft ≤35%) áp ở bước sinh manifest, tất định (seed 20261008, thứ tự sha), ghi danh sách mẫu bị bỏ do cap.
