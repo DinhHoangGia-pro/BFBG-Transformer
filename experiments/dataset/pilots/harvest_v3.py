@@ -16,10 +16,11 @@ os.chdir("/home/dhgia/Work/Defi/BFBG-Transformer"); sys.path.insert(0, ".")
 V3_SEED = 20261008
 SESSION_CAP = 7.5 * 3600
 CAP_SIZE = 12 * 1024 * 1024
-BATCH = 15                 # batch nho (workers=1)
-REST = 600                 # nghi 10' giua batch
-TEMP_WARN, TEMP_HARD, MAX_PAUSES = 92, 96, 3   # CPU-nong: pause@>=92 keo dai 3', finish@>=96 hoac 3 pause lien tiep
-BUILD_WORKERS = 1
+BATCH = 40                 # chay het muc (nguoi dung lo tan nhiet)
+REST = 300                 # nghi 5' giua batch
+TEMP_WARN, TEMP_HARD, MAX_PAUSES = 92, 96, 3   # CHI DE BAO (guard report-only); khong pause/khong dung
+BUILD_WORKERS = 2
+THERMAL_ACTION = False     # False = chi ghi/bao nhiet, KHONG tam dung/ket thuc theo nhiet
 TARGET = {"scoop": 75, "nirsoft": 50}   # PortableApps hoan phien sau (khong API sach)
 BUCKET = {"Main": "ScoopInstaller/Main", "Extras": "ScoopInstaller/Extras", "Nirsoft": "ScoopInstaller/Nirsoft"}
 WORK = os.path.expanduser("~/bfbg_benign_work"); IMP = os.path.join(WORK, "import_v3")
@@ -126,6 +127,10 @@ def thermal_ok(pauses):
     'pauses' = so tam dung LIEN TIEP (khong co batch hoan tat sach xen giua); main loop reset=0 sau batch sach."""
     g = gpu_temp(); c = cpu_temp(); THERM["peak_cpu"] = max(THERM["peak_cpu"], c); THERM["peak_gpu"] = max(THERM["peak_gpu"], g)
     t, lab = (c, f"CPU {c:.0f}C") if c >= g else (g, f"GPU {g}C")
+    if not THERMAL_ACTION:
+        if t >= TEMP_WARN: print(f"[THERMAL-REPORT] {lab} (>= {TEMP_WARN}; nguoi dung lo tan nhiet, chay tiep)", flush=True)
+        return True, pauses
+    # (nhanh cu, khong dung khi THERMAL_ACTION=False)
     if t >= TEMP_HARD:
         print(f"[THERMAL] {lab} >= {TEMP_HARD} -> ket thuc phien sach", flush=True); return False, pauses
     if t >= TEMP_WARN:
@@ -136,8 +141,7 @@ def thermal_ok(pauses):
             pauses += 1; THERM["pauses"] += 1
             print(f"[THERMAL] max(CPU {c2:.0f},GPU {g2})>= {TEMP_WARN} keo dai -> tam dung 10' (pause lien tiep #{pauses})", flush=True)
             time.sleep(600); THERM["pause_secs"] += 600
-            if pauses >= MAX_PAUSES: print(f"[THERMAL] {pauses} tam dung LIEN TIEP (khong batch sach xen giua) -> ket thuc sach", flush=True); return False, pauses
-    # LUU Y: KHONG reset pauses o day; chi reset=0 sau mot batch build sach (main loop)
+            if pauses >= MAX_PAUSES: print(f"[THERMAL] {pauses} tam dung LIEN TIEP -> ket thuc sach", flush=True); return False, pauses
     return True, pauses
 
 # ---- build a batch with build_graphs --workers 2 ----

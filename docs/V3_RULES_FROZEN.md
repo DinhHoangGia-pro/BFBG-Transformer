@@ -51,3 +51,8 @@ Commit này phải có TRƯỚC mọi lần tải/chấm v3 (quy tắc khóa, HO
 - Giữ nguyên guard 92/96, workers=1, batch 15, nghỉ 10′, logger nhiệt 15′ đầu.
 - Thử 15′: nếu CPU<92°C → chạy tiếp (đo ~60′/lần); nếu KHÔNG → BÁO (không nâng ngưỡng).
 - State giữ nguyên để resume (2 mẫu phiên trước đã clean-finish vẫn tính).
+
+## Chạy hết mức (2026-10-14) — người dùng tự lo tản nhiệt
+- Người dùng chịu trách nhiệm tản nhiệt; guard chuyển **REPORT-ONLY** (`THERMAL_ACTION=False`): chỉ GHI/BÁO nhiệt, **KHÔNG tạm dừng, KHÔNG kết thúc theo nhiệt**.
+- Khôi phục **workers=2, batch 40, nghỉ 5′, BỎ ghim core** (chạy hết mức). Logger nhiệt 15′ đầu + nhiệt đỉnh trong tóm tắt vẫn giữ (chỉ để báo).
+- Trần phiên 7h30 + dedup + cap vendor + các bước lọc 1–11 GIỮ NGUYÊN.
