@@ -1,0 +1,4 @@
+"# source: experiments/dataset/pilots/reproduce_tables.py (sha256 858649846109); bin_parse seed-edge stats, first-150-function window"
+group,seed-edges,dropped by first-150 cut (\%)
+benign,574,95.8
+malicious,657,76.6

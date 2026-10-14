@@ -5,6 +5,7 @@
 | BFBG 4-seed | dev_bfbg_4seed | foldrun JSON + experiments/dataset/pilots/reproduce_tables.py | 858649846109a3f8 |
 | within-MSVC14 | dev_within_msvc14 | experiments/dataset/pilots/reproduce_tables.py (cache) | 858649846109a3f8 |
 | LOFO 5-family | dev_lofo_5family | experiments/dataset/pilots/reproduce_tables.py (cache) | 858649846109a3f8 |
+| seed-cut | dev_seed_cut | experiments/dataset/pilots/reproduce_tables.py (cache) | 858649846109a3f8 |
 | v3 AUC | v3_auc | docs/v3_eval_result.json (READ, not recomputed) | 1dca53a21138048e |
 | v3 FPR-by-bin | v3_fpr_by_bin | docs/v3_eval_result.json (READ, not recomputed) | 1dca53a21138048e |
 

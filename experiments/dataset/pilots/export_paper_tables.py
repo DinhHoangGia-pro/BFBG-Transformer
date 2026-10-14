@@ -103,6 +103,16 @@ meanrow=["mean±std"]+["%.3f±%.3f"%(np.mean(res[m]),np.std(res[m],ddof=1)) for 
 write_table("dev_lofo_5family", ["family","metadata","graph","graph+API","bag-of-tokens"], perfam+[meanrow],
     source=f"{REPRO} (sha256 {HASHES[REPRO][:12]}); leave-one-family-out, positives=family vs choco")
 
+# ---------- TABLE: seed-evidence dropped by 150-function cut (from bin_parse) ----------
+def seedcut(recs):
+    tot=sum(P[r["sha256"]]["sd_tot"] for r in recs if r["sha256"] in P)
+    df=sum(P[r["sha256"]]["sd_drop_func"] for r in recs if r["sha256"] in P)
+    return tot, (100*df/max(tot,1))
+bt,bp=seedcut([r for r in tp+ch if r["label"]==0]); mt,mp=seedcut([r for r in man if r["label"]==1])
+write_table("dev_seed_cut", ["group","seed-edges","dropped by first-150 cut (\\%)"],
+    [["benign", bt, "%.1f"%bp],["malicious", mt, "%.1f"%mp]],
+    source=f"{REPRO} (sha256 {HASHES[REPRO][:12]}); bin_parse seed-edge stats, first-150-function window")
+
 # ---------- TABLE v3 (DOC TU JSON, KHONG TINH LAI) ----------
 r3=json.load(open(EVALJSON)); M=r3["models"]
 order=["meta","graph","bag_of_tokens","bfbg_first150","bfbg_apidensity"]
@@ -134,6 +144,7 @@ with open(os.path.join(OUT, "TABLES_MANIFEST.md"), "w") as f:
     f.write(f"| BFBG 4-seed | dev_bfbg_4seed | foldrun JSON + {REPRO} | {HASHES[REPRO][:16]} |\n")
     f.write(f"| within-MSVC14 | dev_within_msvc14 | {REPRO} (cache) | {HASHES[REPRO][:16]} |\n")
     f.write(f"| LOFO 5-family | dev_lofo_5family | {REPRO} (cache) | {HASHES[REPRO][:16]} |\n")
+    f.write(f"| seed-cut | dev_seed_cut | {REPRO} (cache) | {HASHES[REPRO][:16]} |\n")
     f.write(f"| v3 AUC | v3_auc | {EVALJSON} (READ, not recomputed) | {HASHES[EVALJSON][:16]} |\n")
     f.write(f"| v3 FPR-by-bin | v3_fpr_by_bin | {EVALJSON} (READ, not recomputed) | {HASHES[EVALJSON][:16]} |\n")
     f.write(f"\nFull hashes:\n")
