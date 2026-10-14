@@ -41,7 +41,9 @@ def dry_run():
     tung nguon). Target lay tu HOLDOUT_V3_PLAN.md. Bin chi biet SAU khi tai+phan tich -> day la UOC LUONG
     theo phan phoi lich su, khong phai so that."""
     import collections
-    TARGET = {"nirsoft": 40, "scoop": 45, "portableapps": 25}  # HOLDOUT_V3_PLAN muc 1
+    TARGET = {"nirsoft": 50, "scoop": 75, "portableapps": 55}  # HOLDOUT_V3_PLAN muc 1 (tai 160-180)
+    LOSS = 0.30          # ty le dedup+roi du kien
+    VENDOR_CAP = 0.35    # NirSoft <= 35% holdout cuoi
     BINS = ["MSVC<=10", "MSVC 11-12", "MSVC 14", "GNU/MinGW", "Go", "Delphi", "khac"]
     cachep = os.path.expanduser("~/bfbg_benign_work/feat_cache.jsonl")
     prior = collections.defaultdict(collections.Counter)
@@ -58,20 +60,26 @@ def dry_run():
     def dist(src):
         c = prior.get(src) or tot_prior; n = sum(c.values())
         return {b: c.get(b, 0) / max(n, 1) for b in BINS}
-    proj = collections.Counter(); hdr = f"{'nguon':14s}{'n':>5s}  " + " ".join(f"{b[:8]:>8s}" for b in BINS)
+    # KEPT = sau dedup+roi (~LOSS); ap VENDOR_CAP tren NirSoft (<=35% kept-total)
+    kept = {s: TARGET[s] * (1 - LOSS) for s in TARGET}
+    tot0 = sum(kept.values())
+    cap_n = VENDOR_CAP * tot0
+    capped = kept["nirsoft"] > cap_n
+    if capped: kept["nirsoft"] = cap_n
+    N = sum(kept.values())
+    proj = collections.Counter(); hdr = f"{'nguon':14s}{'tai':>5s}{'kept':>6s}  " + " ".join(f"{b[:8]:>8s}" for b in BINS)
     print("  " + hdr)
-    for src, n in TARGET.items():
-        src_key = "windows11-eval-iso" if src == "iso" else src
-        d = dist(src_key if src_key in prior else src)
-        row = {b: n * d[b] for b in BINS}
+    for src in TARGET:
+        d = dist(src if src in prior else src); k = kept[src]
+        row = {b: k * d[b] for b in BINS}
         for b in BINS: proj[b] += row[b]
-        print(f"  {src:14s}{n:5d}  " + " ".join(f"{row[b]:8.1f}" for b in BINS))
-    N = sum(TARGET.values())
-    print(f"  {'TONG(projected)':14s}{N:5d}  " + " ".join(f"{proj[b]:8.1f}" for b in BINS))
+        print(f"  {src:14s}{TARGET[src]:5d}{k:6.0f}  " + " ".join(f"{row[b]:8.1f}" for b in BINS))
+    print(f"  {'TONG kept':14s}{sum(TARGET.values()):5d}{N:6.0f}  " + " ".join(f"{proj[b]:8.1f}" for b in BINS))
     msvc14 = proj['MSVC 14']; nonmsvc = N - msvc14
-    print(f"  => du kien MSVC14≈{msvc14:.0f} ({100*msvc14/N:.0f}%), non-MSVC14≈{nonmsvc:.0f} ({100*nonmsvc/N:.0f}%).")
-    print(f"  LUU Y: >=30 MSVC14 (muc tieu cho within-bin n_neg lon) {'DAT' if msvc14>=30 else 'CHUA DAT — can uu tien them app MSVC14'}.")
-    print("  Day la UOC LUONG theo phan phoi lich su; bin that chi biet sau khi tai + pefile. Chua tai mau nao.")
+    print(f"  => tai {sum(TARGET.values())} -> kept≈{N:.0f} (loss {int(LOSS*100)}%); NirSoft {100*kept['nirsoft']/N:.0f}% {'(da cap 35%)' if capped else '(<=35%, cap khong rang buoc)'}")
+    print(f"  => MSVC14≈{msvc14:.0f} ({100*msvc14/N:.0f}%), non-MSVC14≈{nonmsvc:.0f} ({100*nonmsvc/N:.0f}%); MSVC<=10≈{proj['MSVC<=10']:.0f}")
+    print(f"  LUU Y: >=40 MSVC14 (within-bin n_neg lon) {'DAT' if msvc14>=40 else 'CHUA DAT — uu tien them app MSVC14'}; kept>=120 {'DAT' if N>=120 else 'CHUA — tang target'}.")
+    print("  * Prior bin la UOC LUONG tu pilot nho (46 nirsoft, 203 scoop v2); bin that chi biet sau tai+pefile. Chua tai mau nao.")
 
 def main():
     ap = argparse.ArgumentParser()
@@ -112,7 +120,8 @@ def main():
         if ppdeep:
             try: fh = ppdeep.hash(open(fp, "rb").read())
             except Exception: fh = None
-        rows.append(dict(sha256=digest, label=0, source="holdout_v3", split="holdout_v3_benign",
+        rel = os.path.relpath(fp, A.indir); vendor = rel.split(os.sep)[0].lower() if os.sep in rel else "unknown"
+        rows.append(dict(sha256=digest, label=0, source="holdout_v3", vendor=vendor, split="holdout_v3_benign",
                          orig_name=os.path.basename(fp), num_functions=nf, _fuzz=fh))
     # near-dup clustering (ppdeep): gan cluster id theo sha dai dien nho nhat; loai cum trung v1/v2
     if ppdeep:
@@ -137,6 +146,14 @@ def main():
             used_clusters.add(c); kept.append(r)
         rows = kept
     for r in rows: r.pop("_fuzz", None)
+    # VENDOR CAP: NirSoft <= 35% holdout (loai bot nirsoft theo sha neu vuot)
+    VENDOR_CAP = 0.35
+    nirs = [r for r in rows if r["vendor"] == "nirsoft"]; others = [r for r in rows if r["vendor"] != "nirsoft"]
+    max_nir = int(VENDOR_CAP * len(rows))
+    if len(nirs) > max_nir:
+        nirs = sorted(nirs, key=lambda x: x["sha256"])[:max_nir]
+        print(f"[CAP] NirSoft {len([r for r in rows if r['vendor']=='nirsoft'])} -> {len(nirs)} (<=35% cua {len(others)+len(nirs)})")
+        rows = others + nirs
     rows.sort(key=lambda x: x["sha256"])
     with open(A.out, "w") as f:
         for r in rows: f.write(json.dumps(r, sort_keys=True) + "\n")
