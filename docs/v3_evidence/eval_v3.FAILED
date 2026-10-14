@@ -1,0 +1,30 @@
+2026-10-14T19:21:28.431469
+JSONDecodeError: Expecting ',' delimiter: line 1 column 196072912 (char 196072911)
+Traceback (most recent call last):
+  File "/home/dhgia/Work/Defi/BFBG-Transformer/experiments/dataset/pilots/eval_v3.py", line 291, in main
+    try: run_real("v3")
+         ~~~~~~~~^^^^^^
+  File "/home/dhgia/Work/Defi/BFBG-Transformer/experiments/dataset/pilots/eval_v3.py", line 192, in run_real
+    for r in negs: ext(r, NEG_V3)
+                   ~~~^^^^^^^^^^^
+  File "/home/dhgia/Work/Defi/BFBG-Transformer/experiments/dataset/pilots/eval_v3.py", line 187, in ext
+    if sha not in FEAT: FEAT[sha] = extract(sha, r.get("label", 0), v3)
+                                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dhgia/Work/Defi/BFBG-Transformer/experiments/dataset/pilots/eval_v3.py", line 110, in extract
+    d = json.load(open(jp)); si2 = d.get('structural_indicators', {})
+  File "/usr/lib/python3.14/json/__init__.py", line 298, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "/usr/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 196072912 (char 196072911)
+

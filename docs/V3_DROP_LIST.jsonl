@@ -57,3 +57,4 @@
 {"app": "micaforeveryone", "bucket": "Extras", "reason": "sha256", "sha": "b975c41251d70384635c81ba1bab34506ea4c4094237081bbf9ff4ca7c96a90e", "step": "dedup_drop"}
 {"app": "eclipse-committers", "bucket": "Extras", "reason": "sha256", "sha": "f7728a928299cf4a18f8c30a5cbdefac16ee6b68a37f200b701aee4336ce2bd2", "step": "dedup_drop"}
 {"app": "cryptomator", "bucket": "Extras", "reason": "ppdeep>=90", "sha": "fa5dd22f3456fbe3e5e28974822e0a9eb6d6ce962dc4d98cc04e3ef5feee76d4", "step": "dedup_drop"}
+{"reason": "feature JSON cat cut do dung phien giua build (196MB, khong ket thuc '}')", "sha": "06d84a2e85bda1a651c65f7d159b63bee2458a8b50274da52b70c9e3e9188e97", "step": "dropped_v2"}

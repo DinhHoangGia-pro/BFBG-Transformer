@@ -43,3 +43,24 @@
 ## Task 3 — metric trên v3 (ghi rõ)
 - **AUC = dev positives (BumbleBee holdout 262) vs holdout negatives (v3 166)** + cluster-bootstrap CI. (positives ghi trước, KHÔNG từ train.)
 - **FPR**: ngưỡng cố định chọn từ TRAIN; báo FPR trên v3 + Wilson CI, **TÁCH THEO BIN** (MSVC≤10/MSVC14/GNU/Go/Delphi/khác).
+
+---
+# FREEZE v3 — BẢN 2 (2026-10-14, sau lần chấm LỖI) 
+## Lý do thay đổi
+- Lần chạy v3 đầu (CONFIG_HASH cũ `a7945f94…`) **LỖI GIỮA CHỪNG** tại bước trích đặc trưng: 1 feature JSON **cắt cụt** `06d84a2e85…` (196MB, qtemu/Qt6Core.dll, scoop/GNU-MinGW) — bị cắt khi **dừng tay PHIÊN 2 giữa batch-build**.
+- **Loại `06d84a2e`** khỏi v3 (lý do: feature JSON cắt cụt). v3: 166 → **165 benign**.
+- **CHƯA có điểm số v3 nào được tính trước thay đổi** (crash trong trích đặc trưng, trước mọi phép chấm) → holdout chưa "đốt".
+- Kiểm toàn bộ: v1/v2 (1886 JSON) **0 hỏng**; v3 chỉ 1 hỏng (đã loại).
+
+## Hash BẢN 2 (tất định)
+- **dataset_v3_manifest.jsonl (165)** = `9f6e54f2a4293d007081b409d7e4d9df74dc5fcb3ebd7dde72dcacfe318a460a`
+- **V3_DROP_LIST.jsonl** = `57e7315b6e143a356d5e4e90efd09463c48fc593ce7ea6154309f88fcc862901` (06d84a2e: step=dropped_v2)
+- **v3_eval_config.json (CONFIG_HASH v2)** = `55ace0a9cafa08489446ca818b45a9701d3ffa703dfe1957ec00815028d3a58e`
+- Cap vendor tính lại: NirSoft 50/165 = **30% ≤ 35%** (cap=61, KHÔNG cắt).
+
+## Bằng chứng (docs/v3_evidence/)
+- Bản 1: `dataset_v3_manifest.v1.jsonl` (166), `v3_eval_config.v1.json` (hash a7945f94), `V3_DROP_LIST.v1.jsonl`, `FREEZE_v3.v1.md`.
+- Lần chạy lỗi: `eval_v3.lock.FAILEDRUN` (STARTED), `eval_v3.FAILED` (JSONDecodeError traceback).
+
+## Trạng thái
+- Lock/.FAILED lần lỗi đã **lưu bằng chứng** rồi **xóa active** để lần "chạy" mới (config v2) chạy được. eval_v3.py CONFIG_HASH cập nhật = v2. **CHƯA chạy lại v3.**

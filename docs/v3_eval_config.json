@@ -24,9 +24,9 @@
   },
   "holdout_negatives": {
     "manifest": "docs/dataset_v3_manifest.jsonl",
-    "n": 166,
+    "n": 165,
     "role": "negatives_benign_only",
-    "sha256": "d0aae90021ab737fb310e6b60cd0aa8c3d505fc0d01db691f7122674835bade2"
+    "sha256": "9f6e54f2a4293d007081b409d7e4d9df74dc5fcb3ebd7dde72dcacfe318a460a"
   },
   "metric": {
     "primary": "FPR@thr tren v3 (+Wilson CI), TACH THEO BIN",
@@ -39,6 +39,7 @@
     "bfbg_first150_ens4",
     "bfbg_apidensity_ens4"
   ],
+  "note_v2": "Ban 2: loai 06d84a2e (feature JSON cat cut); 165 benign; CHUA co diem so v3 nao truoc thay doi.",
   "one_shot": {
     "lockfile": "~/bfbg_benign_work/eval_v3.lock",
     "refuse_if_exists": true
@@ -58,7 +59,7 @@
     "manifest_sha256": "e2e2c67adcf236cd87fe1cdd752e5e776c5069cd69fec11b34a26ceab25350c9",
     "set": "v2_train_pool"
   },
-  "version": "v3-eval-final-1",
+  "version": "v3-eval-final-2",
   "vocab": {
     "file": "data/insn_vocab_v2.json",
     "sha256_prefix": "af69e190"

@@ -12,7 +12,7 @@ import os, sys, json, hashlib, argparse, warnings, math
 warnings.filterwarnings("ignore")
 REPO = "/home/dhgia/Work/Defi/BFBG-Transformer"
 CONFIG = os.path.join(REPO, "docs", "v3_eval_config.json")
-CONFIG_HASH = "a7945f94dc33c78428faa94c582ec48477dcf3dfb1c89679efdf58172e386b1c"
+CONFIG_HASH = "55ace0a9cafa08489446ca818b45a9701d3ffa703dfe1957ec00815028d3a58e"  # ban 2 (165 benign; loai 06d84a2e)
 LOCK = os.path.expanduser("~/bfbg_benign_work/eval_v3.lock")
 BINS = ["MSVC<=10", "MSVC 11-12", "MSVC 14", "GNU/MinGW", "Go", "Delphi", "khac"]
 IMPV3 = os.path.expanduser("~/bfbg_benign_work/import_v3")
@@ -159,7 +159,8 @@ def _iso_capped_trainpool(man, by_split, group_key, random):
 def run_real(neg_set="v3"):
     import numpy as np
     cfg = verify_config()
-    if neg_set == "v3": check_lock()
+    if neg_set == "v3":
+        check_lock(); write_lock("STARTED")   # tao lock NGAY khi bat dau (chan chay lan hai/crash giua chung)
     sys.path.insert(0, REPO); os.chdir(REPO)
     import torch, random
     from src.training.splits import by_split, group_key, group_kfold
@@ -202,7 +203,10 @@ def run_real(neg_set="v3"):
     def Xmat(recs, which, vec=None):
         if which in ("meta", "graph"): return np.array([FEAT[r["sha256"]][which] for r in recs], float)
         return vec.transform([FEAT[r["sha256"]]["tokc"] for r in recs])
-    results = {"neg_set": neg_set, "models": {}}
+    results = {"neg_set": neg_set, "config_hash": CONFIG_HASH, "models": {}, "per_sample": {},
+               "samples": {}}
+    for r in negs_p: results["samples"][r["sha256"]] = {"set": "neg", "label": 0, "bin": (r["tbin"] if NEG_V3 else FEAT[r["sha256"]]["tbin"])}
+    for r in bb_p: results["samples"][r["sha256"]] = {"set": "pos_bumblebee", "label": 1, "bin": FEAT[r["sha256"]]["tbin"]}
     # ---------- PROBES ----------
     for which in ("meta", "graph", "bag_of_tokens"):
         vec = None
@@ -226,6 +230,8 @@ def run_real(neg_set="v3"):
         results["models"][which] = {"thr": thr, "fpr": fpr_at(sn, thr), "fpr_wilson": [wl, wh],
                                     "fpr_by_bin": fpr_by_bin(sn, nb, thr), "auc": auc_score(y, s), "auc_ci": [lo, hi],
                                     "n_neg": len(sn), "n_pos": len(sp)}
+        results["per_sample"][which] = {**{negs_p[i]["sha256"]: float(sn[i]) for i in range(len(negs_p))},
+                                        **{bb_p[i]["sha256"]: float(sp[i]) for i in range(len(bb_p))}}
         print(f"  [{which}] thr={thr:.3f} FPR={results['models'][which]['fpr']:.3f} AUC={results['models'][which]['auc']:.3f} [{lo:.3f},{hi:.3f}]", flush=True)
     # ---------- BFBG ensembles ----------
     @torch.no_grad()
@@ -263,6 +269,8 @@ def run_real(neg_set="v3"):
         results["models"][name] = {"thr": thr, "fpr": fpr_at(snv, thr), "fpr_wilson": [wl, wh],
                                    "fpr_by_bin": fpr_by_bin(snv, nbv, thr), "auc": auc_score(y, s), "auc_ci": [lo, hi],
                                    "n_neg": int(len(snv)), "n_pos": int(len(spv))}
+        results["per_sample"][name] = {**{k: (None if v != v else float(v)) for k, v in sn.items()},
+                                       **{k: (None if v != v else float(v)) for k, v in sp.items()}}
         print(f"  [{name}] thr={thr:.3f} FPR={results['models'][name]['fpr']:.3f} AUC={results['models'][name]['auc']:.3f} [{lo:.3f},{hi:.3f}]", flush=True)
     out = os.path.expanduser(f"~/bfbg_benign_work/eval_{neg_set}_result.json")
     json.dump(results, open(out, "w"), indent=2)
