@@ -45,3 +45,19 @@
 - [ ] Metric: AUC + FPR@ngưỡng-dev (đã nêu)
 - [ ] Có thu thêm benign (lên ~100–150) trước khi chạm không?
 - [ ] Commit cấu hình + hash, rồi mới chạm 1 lần.
+
+---
+## CẤU HÌNH CUỐI (KHÓA) — 9 điểm, CONFIG_HASH `a7945f94dc33c78428faa94c582ec48477dcf3dfb1c89679efdf58172e386b1c`
+Spec tất định: `docs/v3_eval_config.json` (sha256 = CONFIG_HASH ở trên). Chạm v3 MỘT lần theo đúng spec này.
+
+1. **Holdout negatives** = v3 (166 benign), manifest `d0aae900…`. Benign-only.
+2. **AUC positives** = BumbleBee holdout (262), **ghi trước, KHÔNG từ train**.
+3. **Train** = v2 train_pool (ISO cap 113), **LOẠI BumbleBee** (BumbleBee là holdout family → không bao giờ trong train; xác nhận excludes_bumblebee=true). Không dùng v3 để train/chọn/tune.
+4. **5 model**: metadata_rf8, graph_rf7, bag_of_tokens (model-view), **BFBG first-150 ens4**, **BFBG api-density ens4** (nhãn **UNPROVEN**, §20 không đạt).
+5. **Checkpoint BFBG** = **best-val_loss** của 4 seed {101,202,303,404}; ensemble = **trung bình softmax** qua 4 seed. File: `ckpt_v2es*.pt` (first-150) / `ckpt_v2api*.pt` (api-density). KHÔNG chọn seed tốt nhất.
+6. **Ngưỡng OOF** (quan trọng): **probe** → group-kfold (k=5, theo cụm, seed 20261008) **out-of-fold** trên train_pool, ngưỡng tại **TPR95 trên OOF-positives**; **BFBG** → TPR95 trên **tập cluster-validation §17** (nằm ngoài train của mỗi seed), trung bình qua 4 seed. Ngưỡng **KHÔNG lấy từ v3**. Áp ngưỡng này lên v3 để đo FPR.
+7. **Metric**: CHÍNH = **FPR@ngưỡng trên v3 + Wilson CI, TÁCH THEO BIN**; PHỤ = **AUC(BumbleBee vs v3) + cluster-bootstrap CI**.
+8. **Chạm một lần**: `eval_v3.py` kiểm **file khóa** `~/bfbg_benign_work/eval_v3.lock` (chứa CONFIG_HASH); nếu đã có → **từ chối chạy lần hai**. Sau khi chạy ghi lock + hash kết quả.
+9. **Kế hoạch báo KẾT QUẢ XẤU** (ghi trước): báo FPR/AUC của **CẢ 5 model y như số ra**, kể cả khi: BFBG FPR cao / không bằng metadata / api-density tệ / mọi model FPR cao trên v3. **Không** đổi cấu hình/ngưỡng/model theo kết quả, **không** chạm lại, **không** thêm metric. Kết quả xấu = kết quả (đưa vào Threats-to-Validity + bài).
+
+> Chạy v3 CHỈ khi người dùng nói "chạy". Trước đó eval_v3.py chỉ chạy `--selftest` (dữ liệu giả).
