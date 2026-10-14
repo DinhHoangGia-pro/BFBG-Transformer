@@ -87,7 +87,7 @@ rows14=[]
 for m,lab in [("meta","metadata"),("graph","graph"),("gapi","graph+API"),("tokens","bag-of-tokens")]:
     s,y=rf(tr14,ev14,m,topapi); lo,hi=cboot(s,y,[group_key(r) for r in ev14 if r["sha256"] in fc])
     rows14.append([lab,"%.3f"%auc(s,y),"%.3f"%lo,"%.3f"%hi])
-write_table("dev_within_msvc14", ["model","AUC","ci_lo","ci_hi"], rows14,
+write_table("dev_within_msvc14", ["model","AUC","CI-lo","CI-hi"], rows14,
     source=f"{REPRO} (sha256 {HASHES[REPRO][:12]}); eval MSVC14 BumbleBee vs choco, n_neg=21")
 
 # ---------- TABLE: LOFO 5-family ----------
@@ -108,7 +108,7 @@ r3=json.load(open(EVALJSON)); M=r3["models"]
 order=["meta","graph","bag_of_tokens","bfbg_first150","bfbg_apidensity"]
 disp={"meta":"metadata","graph":"graph","bag_of_tokens":"bag-of-tokens","bfbg_first150":"BFBG first-150","bfbg_apidensity":"BFBG api-density"}
 rowsA=[[disp[m],"%.3f"%M[m]["auc"],"%.3f"%M[m]["auc_ci"][0],"%.3f"%M[m]["auc_ci"][1]] for m in order]
-write_table("v3_auc", ["model","AUC","ci_lo","ci_hi"], rowsA,
+write_table("v3_auc", ["model","AUC","CI-lo","CI-hi"], rowsA,
     source=f"READ FROM {EVALJSON} (sha256 {HASHES[EVALJSON][:12]}); NOT recomputed",
     note="AUC = BumbleBee dev positives (262) vs v3 holdout negatives (165), cluster-bootstrap CI")
 BINS=["MSVC<=10","MSVC 11-12","MSVC 14","GNU/MinGW","Go","Delphi","khac"]
@@ -117,7 +117,7 @@ nb=Counter(v["bin"] for v in r3["samples"].values() if v["set"]=="neg")
 binrows=[]
 for b in BINS:
     if nb.get(b,0)==0: continue
-    row=[f"{b} (n={nb[b]})"]
+    row=[f"{('other' if b=='khac' else b)} (n={nb[b]})"]
     for m in order:
         fb=M[m]["fpr_by_bin"].get(b)
         row.append("%.1f"%(fb["fpr"]*100) if fb else "-")
