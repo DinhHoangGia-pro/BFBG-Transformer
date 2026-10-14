@@ -73,3 +73,12 @@ Spec tất định: `docs/v3_eval_config.json` (sha256 = CONFIG_HASH ở trên).
 - (c) **Hash kết quả subtest** `eval_test_indist_result.json` = `6545b56a559ebc38db3e70069ae888dced534c6ba5406f484eac35575f213bca`.
 - Số subtest (chỉ xác nhận đường, KHÔNG phải v3): meta AUC 0.992 FPR 0.014 · graph 0.941/0.069 · bag 0.959/0.347 · BFBG first-150 0.886/0.375 · api-density 0.931/0.292.
 - → run_real self-contained hoạt động đúng; v3 vẫn CHƯA chạm (không lock). Chạy v3 chỉ khi người dùng nói "chạy".
+
+## Độ lệch raw-vs-cache cho 3 model còn lại (2026-10-14) — đều 0
+- **bag-of-tokens** dùng **token model-view** (150 hàm đầu, ≤512 node) — GIỐNG bin_parse. Không chấm cache-bag trên test_indist được (bin_parse không có test_indist), nhưng token-counter `extract()` vs bin_parse trên 50 mẫu chung (bb/train) **lệch 0** → feature y hệt ⇒ AUC raw==cache.
+- **BFBG first-150 / api-density**: không có "cache điểm" riêng; so điểm ensemble `eval_v3` vs `foldrun per_sample` (cùng checkpoint) trên 40 BumbleBee → **max|lệch|=0.0000** ⇒ tái lập y hệt.
+- Kết: cả 5 model raw==cache (lệch ≤0.003 AUC do nhiễu RF ở probe; 0 ở token/BFBG). **Không model nào >0.01 → không sửa.**
+
+## CÁCH ĐỌC FPR (ghi trước)
+- **FPR@ngưỡng của bag-of-tokens và BFBG hiệu chỉnh KÉM** (subtest: bag 34.7%, BFBG first-150 37.5%, api-density 29.2% — cao do điểm nén/ngưỡng từ val nhỏ) → **FPR tuyệt đối KHÔNG so chéo giữa model**.
+- ⇒ **AUC (threshold-free) là SỐ CHÍNH** để so giữa model. **FPR chỉ so TRONG TỪNG model theo bin** (xu hướng bin nào bị bắn nhầm nhiều), không dùng FPR để xếp hạng model.
