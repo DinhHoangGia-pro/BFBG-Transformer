@@ -4,7 +4,7 @@
 - State tung mau -> ~/bfbg_benign_work/v3_state.jsonl (ngoai git): {ts,app,bucket,sha,step,reason}.
   Phien sau bo qua app/sha da xong.
 - Batch ~40 payload: download+dedup -> build_graphs --workers 2 -> nghi 5 phut.
-- Nhiet GPU >85C keo dai -> tam dung 10'; >90C hoac 3 tam dung lien tiep -> ket thuc sach.
+- Nhiet CPU (package id 0, qua `sensors`) VA GPU: >85C keo dai -> tam dung 10'; >90C hoac 3 tam dung lien tiep -> ket thuc sach.
 - Raw -> import_v3/ (ngoai data/); feature -> v3_features/ (ngoai data/features_graph). KHONG vao train.
 - Cuoi phien: tom tat + commit cuc bo (khong trailer, khong push) mot dong log session.
 KHONG sinh manifest o day (Task 4, khi moi phien xong). KHONG cham holdout.
@@ -62,6 +62,17 @@ print(f"[dedup refs] v1/v2 benign sha={len(v_sha)} ppdeep={len(v_h)} | v2 apps s
 def gpu_temp():
     try: return int(subprocess.run(["nvidia-smi","--query-gpu=temperature.gpu","--format=csv,noheader"],capture_output=True,text=True,timeout=10).stdout.strip().split("\n")[0])
     except: return 0
+def cpu_temp():
+    """Nhiet CPU package id 0 qua `sensors`. Tra 0 neu khong doc duoc."""
+    try:
+        o = subprocess.run(["sensors"], capture_output=True, text=True, timeout=10).stdout
+        m = re.search(r"Package id 0:\s*\+?([0-9.]+)", o)
+        return float(m.group(1)) if m else 0.0
+    except: return 0.0
+def hot_temp():
+    """Tra (temp_max, nhan) tren ca CPU va GPU."""
+    g = gpu_temp(); c = cpu_temp()
+    return (c, f"CPU {c:.0f}C") if c >= g else (g, f"GPU {g}C")
 def is_mz(f):
     try:
         with open(f, "rb") as fh: return fh.read(2) == b"MZ"
@@ -89,13 +100,14 @@ def url64(m):
     return u.split("#/")[0]
 
 def thermal_ok(pauses):
-    t = gpu_temp()
+    """Guard theo CA CPU (package id 0) VA GPU: dung temp cao nhat trong hai."""
+    t, lab = hot_temp()
     if t >= TEMP_HARD:
-        print(f"[THERMAL] GPU {t}C >= {TEMP_HARD} -> ket thuc phien sach", flush=True); return False, pauses
+        print(f"[THERMAL] {lab} >= {TEMP_HARD} -> ket thuc phien sach", flush=True); return False, pauses
     if t >= TEMP_WARN:
-        time.sleep(180); t2 = gpu_temp()
+        time.sleep(180); t2, lab2 = hot_temp()
         if t2 >= TEMP_WARN:
-            pauses += 1; print(f"[THERMAL] GPU {t2}C >= {TEMP_WARN} keo dai -> tam dung 10' (pause #{pauses})", flush=True)
+            pauses += 1; print(f"[THERMAL] {lab2} >= {TEMP_WARN} keo dai -> tam dung 10' (pause #{pauses})", flush=True)
             time.sleep(600)
             if pauses >= MAX_PAUSES: print(f"[THERMAL] {pauses} tam dung lien tiep -> ket thuc sach", flush=True); return False, pauses
         else: pauses = 0
