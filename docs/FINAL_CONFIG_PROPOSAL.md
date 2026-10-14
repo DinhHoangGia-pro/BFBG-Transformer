@@ -1,30 +1,28 @@
-# Đề xuất cấu hình cuối cho lần CHẠM holdout_nirsoft DUY NHẤT (bản nháp — CHƯA chốt, CHƯA chạy)
+# Đề xuất cấu hình cuối cho lần CHẠM holdout v3 DUY NHẤT (bản nháp — CHƯA chốt, CHƯA chạy)
 
-> holdout_nirsoft **chỉ chạm MỘT lần**. Mọi lựa chọn dưới đây phải được **người dùng duyệt + commit**
-> TRƯỚC khi chạm; sau khi chạm, **báo cả tốt lẫn xấu, không chạm lại, không tinh chỉnh theo kết quả**.
-> Hiện nirsoft = **20 benign-only** → CI sẽ rộng; xem mục E về thu thêm trước khi chạm.
+> Holdout cuối = **v3 (166 benign)** đã đóng băng: manifest SHA256 `d0aae900…835bade2` (FREEZE_v3).
+> Chạm **MỘT lần**. Mọi lựa chọn phải được **người dùng duyệt + commit** TRƯỚC khi chạm;
+> sau khi chạm **báo cả tốt lẫn xấu, không chạm lại, không tinh chỉnh theo kết quả**.
+> (holdout_v2_nirsoft 20 cũ giữ riêng; v3 đã dedup vs nó — xem FREEZE_v3.)
 
-## A. Mô hình đem so (ghi trước, cùng tập/split)
-Đề xuất so song song (người dùng chọn tập con):
-- **BFBG** — phải chốt MỘT biến thể: (i) first-150 §17 **ensemble 4 seed** {101,202,303,404}, HOẶC
-  (ii) api-density §17 ensemble 4 seed. *Khuyến nghị nêu rõ: api-density CHƯA đạt §20 (0.951<0.976) →
-  nếu chọn api-density phải gắn nhãn "ứng viên chưa chứng minh". Mặc định an toàn = first-150 ensemble.*
-  KHÔNG chọn "seed tốt nhất" (đó là chọn theo kết quả).
-- **probe metadata** (RF 8 scalar) — baseline mạnh nhất hiện tại.
-- **probe graph** (RF 7 scalar).
-- **bag-of-tokens** (TF-IDF + RF, model-view).
-Tất cả train trên **cùng train set đã khóa** (v2 train_pool, ISO cap 113), KHÔNG dùng nirsoft để train/chọn.
+## A. Mô hình đem so (ghi trước, cùng train set đã khóa) — SO CẢ 5
+1. **metadata probe** (RF 8 scalar).
+2. **graph probe** (RF 7 scalar).
+3. **bag-of-tokens** (TF-IDF + RF; nêu rõ BoT-full hay model-view, FREEZE/reproduce).
+4. **BFBG first-150** — §17 **ensemble 4 seed** {101,202,303,404} (trung bình xác suất; KHÔNG chọn seed tốt nhất).
+5. **BFBG api-density** — §17 ensemble 4 seed. **Gắn nhãn "ứng viên CHƯA chứng minh"** (§20 không đạt: 0.951<0.976).
+- Tất cả train trên **v2 train_pool (ISO cap 113)** đã khóa; **KHÔNG dùng v3 để train/chọn/tune**.
 
-## B. Positives mượn (vì nirsoft benign-only)
-- nirsoft (20) = **negatives**. Positives = **một family malware GIỮ LẠI** đã ghi trước — đề xuất **BumbleBee (262)**
-  (đã là holdout family), hoặc công bố cả 5 family riêng. Ghi trước family nào, KHÔNG đổi sau.
+## B. Positives cho AUC (v3 benign-only)
+- v3 (166) = **negatives**. Positives = **BumbleBee holdout (holdout_family_bumblebee, 262)** — ghi trước,
+  **nguồn rõ, KHÔNG từ train**. (Tùy chọn công bố thêm từng family 5 nhóm, ghi trước.)
 
 ## C. Metric (ghi trước)
-1. **AUC(nirsoft vs positives)** + **cluster-bootstrap CI** (cụm near-dup; nirsoft 20 singleton).
-2. **FPR tại ngưỡng CỐ ĐỊNH** — ngưỡng chọn từ **train/dev (choco)**, **KHÔNG từ nirsoft**
-   (ví dụ ngưỡng TPR95 trên dev positives). Báo FPR trên nirsoft + **Wilson CI**.
-3. Báo n, số cụm, và khoảng CI thô (dự kiến rất rộng ở n=20).
-KHÔNG thêm metric sau khi nhìn số.
+1. **FPR là chính** (v3 benign-only): **ngưỡng CỐ ĐỊNH chọn từ TRAIN** (vd TPR95 trên train positives của từng model),
+   **KHÔNG từ v3/dev**. Báo **FPR trên v3 + Wilson CI**, và **FPR TÁCH THEO BIN** (MSVC≤10/MSVC14/GNU/Go/Delphi/khác).
+2. **AUC(BumbleBee vs v3)** + **cluster-bootstrap CI** (cụm; v3 chủ yếu singleton).
+3. Báo n theo bin, số cụm, CI (MSVC14 n=41 → CI rộng; một số bin n nhỏ).
+- KHÔNG thêm metric sau khi nhìn số. Một ngưỡng/model, ghi trước.
 
 ## D. Quy tắc báo cáo
 - Báo **cả kết quả tốt lẫn xấu**, gắn nhãn "holdout cuối, chạm 1 lần, cấu hình đã commit <hash>".

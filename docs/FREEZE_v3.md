@@ -30,3 +30,16 @@
 ## HẠN CHẾ (threats to validity)
 - **Thiên lệch mẫu rơi:** mẫu rơi (build_fail) nghiêng về chương trình **nhiều hàm/lớn** (timeout) và bin khác/GNU → **benign v3 còn lại ĐƠN GIẢN hơn** (ít hàm). Phải nêu rõ khi báo cáo.
 - MSVC14 n=41 → CI rộng; NirSoft chiếm toàn bộ MSVC≤10 (50/74) → bin MSVC≤10 lệch vendor.
+
+## Task 1 — phân loại 21 bin "khác" (header/section/import/packer) 2026-10-14
+- **Nghi đóng gói: 2/21 = 10%** — `1482c7c1…` (UPX0/UPX1, maxent 7.94) và `4d2e724e…` (maxent 7.79).
+- 19/21 còn lại KHÔNG packer: compiler đa dạng — Rust (`_RDATA`,`.fptable`,`malloc_h`), GCC/binutils COFF (`/4 /19 /31 /45`), CFG/clang (`.gxfg`,`.retplne`), NSIS stub (`.ndata`). maxent phần lớn 6.0–6.9, import 45–356 (bình thường).
+- → benign v3 bin "khác" **chủ yếu không đóng gói** (10% nghi packer).
+
+## Task 2 — NirSoft v3 không trùng v2-holdout/pilot
+- 50 NirSoft v3 so với **20 v2 holdout_source_nirsoft** + **46 pilot (import_nirsoft/, siêu tập của ~23 pilot)**:
+  **trùng sha256 = 0 ; trùng ppdeep≥90 = 0** → **hoàn toàn rời**. (v3 đã dedup vs v1/v2 lúc harvest; đây xác nhận thêm vs pilot ngoài data/.)
+
+## Task 3 — metric trên v3 (ghi rõ)
+- **AUC = dev positives (BumbleBee holdout 262) vs holdout negatives (v3 166)** + cluster-bootstrap CI. (positives ghi trước, KHÔNG từ train.)
+- **FPR**: ngưỡng cố định chọn từ TRAIN; báo FPR trên v3 + Wilson CI, **TÁCH THEO BIN** (MSVC≤10/MSVC14/GNU/Go/Delphi/khác).
