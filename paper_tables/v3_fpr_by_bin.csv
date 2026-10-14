@@ -1,0 +1,10 @@
+# source: READ FROM docs/v3_eval_result.json (sha256 1dca53a21138); NOT recomputed
+# note: FPR(%) at train-chosen threshold; READ WITHIN model only (not comparable across models); Wilson CI in JSON
+bin,meta,graph,tokens,BFBG-f150,BFBG-API
+MSVC<=10 (n=74),2.7,9.5,58.1,54.1,56.8
+MSVC 14 (n=41),0.0,0.0,26.8,22.0,12.2
+GNU/MinGW (n=8),12.5,0.0,62.5,50.0,12.5
+Go (n=17),0.0,5.9,52.9,35.3,0.0
+Delphi (n=4),25.0,25.0,25.0,25.0,100.0
+khac (n=21),4.8,23.8,66.7,42.9,28.6
+all (n=165),3.0,8.5,50.3,41.8,35.2

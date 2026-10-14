@@ -1,0 +1,13 @@
+% source: READ FROM docs/v3_eval_result.json (sha256 1dca53a21138); NOT recomputed
+% note: AUC = BumbleBee dev positives (262) vs v3 holdout negatives (165), cluster-bootstrap CI
+\begin{tabular}{lrrr}
+\toprule
+model & AUC & ci_lo & ci_hi \\
+\midrule
+metadata & 0.987 & 0.977 & 0.995 \\
+graph & 0.927 & 0.898 & 0.955 \\
+bag-of-tokens & 0.926 & 0.902 & 0.949 \\
+BFBG first-150 & 0.879 & 0.839 & 0.913 \\
+BFBG api-density & 0.858 & 0.818 & 0.897 \\
+\bottomrule
+\end{tabular}

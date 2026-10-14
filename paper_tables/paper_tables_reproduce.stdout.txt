@@ -1,0 +1,43 @@
+====================================================================
+BANG 1 — BFBG 4-seed choco AUC (best-val_loss, n ghep doi)
+====================================================================
+  first-150    seeds=['0.891', '0.950', '0.934', '0.848'] mean=0.906 ± 0.046
+  api-density  seeds=['0.971', '0.942', '0.961', '0.931'] mean=0.951 ± 0.018
+====================================================================
+BANG 2 — WITHIN-MSVC14 (train trong bin) AUC [CI cum]
+====================================================================
+  meta       AUC=1.000 [1.000,1.000] (n=273, neg=21)
+  graph      AUC=0.974 [0.955,0.990] (n=273, neg=21)
+  gapi       AUC=0.991 [0.981,0.999] (n=273, neg=21)
+  tokens     AUC=0.976 [0.941,1.000] (n=273, neg=21)
+====================================================================
+BANG 3 — LOFO 5-family (mal giu lai vs choco) AUC
+====================================================================
+  TrickBot   meta=0.977 graph=0.898 gapi=0.923 tokens=0.922 
+  Dridex     meta=0.995 graph=0.953 gapi=0.945 tokens=0.945 
+  IcedID     meta=0.955 graph=0.929 gapi=0.939 tokens=0.747 
+  Emotet     meta=0.954 graph=0.853 gapi=0.911 tokens=0.842 
+  BumbleBee  meta=0.977 graph=0.908 gapi=0.927 tokens=0.924 
+    meta       mean=0.972 ± 0.017
+    graph      mean=0.908 ± 0.037
+    gapi       mean=0.929 ± 0.013
+    tokens     mean=0.876 ± 0.082
+====================================================================
+BANG 4 — H2 ensemble + H3 tokens + H4 gapi (eval bb vs choco)
+====================================================================
+  model                     so goc (full)  tai lap (model-view)
+  H2 ensemble first-150                 —                 0.932
+  H3 BoT-full→model-view            0.972                 0.928
+  H4 graph+API                      0.950                 0.919
+     graph-only                     0.907                 0.907
+     metadata                       0.982                 0.982
+  * 'BoT-full' = bag-of-tokens TOAN token (experiments_h.py); 'BoT-model-view' = cat 150ham/512tok (bin_parse).
+    H3: full 0.972 vs model-view ~0.93; H4 graph+API: full 0.950 vs model-view ~0.92. Khac do pham vi token/api.
+====================================================================
+BANG 5 — seed-evidence bi cat (first-150, tu bin_parse) theo nhan
+====================================================================
+  benign     seed_tot=574 drop_by_funcs>150=95.8%
+  malicious  seed_tot=657 drop_by_funcs>150=76.6%
+
+[NOTE] Bang #3-sach (coverage theo policy first/spread/api-density) can per-func -> chay verify_sel.py (doc JSON).
+DONE reproduce_tables

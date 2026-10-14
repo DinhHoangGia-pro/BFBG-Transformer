@@ -1,0 +1,4 @@
+# source: foldrun_v2es*/v2api*.json (ensemble seeds); recomputed by experiments/dataset/pilots/reproduce_tables.py (sha256 858649846109)
+variant,seeds,mean,std
+first-150,0.891/0.950/0.934/0.848,0.906,0.046
+api-density,0.971/0.942/0.961/0.931,0.951,0.018
