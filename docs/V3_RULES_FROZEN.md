@@ -63,3 +63,8 @@ Commit này phải có TRƯỚC mọi lần tải/chấm v3 (quy tắc khóa, HO
 - workers=1, nice 19, cgroup 8G, trần phiên 7h30; không tắt máy.
 - **Mục tiêu: ≥40 MSVC14 VÀ tổng ≥120 sau cap**; dừng khi đủ (theo dõi thủ công vì cap tính ở manifest).
 - **Cap vendor** (NirSoft ≤35%) áp ở bước sinh manifest, tất định (seed 20261008, thứ tự sha), ghi danh sách mẫu bị bỏ do cap.
+
+## Metric trên v3 (khóa 2026-10-14) — v3 CHỈ benign
+- v3 = **benign-only (166)** → chỉ đo **FPR** tại ngưỡng cố định chọn từ **train/dev** (KHÔNG từ v3), kèm Wilson CI.
+- **AUC cần mẫu dương ghép, CHỌN TRƯỚC:** dùng **BumbleBee holdout (holdout_family_bumblebee, 262 malicious)** làm positives — **nguồn ghi rõ, KHÔNG lấy từ train**. AUC(BumbleBee vs v3-benign) + cluster-bootstrap CI.
+- Chạm v3 MỘT lần với cấu hình đã commit (FINAL_CONFIG_PROPOSAL); báo cả tốt lẫn xấu; không chạm lại.

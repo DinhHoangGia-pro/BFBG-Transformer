@@ -1,0 +1,59 @@
+{"app": "typora", "bucket": "Extras", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "infekt", "bucket": "Extras", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "blender", "bucket": "Extras", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "xz", "bucket": "Main", "reason": "no_url", "sha": null, "step": "app_fail"}
+{"app": "diagram-designer", "bucket": "Extras", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "pocketsphinx", "bucket": "Extras", "reason": "no_url", "sha": null, "step": "app_fail"}
+{"app": "foto-mosaik-edda", "bucket": "Extras", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "pdftk-builder", "bucket": "Extras", "reason": "dl:HTTP Error 406: Not Acceptable", "sha": null, "step": "app_fail"}
+{"app": "eraser", "bucket": "Extras", "reason": "no_url", "sha": null, "step": "app_fail"}
+{"app": "nim", "bucket": "Main", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "deepgit", "bucket": "Extras", "reason": "dl:HTTP Error 403: Forbidden", "sha": null, "step": "app_fail"}
+{"app": "gcfscape", "bucket": "Extras", "reason": "no_url", "sha": null, "step": "app_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "00fd5b3d3b30218f8e6b034c5281e32f972f60d44e8ccd7e7d1b0b0545443e83", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "068ed9d5866e2eeee4dc9dbcc10459855999dc45e6d49a589d9dc20f3e45115a", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "0af2e88a4a797f509780b7a4ddbe050ed1615d29e83461aeed26af0631305bee", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "118aca72298c074500753b64e3f6cf2b8ef2d5cb0b447bc873db7f4b19c3e7ee", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "18ceafcd63c1579e4c03bd0d962560f704d4ccaf34607551345d010d25d091cc", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "1dcc307623fb509bfcc055478774ae1cd7e87d452ccdfad8183f8ee270cd711e", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "2809d6f942c1c5a048018484c7580e9ea228795e6abd21f44f8a1167dd009d4e", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "2f169b56f6994e58b84bb27a3cc64e3682641b24429b6777a210f136bf4718e3", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "65c8f229c84b57ff2b8097f0064a59693c6e2bc58660801c7679903e57891ab1", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "6c07e386a8c79eef0f1160a211ad74699e9364caada92ba0c7c5983905bedd46", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "6f4bef66261261fcb43131be8720bab817d403a09edec7455c371974b90bdb7e", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "7dec3ba900ab353491e6446f0083739924c6f8dd668832e2f09d38ebffdbbe1c", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "8144f3ee314de14a028a816280b66f1ce6e4b4ca0e38a1767032273649ceaf08", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "855c296a05bdcf415e1c090331585fe0a325d5888b1f62aade30a09544c8dc35", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "9076b021a060dc8c0ae5a50f3dbf9c23018d7729fe102f7a75adbdf863fa2d0d", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "9a0d95e8caaa852c70d085af6a40a744242172ad9ea3fd6bc7599875a8a1dbcd", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "a079de67764ba814227e754ede3079e561472f73163eb38e0dafd77ea1776d62", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "b3bba60bf219501996fe5349ec659eff25daf0072c0ae81f2ceac8b0c06788f2", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "b975c41251d70384635c81ba1bab34506ea4c4094237081bbf9ff4ca7c96a90e", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "c13aadf7a621e1c8c7111d9948e9673596491222d23d60dffecd500d17df1194", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "c78919e195fe3c49d915a6d99fe195acc7ac712e2f98f7d2116bed0e7ab8a25f", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "d51a2ff1c1672a4db3f87e4d34e09c4635a021b8aa09fd965759082a13bb9231", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "db631736552d01b1847ce2511b5ac037b9d90413c385c64ba76862fc95644cd3", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "dfb372dfa8b0068f2f6c2f647244d412581c7e57fe922c808f67f9ba599aea1c", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "e6d1371d1aa774d155e9a4a89da32b87fd4928650f4d76a1cf68c8c88283693c", "step": "build_fail"}
+{"app": "?", "bucket": null, "reason": "no feature json", "sha": "ef458a379a4b588fd6042a3bcc7d0b9631352745600ae933a7faec4c851b16bb", "step": "build_fail"}
+{"app": "micaforeveryone", "bucket": "Extras", "reason": "sha256", "sha": "2538f397a08f78c7ef872095da10982d0b854333323988e260f288b66f279010", "step": "dedup_drop"}
+{"app": "cmder-full", "bucket": "Main", "reason": "sha256", "sha": "2809d6f942c1c5a048018484c7580e9ea228795e6abd21f44f8a1167dd009d4e", "step": "dedup_drop"}
+{"app": "cryptomator", "bucket": "Extras", "reason": "ppdeep>=90", "sha": "2b2b7f1e89e42919dc97ffe27edfb7f5692de33de78e01a1598e8cc55aca7e48", "step": "dedup_drop"}
+{"app": "logstash", "bucket": "Extras", "reason": "sha256", "sha": "2e5fb14b7bf8540278f3614a12f0226e56a7cc9e64b81cbd976c6fcf2f71cbfb", "step": "dedup_drop"}
+{"app": "natron", "bucket": "Extras", "reason": "sha256", "sha": "3d661f8703c0f41ec6c324605acc7608cb3babc8a81834363152b9529dbe5b73", "step": "dedup_drop"}
+{"app": "nunit-console", "bucket": "Main", "reason": "sha256", "sha": "55efa956cb6b9682e6508dbcef41d7506030e660796e29c87cc42f4c1e043e34", "step": "dedup_drop"}
+{"app": "nunit-console", "bucket": "Main", "reason": "sha256", "sha": "55efa956cb6b9682e6508dbcef41d7506030e660796e29c87cc42f4c1e043e34", "step": "dedup_drop"}
+{"app": "openchamber", "bucket": "Extras", "reason": "sha256", "sha": "5d9ceb1ce5f35aea5f9e5a0c0edeeec04dfefe0c77890c80c70e98209b58b962", "step": "dedup_drop"}
+{"app": "eclipse-committers", "bucket": "Extras", "reason": "sha256", "sha": "67b00801da2bb2a3af3a6c65b06dfbd8ddfd4ebc1b6a1ffade1d3e8db5612b14", "step": "dedup_drop"}
+{"app": "natron", "bucket": "Extras", "reason": "sha256", "sha": "7fe40ab24cc83555deed61585b20a9d36f7531503840555e584d2ddd341b11ad", "step": "dedup_drop"}
+{"app": "rufus", "bucket": "Extras", "reason": "sha256", "sha": "84c8a437f8af89257524478489e5c85f1edf25f761d299e2bcde46ac0afbe106", "step": "dedup_drop"}
+{"app": "nunit-console", "bucket": "Main", "reason": "sha256", "sha": "8a1098f54f72cda77440af00232432250bc0bb24fd0eb45d52d20d321b67911f", "step": "dedup_drop"}
+{"app": "openchamber", "bucket": "Extras", "reason": "sha256", "sha": "996a259e53ca18b89ec36d038c40148957c978c0fd600a268497d4c92f882a93", "step": "dedup_drop"}
+{"app": "openchamber", "bucket": "Extras", "reason": "sha256", "sha": "9be85b986ea66a6997dde658abe82b3147ed2a1a3dcb784bb5176f41d22815a6", "step": "dedup_drop"}
+{"app": "natron", "bucket": "Extras", "reason": "sha256", "sha": "9fc1d0c6e209b4b2654a8242c51516ac5c4463d624bcaa5a216a65dc6c7da346", "step": "dedup_drop"}
+{"app": "tenv", "bucket": "Main", "reason": "ppdeep>=90", "sha": "a2cfa315188f7c6b1ab5ade045cf79a9b6870a5211b5afd666099c3c8e6f8787", "step": "dedup_drop"}
+{"app": "openchamber", "bucket": "Extras", "reason": "sha256", "sha": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592", "step": "dedup_drop"}
+{"app": "openchamber", "bucket": "Extras", "reason": "sha256", "sha": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e", "step": "dedup_drop"}
+{"app": "micaforeveryone", "bucket": "Extras", "reason": "sha256", "sha": "b975c41251d70384635c81ba1bab34506ea4c4094237081bbf9ff4ca7c96a90e", "step": "dedup_drop"}
+{"app": "eclipse-committers", "bucket": "Extras", "reason": "sha256", "sha": "f7728a928299cf4a18f8c30a5cbdefac16ee6b68a37f200b701aee4336ce2bd2", "step": "dedup_drop"}
+{"app": "cryptomator", "bucket": "Extras", "reason": "ppdeep>=90", "sha": "fa5dd22f3456fbe3e5e28974822e0a9eb6d6ce962dc4d98cc04e3ef5feee76d4", "step": "dedup_drop"}
