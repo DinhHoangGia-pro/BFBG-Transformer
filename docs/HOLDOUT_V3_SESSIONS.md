@@ -15,3 +15,11 @@
 - Bin: khác 11, GNU/MinGW 6, MSVC14 2, MSVC≤10 1, Delphi 1. Size median 7.6MB / max 12.7MB.
 - **Thiên lệch mẫu rơi:** nghiêng về file lớn/nhiều hàm (timeout) + bin khác/GNU → benign built còn lại ĐƠN GIẢN hơn (ít hàm) → ghi Threats-to-Validity.
 - build_ok theo bin: MSVC≤10 64, MSVC14 23, Go 9, khác 6, GNU 4 → **MSVC14=23 (cần ≥40, PHIÊN 2 bù bằng scoop)**.
+
+## PHIÊN 2 — 2026-10-14 (12:53→17:08, ~4h15) — Scoop-only, workers=1, no-guard
+- stop = DỪNG TAY khi đủ mục tiêu (watcher auto-stop lỗi in blank dưới tải; tôi dừng thủ công khi check ENOUGH).
+- **Cộng dồn 2 phiên:** kept(raw)=211 (scoop 161 / nirsoft 50), app_done=191, dedup_drop=21, app_fail=12.
+- **Feature built (usable) = 166** (scoop 116 / nirsoft 50); build_fail cộng dồn=26; nf0=0.
+- **MSVC14 built = 41 (≥40 ✓)**; **tổng sau cap = 166 (≥120 ✓)** — NirSoft 50/166 = **30% ≤35% → cap KHÔNG cắt** (giữ cả 166).
+- Nhiệt phiên 2 (no-guard, người dùng tản nhiệt): peak CPU **100°C**, GPU 47°C, **ge95 ≈ 228 mẫu đo**. thermal_pauses=0.
+- Raw import_v3/, feature v3_features/ (ngoài data/). **CHƯA sinh manifest** (Task 4).
