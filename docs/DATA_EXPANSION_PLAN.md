@@ -379,6 +379,35 @@ ngoài `v4_benign/`). Không dừng/sửa unit `bfbg-v4benign`/VT.
 - **Họ còn thiếu để chạm ~1500:** Qakbot và các họ banking cũ (tinba/carberp/...) — BODMAS lấp được **nếu** xin
   được binary qua email; nếu không, phải tìm nguồn khác (VX-Underground/VirusShare).
 
-### 8.4 Kết luận
-BODMAS = nguồn **có nhãn family tốt** (747 banking, 0 trùng) nhưng **binary phải xin email** (MB gần như không có).
-Dùng làm **phương án nếu được cấp Drive**; không phải nguồn tải tự động như MB. Chưa xin, chưa tải mẫu.
+### 8.4 Kết luận & trạng thái
+BODMAS = nguồn **có nhãn family tốt** (**747 banking, 0 trùng** dữ liệu cũ) nhưng **binary chỉ qua email**
+(**disarmed — CHƯA XÁC MINH**; MB chỉ có 3/747). Dùng làm **phương án nếu được cấp Drive**; không phải nguồn
+tải tự động như MB.
+- **Trạng thái: CHỜ PHẢN HỒI** — yêu cầu binary gửi qua email (`pirouz.naghavi@gmail.com`, CC `gangw@illinois.edu`);
+  **tính đến 2026-10-15 CHƯA gửi/ chưa có phản hồi** (mình không gửi email thay; người dùng gửi). Điều kiện xin:
+  không chia sẻ lại, nêu vài câu kế hoạch, academic email + webpage trường / industrial email + thư PDF, kèm Gmail
+  để được add Drive.
+- **KHÔNG tính ~150–375 (ước lượng khác biệt) vào cổng dữ liệu §0.1** — chưa có binary, chưa lift, chưa dedup
+  ppdeep, chưa khóa. Dòng "malware khác biệt" ở §0.1 **giữ nguyên 708**; BODMAS chỉ cộng vào cổng **sau khi** xin
+  được binary + lift + ppdeep + khóa manifest.
+
+### 7.4 Kết quả VT malware (490/614 đã tra, 2026-10-15) — ngưỡng §7.1 khóa trước khi tra
+Đối chiếu `popular_threat_name`/`suggested_threat_label` của VT với nhãn family MalwareBazaar (theo dòng mã nguồn).
+Script `vt_report.py`. Chưa tra thêm tới ngày mai (hạn mức 500/ngày đã dùng).
+
+| họ (nhãn MB) | đã tra | khớp họ | khác-họ | mẫu <3 engine | không trên VT |
+|---|---|---|---|---|---|
+| Zeus | 277 | 226 | 51 | 0 | 0 |
+| Gozi | 119 | 58 | 60 | 0 | 1 |
+| Zloader | 74 | 46 | 28 | 0 | 0 |
+| Ramnit | 20 | 9 | 11 | 0 | 0 |
+| **TỔNG** | **490** | **339 (69%)** | **150** | **0** | **1** |
+
+- **0 mẫu <3 engine** → **mọi mẫu đều malicious** (≥3 engine gắn cờ); không có mẫu lành/giả. Nhãn "malware" vững.
+- **339/490 (69%) khớp family** ở mức token (zbot/zeus; gozi/ursnif; zloader; ramnit).
+- **150 "khác-họ" KHÔNG = nhãn MB sai**: VT `popular_threat_name` thường gán nhãn **generic/đồng-xuất-hiện** khác
+  (vd Zeus→`upatre`/`waski`/`katusha`; Ramnit→`loki`/`zenpak`/`carberp`; Gozi→`stop`/`azorult`/`fragtor`).
+  Việc **đặt tên family không đồng thuận giữa engine** là đã biết; vài nhãn lệch (vd `locky`) gợi ý MB-tag
+  **không phải ground-truth tuyệt đối** cho mọi mẫu → **cần VT cross-check trước khi khóa nhãn v4**.
+- **Mẫu nghi (benign):** chưa — chưa tra benign (ưu tiên malware trước; benign 669 tra ngày mai).
+- Còn lại: **124 malware + 669 benign** tra **ngày mai** (quota reset), resumable từ `vt_summary.jsonl`.
