@@ -10,6 +10,30 @@ holdout/benign khớp phân phối toolchain×size của malware để phép đo
 
 ---
 
+## 0. CỔNG DỮ LIỆU (DATA GATE) — quy tắc chi phối
+**CHỈ được train / chạy GRL / chấm holdout KHI mục 0.1 dưới đây ghi rõ các ngưỡng ĐÃ ĐẠT.**
+Khi cổng **đóng** (chưa đạt), chỉ được: **thu thập, lift, dedup, khóa manifest, viết tài liệu**.
+**KHÔNG tự đề xuất train/GRL/holdout khi cổng chưa mở.** Mỗi báo cáo cuối phiên PHẢI nêu: ngưỡng nào đã
+đạt, ngưỡng nào chưa, còn thiếu bao nhiêu. Ngưỡng định nghĩa ở §5.5; trạng thái sống cập nhật ở §0.1.
+
+### 0.1 Trạng thái cổng (cập nhật 2026-10-15) — **ĐÓNG** 🔴
+| Ngưỡng (§5.5) | Mục tiêu | Hiện tại | Còn thiếu | Đạt? |
+|---|---|---|---|---|
+| Malware khác biệt (ppdeep) | ~1500 | **708** | ~792 | ❌ |
+| Benign ô #1 MSVC≤10×256KB-1MB | ≥100 | 23 | 77 | ❌ |
+| Benign ô #2 MSVC14×256KB-1MB | ≥100 | 57 | 43 | ❌ |
+| Benign ô #3 MSVC14×1-4MB | ≥100 | 87 | 13 | ❌ |
+| Benign ô #4 MSVC11-12×256KB-1MB | ≥20 | 6 | 14 | ❌ |
+| Benign ô #5 MSVC11-12×1-4MB | ≥20 | 3 | 17 | ❌ |
+| Benign ô #6 MSVC11-12×<256KB | ≥20 | 0 | 20 | ❌ |
+| Nhãn family v4 đã xác minh | có | chưa | — | ❌ |
+| Holdout v4 đã khóa (manifest+hash+split) | có | chưa | — | ❌ |
+
+→ Cổng **ĐÓNG**: phiên này và tới khi mọi ô trên "đạt", chỉ thu thập/lift/dedup/khóa-manifest/viết-docs.
+Benign hiện tại từ v1/v2/v3 (chưa có mẫu v4 nào). Cập nhật bảng này sau mỗi đợt thu thập + dedup.
+
+---
+
 ## 1. Trạng thái run GRL (tóm tắt)
 - Dừng bằng tay 2026-10-15 07:56:32 sau ~13'51" / **1 epoch** (epoch 0: det 0.5061, val 0.5033, λ=0.245).
   Không result JSON. **Không chạm v3/holdout v2** (chỉ train_pool + BumbleBee fold + choco dev).
