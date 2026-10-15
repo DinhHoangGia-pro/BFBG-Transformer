@@ -32,10 +32,13 @@ Khi cổng **đóng** (chưa đạt), chỉ được: **thu thập, lift, dedup,
 → Cổng **ĐÓNG**: phiên này và tới khi mọi ô trên "đạt", chỉ thu thập/lift/dedup/khóa-manifest/viết-docs.
 Benign hiện tại từ v1/v2/v3 (chưa có mẫu v4 nào). Cập nhật bảng này sau mỗi đợt thu thập + dedup.
 
-**Pilot 2026-10-15 (đo yield, §4.5):** tải thử 75 malware (Zeus/Gozi/Zloader, 25/họ, seed 20261015) vào thư mục
-RIÊNG — **KHÔNG khóa vào v4**, nên con số "708" ở trên **không đổi**. Pilot xác nhận yield MB cao (native 96%,
-rơi 3%, 0 trùng với dữ liệu cũ). Số malware khác biệt chỉ tăng **sau khi** tải thật + ppdeep nội bộ + khóa manifest v4.
-**Còn thiếu để mở cổng:** malware khác biệt ~792; benign 6 ô (77/43/13/14/17/20); nhãn v4; holdout v4. **Không đề xuất train.**
+**Full pull 2026-10-15 (đo thật, §4.6):** đã tải+lift+dedup đủ Zeus/Gozi/Zloader/Ramnit → **559 mẫu KHÁC BIỆT**
+(ppdeep≥90, 0 trùng 708 cũ), lưu thư mục RIÊNG. **CHƯA khóa vào v4** nên dòng "malware khác biệt = 708" ở bảng trên
+**giữ nguyên cho trạng thái cổng**. Khi khóa v4 (manifest+hash+split theo dòng mã nguồn) → **708 + 559 = 1267 distinct**.
+- **Còn thiếu để mở cổng (tính cả 559 nếu khóa):** malware khác biệt **1267/1500 → thiếu ~233** (cần thêm family
+  banking/loader đúng loại, vd Qakbot qua VX/VirusShare, hoặc mở rộng alias); benign 6 ô vẫn thiếu
+  **77/43/13/14/17/20**; nhãn v4 chưa xác minh; holdout v4 chưa khóa.
+- **Không khóa v4, không train** phiên này (cổng vẫn ĐÓNG). 559 là availability đã chứng minh, chưa phải v4 đã khóa.
 
 ---
 
@@ -207,6 +210,30 @@ Quy tắc loại/dedup khóa **trước** khi tải (sha256 vs **1967** sha cũ,
   **0 trùng sha256 + 0 trùng ppdeep≥90 với 5 họ hiện có** → 3 họ mới KHÁC BIỆT dataset cũ.
 - **CHƯA đo near-dup NỘI BỘ từng họ mới** (chỉ 25 mẫu) → khác biệt sau pull đầy đủ **vẫn theo dải §4.1 (20–50%)**,
   cần ppdeep nội bộ khi tải thật. Pilot chỉ xác nhận **yield + khác biệt chéo-họ**, **KHÔNG khóa vào v4** (cổng vẫn đóng).
+
+### 4.6 Full pull (ĐO THẬT, 2026-10-15) — tải đủ Zeus/Gozi/Zloader/Ramnit, lift, ppdeep cụm — KHÔNG khóa v4
+Tải hết candidate (`get_siginfo` ≤500/alias, size≤12MB, loại sha trùng 1967 cũ) vào thư mục RIÊNG; lift
+workers=4/14G/nice19/timeout900/RuntimeMaxSec=7h30, OOM(ProcessCrash exit-9) tách Timeout, resumable
+(stage symlink mẫu chưa lift). Scripts: `pilot_malware_v4_fetch_full.py` / `pilot_malware_v4_report_full.py`.
+Mạng serial (≤3 luồng), backoff 429/502/503 trong `api_query`. **Ramnit thêm vì xác minh banking** (Malpedia/Check Point).
+
+| họ | tải | lift OK | .NET | rơi (nguyên nhân) | **distinct nội bộ (ppdeep≥90)** | trùng 5 họ cũ |
+|---|---|---|---|---|---|---|
+| Zeus | 357 | 353 | 1 | 3 Timeout | **337** | 0 |
+| Gozi | 157 | 145 | 8 | 3 Timeout, 1 IndexError | **131** | 0 |
+| Zloader | 90 | 86 | 1 | 2 UnicodeDecodeError, 1 Timeout | **61** | 0 |
+| Ramnit | 31 | 30 | 0 | 1 CLEError | **30** | 0 |
+| **TỔNG** | **635** | **614** | **10** | **11** | **559** | **0** |
+
+- **Chéo toàn bộ (gộp 4 họ):** 614 → **559 cụm khác biệt, 0 cụm lẫn >1 họ** → 4 họ tách biệt nhau ở ppdeep≥90.
+- **Distinct theo DÒNG MÃ NGUỒN (cho gán split):** Zeus-lineage (Zeus+Zloader) 439→**398**; Gozi-lineage 145→**131**;
+  Ramnit **30**. (398 = 337+61 → Zeus↔Zloader **không** near-dup nhau ≥90 dù cùng dòng Zeus.)
+- **0 trùng ppdeep≥90 với 708 mẫu cũ** → toàn bộ **559 khác biệt** so dataset hiện có.
+- **Linker major:** Zeus **trội MSVC≤10** (v9×102, v10×53, v8×40, v6×41, v7×31 ≈ 267/353; vài giá trị rác
+  v161/v242/v255 = header pack/hỏng); Gozi v9/v10/v14; Zloader v14×38 (hiện đại) + đời cũ; Ramnit v9/v6/v8.
+- **Yield** cao (lift-OK 614/635 = 96.7%; .NET 1.6%; rơi 1.7%, trong đó Timeout 7 = mẫu pack/nhiều hàm).
+- **Khác biệt THẬT thu được: 559** (đã tải+lift+dedup, **CHƯA khóa vào v4**). Nếu khóa → 708 + 559 = **1267 distinct**.
+  **Rơi KHÔNG thay thế** (yield phản ánh thật).
 
 ---
 
