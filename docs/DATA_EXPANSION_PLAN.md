@@ -323,3 +323,62 @@ Tài khoản VT (key chỉ trong `.env`, không commit/không in). **Tier free: 
 - Thứ tự: (1) malware 614 trước, (2) benign 669 sau. Vì cap 500/ngày < 1283 → chạy **nhiều ngày**, resume.
 - Script: `experiments/dataset/pilots/vt_lookup.py`. Key đọc từ `.env`, **không bao giờ in/commit**.
 - `data/vt/*` nằm trong `data/*` → **gitignored** (không commit mẫu/thô); chỉ commit script + báo cáo tổng hợp.
+
+---
+
+## 8. Khảo sát BODMAS (CHỈ khảo sát, 2026-10-15) — KHÔNG tải mẫu, KHÔNG khóa v4
+Clone `github.com/whyisyoung/BODMAS` (shallow) vào `~/bfbg_benign_work/bodmas_survey/` (ngoài `data/`,
+ngoài `v4_benign/`). Không dừng/sửa unit `bfbg-v4benign`/VT.
+
+### 8.1 Cấu trúc & truy cập
+- **Repo git = chỉ CODE + README + LICENSE** (BSD 2-Clause cho code). **KHÔNG có** danh sách sha/nhãn,
+  **KHÔNG có** binary trong repo.
+- Dữ liệu ở **Google Drive** (trang `whyisyoung.github.io/BODMAS`): `bodmas_metadata.csv` (12.1MB:
+  cột `sha, timestamp, family`; family rỗng = benign), `bodmas_malware_category.csv` (3.9MB),
+  `bodmas.npz` (249MB, feature). **Binary malware CHỈ xin qua email** (disarmed — README repo ghi
+  "binaries (disarmed malware only)"; trang Download **không** nhắc lại "disarmed" → **chưa xác minh** disarmed).
+- **Xin binary (nguyên văn trang):** email **Pirouz Naghavi `pirouz.naghavi@gmail.com`**, CC **Dr. Gang Wang
+  `gangw@illinois.edu`** (liminy2@illinois.edu, zhic4@illinois.edu đã tốt nghiệp). Điều kiện: không chia sẻ
+  lại; nêu vài câu kế hoạch; academic dùng email + webpage trường; industrial dùng email công ty + thư PDF;
+  kèm địa chỉ Gmail để được add vào Drive. License dữ liệu: **trang không nêu** (README repo ghi BSD-2) → **chưa xác minh**.
+- Mình chỉ tải **2 CSV metadata** (không phải mẫu); npz 261MB lỡ tải đã **xóa**.
+
+### 8.2 Họ banking/loader trong BODMAS (lọc từ metadata; 134.435 dòng, 582 họ, 77.142 benign)
+| họ (nhãn BODMAS) | số sha | trùng dữ liệu cũ | MB `get_info` có | MB không |
+|---|---|---|---|---|
+| zbot (Zeus) | 473 | 0 | 0 | 473 |
+| emotet | 56 | 0 | 1 | 55 |
+| ursnif (Gozi) | 43 | 0 | 0 | 43 |
+| qakbot | 42 | 0 | 1 | 41 |
+| pwszbot (Zeus) | 34 | 0 | 0 | 34 |
+| tinba | 23 | 0 | 0 | 23 |
+| carberp | 14 | 0 | 0 | 14 |
+| trickbot (+crypt) | 14 | 0 | 1 | 13 |
+| gozi | 13 | 0 | 0 | 13 |
+| dridex | 10 | 0 | 0 | 10 |
+| qbot | 9 | 0 | 0 | 9 |
+| nymaim | 8 | 0 | 0 | 8 |
+| icedid | 5 | 0 | 0 | 5 |
+| spyeye | 2 | 0 | 0 | 2 |
+| vawtrak | 1 | 0 | 0 | 1 |
+| **TỔNG** | **747** | **0** | **3** | **744** |
+
+- **0/747 trùng sha256** với toàn bộ dữ liệu cũ (v1-v3 + 614 malware mới; 2813 sha) — BODMAS 2019-2020, mẫu khác.
+- **MalwareBazaar chỉ có 3/747** (`get_info`, không `get_file`) → **BODMAS KHÔNG lấy được qua MB**; muốn binary
+  phải qua **email BODMAS** (disarmed, chưa xác minh). (SpyEye/Tinba/Carberp/Nymaim/Vawtrak không tìm được ở MB.)
+
+### 8.3 Ước lượng & ô toolchain (chưa có binary → chưa bin được)
+- **Khác biệt sau dedup (ƯỚC LƯỢNG):** không có binary → **không ppdeep được** → chỉ áp dải near-dup họ
+  banking 20–50% → ~**150–375 khác biệt** (CHƯA XÁC MINH; sha-dedup chính xác đã 0 trùng).
+- **Giá trị bổ sung:** **Qakbot 51 (qakbot 42 + qbot 9)** — họ MB **không trả** qua `get_siginfo` (§4) → BODMAS
+  là một đường lấy Qakbot (nhưng phải qua email). **Họ MỚI** chưa có trong tập: **tinba 23, carberp 14, nymaim 8,
+  spyeye 2, vawtrak 1**. zbot/pwszbot 507 (dòng Zeus, bổ sung lớn); ursnif/gozi 56 (dòng Gozi).
+  trickbot/dridex/icedid/emotet trùng loại đã có (mẫu khác).
+- **Ô toolchain dự kiến (CHƯA XÁC MINH — cần binary để bin):** zbot/pwszbot/carberp/tinba/gozi/ursnif → dự kiến
+  **MSVC đời cũ (≤10/11-12)**; qakbot/trickbot/dridex/icedid → dự kiến **MSVC14**.
+- **Họ còn thiếu để chạm ~1500:** Qakbot và các họ banking cũ (tinba/carberp/...) — BODMAS lấp được **nếu** xin
+  được binary qua email; nếu không, phải tìm nguồn khác (VX-Underground/VirusShare).
+
+### 8.4 Kết luận
+BODMAS = nguồn **có nhãn family tốt** (747 banking, 0 trùng) nhưng **binary phải xin email** (MB gần như không có).
+Dùng làm **phương án nếu được cấp Drive**; không phải nguồn tải tự động như MB. Chưa xin, chưa tải mẫu.
