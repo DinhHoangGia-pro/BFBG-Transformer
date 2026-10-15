@@ -59,7 +59,7 @@ def tc_bin(path):
     if ".symtab" in secs or any(s.startswith(".go") for s in secs): return "Go", lk
     if "CODE" in secs or "DATA" in secs or ".itext" in secs or ".didata" in secs: return "Delphi", lk
     mingw = any(d in simp for d in ("libgcc", "libstdc++", "libwinpthread", "mingw", "msys-"))
-    if ".eh_frame" in secs or mingw or (not rich and "msvcrt.dll" in imps and lk < 14): return "GNU/MinGW", lk
+    if ".eh_frame" in secs or mingw: return "GNU/MinGW", lk   # chi GNU khi co .eh_frame/mingw-dll (bo da kiem; old-MSVC khong Rich + msvcrt KHONG phai GNU)
     if rich or "ucrtbase.dll" in imps or any("vcruntime" in d for d in imps) \
             or any("api-ms-win-crt" in d for d in imps) or "msvcrt.dll" in imps:
         if lk <= 10: return "MSVC<=10", lk

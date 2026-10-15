@@ -434,3 +434,40 @@ Quy tắc `V4_BENIGN_RULES_FROZEN.md`, seed 20261015, isolation `~/bfbg_benign_w
 - **Đọc kết quả:** MSVC14 (ô #2/#3) **đạt/vượt mức thiếu** (kept 37 & 86 vs thiếu 43 & 13). **Ô #1 MSVC≤10
   gần như không nhích (7)** và **MSVC11-12 = 0** từ Scoop → cần nguồn khác (NirSoft/PortableApps/GitHub-cũ/freeware).
 - **Cổng vẫn ĐÓNG:** 130 benign này ở thư mục riêng, **chưa khóa v4**, chưa tính vào §0.1.
+
+---
+
+## 10. PILOT nguồn mới cho ô #1 & MSVC11-12 (seed 20261016, 2026-10-15) — chỉ đo yield
+Pilot NirSoft + PortableApps (isolation `~/bfbg_benign_work/v4_pilot2/`, không đụng v4_benign/). Quy tắc dedup
+`V4_BENIGN_RULES_FROZEN.md`. **Sửa lỗi binning:** old-MSVC (linker 6-8, không Rich, import `msvcrt`) trước bị
+`tc_bin` phân nhầm GNU/MinGW; đã sửa (chỉ gọi GNU khi có `.eh_frame`/mingw-dll) — áp cho pilot này và các phiên sau.
+
+### NirSoft (nguồn MSVC≤10 chính) — 25 app random
+- 25 app → **15 giữ** (9 loại `dedup_sha256` = đã có trong v2/v3 holdout). **13/15 = MSVC≤10** (đúng, sau sửa bin).
+- **Phân bố size MSVC≤10: `<256K`=11, `256K-1M`=1, `1-4M`=1** → **ô #1 (MSVC≤10 × 256K-1M) yield = 1/15 = 7%** (<10%).
+- **MSVC11-12 = 0**.
+- **Lý do cấu trúc:** tiện ích MSVC đời cũ (NirSoft) **gần như toàn <256K** (tí hon); binary **256K-1M** lại
+  chủ yếu **MSVC14 hiện đại** → ô #1 là **mismatch toolchain-cũ × size-vừa**.
+
+### PortableApps / GitHub-SourceForge cũ / freeware cũ
+- **PortableApps**: build **hiện đại = MSVC14** (vd IrfanView 4.75) → **không lấp MSVC≤10**; server download bị
+  throttle (~11KB/s) → pilot không hoàn tất (không đáng theo đuổi vì sai bin đích).
+- **GitHub/SourceForge release cũ + freeware cũ**: cần **URL phiên-bản-cũ thủ công (2008–2012)**; không tự động
+  hóa trong pilot gọn; dự kiến yield thấp, công sức cao.
+
+### KẾT LUẬN — ô #1 & MSVC11-12 KHÔNG lấp được ở quy mô mục tiêu (khả thi thu thập)
+- **Ô #1 (MSVC≤10 × 256K-1M)**: yield 7% từ nguồn tốt nhất (NirSoft) → **không đạt ≥100** bằng nguồn tải tự động.
+- **MSVC11-12 (mọi size)**: 0 từ mọi nguồn thử → toolchain 2012–2015 đời ngắn, **hiếm**.
+- **KHÔNG viết fetcher quy mô lớn** cho các nguồn này (theo lệnh).
+
+### Mục tiêu THỰC TẾ đề xuất (sửa §5.1/§5.5)
+1. **Bỏ ép ≥100 cho MSVC≤10 × 256K-1M**. Thay bằng: (a) **gộp theo bin toolchain, bỏ ràng buộc size**
+   (MSVC≤10 mọi size — NirSoft phủ tốt `<256K`), và/hoặc (b) **reweight theo bin ở loader** thay vì khớp từng ô size.
+2. **MSVC11-12**: **gộp vào bin "MSVC-cũ (≤12)"** khi đánh giá; **không** đặt mục tiêu số riêng.
+3. Giữ **≥100 chỉ cho ô khả thi**: MSVC14 × 256K-1M và MSVC14 × 1-4M (đã gần đạt từ Scoop, §9).
+
+### HẠN CHẾ cần nêu trong bài (threats to validity)
+- Benign v4 **không khớp 1:1 toolchain×size** với malware ở các ô MSVC≤10/11-12 × size-vừa → **confound toolchain/size
+  còn dư** ở những ô đó; đây là **giới hạn khả thi của thu thập**, không phải lựa chọn theo kết quả.
+- Benign MSVC≤10 **lệch về `<256K` và một vendor (NirSoft)** → confound **vendor + size** (giống rủi ro ISO-65% nhưng ở cấp bin).
+- Cổng dữ liệu §0.1: giữ nguyên; các ô MSVC≤10/11-12 **đánh dấu "không khả thi đạt mục tiêu"** thay vì treo mãi.
