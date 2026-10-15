@@ -130,11 +130,53 @@ cho family mới (→ khác biệt ≈ 20–50% số mẫu). **Đây là ước 
 
 Trùng chéo-family (ppdeep≥90 giữa Zeus và TrickBot…) kỳ vọng ~0 (family khác nhau hiếm khi near-dup) → cộng gần như trực tiếp.
 
-### 4.2 VX-Underground (nguồn phụ, thủ công)
-- Hiện đã có **8 mẫu VX import thủ công** (`DATASET.md`). VX-Underground phát hành theo **collection/family**
-  dạng file-share (không có API `get_siginfo` như MB) → **trần = ước lượng sau khi tải thủ công từng collection**,
-  không khảo sát tự động được ở đây. Dùng để bổ sung family MB thiếu (Ursnif/ISFB/QakBot) **nếu** xác minh được
-  nhãn family + đúng loại banking. Ghi nguồn + hash như các mẫu VX hiện có.
+**Khác biệt ước tính THEO NGUỒN** (áp cùng dải 20–50% sau ppdeep; xác minh sau lift):
+- **MalwareBazaar** (Zeus+Gozi+Zloader+Ramnit = 635 PE) → **~125–315 khác biệt**. Nguồn chính, PE thật, lift được.
+- **VX-Underground / VirusShare / MalShare**: trần **chưa xác minh** (không khảo sát tự động được) → ước tính sau khi
+  xin truy cập + tải thử; dùng cho **Qakbot** và Ursnif/ISFB mà MB không trả. Khác biệt chỉ ước được sau tải+dedup.
+- **SOREL-20M / BODMAS**: có **nhãn family** → lọc tập con banking được, nhưng SOREL **disarmed** (cần xác minh lift) và
+  BODMAS binary **theo yêu cầu** → coi là **phương án dự phòng**, không phải nguồn chính. Khác biệt chưa ước được.
+
+### 4.2 Khảo sát nguồn quy mô lớn (2026-10-15, qua web — KHÔNG tải; "chưa xác minh" khi không chắc)
+So sánh điều kiện truy cập / có **PE thật** không (hay đặc trưng/binary bị vô hiệu hóa) / quy mô / giấy phép.
+
+| Nguồn | Truy cập | PE thật? | Quy mô / theo family | Giấy phép |
+|---|---|---|---|---|
+| **MalwareBazaar** (đang dùng) | API key (đã có) | ✅ PE thật, zip AES "infected" | theo signature (get_siginfo); trần đã khảo sát §4 | TOS abuse.ch; nghiên cứu |
+| **VX-Underground** | Công khai, miễn phí; mẫu nén có mật khẩu (công bố trên site/Twitter — **không chép vào đây**) | ✅ PE thật (mẫu sống), **không** vô hiệu hóa | tự nhận "lớn nhất", ~**35M** mẫu (chưa xác minh); có collection **"Families"**, InTheWild, mirror VirusShare/VirusSign | **Không có license mã-nguồn-mở rõ ràng**; chỉ disclaimer trách nhiệm; "research/edu" là tóm tắt bên thứ ba → **chưa xác minh** |
+| **VirusShare** | **Mời riêng**: email xin ("access") → link mời; cấm scraping; có thể thu hồi | ✅ PE thật (mẫu sống), zip mật khẩu "infected"; định dạng EXE | rất lớn (hàng chục triệu, chưa xác minh con số); **không lọc theo family sẵn** (phải tự map hash) | Không license chính thức; TOS: nghiên cứu, cấm tải quá mức/scraping |
+| **SOREL-20M** (Sophos/ReversingLabs) | Bucket AWS S3 mở (theo Terms of Use trên GitHub) | ⚠️ **PE "disarmed"** (~10M malware): **zero 2 cờ header** `optional_headers.subsystem` + `file_header.machine` → không chạy trực tiếp. **Benign CHỈ đặc trưng** (EMBER2.0, không có binary benign) | ~10M malware disarmed; nhãn/tag ReversingLabs → có thể lọc **tập con banking** | Terms of Use (GitHub README) — **chưa xác minh chi tiết** |
+| **BODMAS** (UIUC/Blue Hexagon) | Đặc trưng/metadata công khai (`bodmas.npz`, `bodmas_metadata.csv`); **binary malware theo yêu cầu** | ⚠️ có **binary malware thật theo request**; benign chỉ hash+feature | 57.293 malware + 77.142 benign PE, **Aug2019–Sep2020**; **581 family** (`bodmas_malware_category.csv`) | Hạn chế bản quyền (binary benign không phát hành); chi tiết **chưa xác minh** |
+| **EMBER** | Công khai | ❌ **CHỈ đặc trưng** (vector 2381-d), **không có PE thô** ở bản chuẩn → **KHÔNG dùng được cho BFBG** (cần PE thô để angr lift) | 2017/2018 | mở (BSD-ish, chưa xác minh) |
+| **theZoo** | GitHub công khai; zip "infected" | ✅ PE thật (mẫu sống), tập **curated nhỏ** | nhỏ (không quy mô lớn); test gần nhất 2022 | GPL repo; mẫu "chỉ nghiên cứu" |
+| **MalShare** | Đăng ký miễn phí → API key; hạn ngạch ~1000–2000/ngày (chưa xác minh) | ✅ PE thật | cộng đồng từ 2013; **không lọc family sẵn** | community, phi lợi nhuận |
+| **Malpedia** (FKIE) | **Chưa xác minh** policy mẫu (thường gated cho researcher đã duyệt) | — | tốt làm **tham chiếu phân loại family**, chưa xác nhận là nguồn mẫu ở đây | nghiên cứu, chưa xác minh |
+
+**Hệ quả cho BFBG:** cần **PE thô lift được** → ưu tiên MalwareBazaar (đang dùng), VirusShare, VX-Underground, MalShare.
+**EMBER loại** (chỉ feature). **SOREL** chỉ dùng nếu xác minh được binary disarmed (cờ header bị zero) vẫn **lift ra mã x86**
+bằng angr/CFGFast và bộ phân-bin toolchain (`validate_tc.py`) không vỡ vì machine=0 — **CHƯA XÁC MINH, cần thử 1 mẫu trước**.
+**BODMAS/SOREL có nhãn family** → có thể lọc tập con banking thay vì tải mù.
+
+### 4.3 Phân loại từng family ứng viên (nguồn phân loại; đúng loại banking/loader?)
+Trần mẫu = khảo sát MalwareBazaar §4 (metadata, 12MB, sha-dedup). Toolchain **dự kiến** (chưa lift → chưa xác minh).
+
+| Family | Đúng loại? (nguồn) | Trần MB (PE≤12MB) | Khoảng thời gian | Toolchain dự kiến | Ô toolchain lấp |
+|---|---|---|---|---|---|
+| **Zeus/Zbot** | ✅ banking trojan kinh điển (Malpedia `win.zeus`; nhiều nguồn) | **357** | ~2007–2013 | **MSVC đời cũ (≤10/11-12)** | malware MSVC≤10 (khớp đời benign ô #1) |
+| **Gozi/ISFB/Ursnif/Snifula** | ✅ banking lineage; Gozi v1.0 2006, v2.0=ISFB, rò source 2010 → GozNym/Vawtrak; sau chuyển hướng backdoor (Mandiant) — Malpedia `win.isfb` | **157** (tên "Gozi"); Ursnif/ISFB=0 dưới tên đó (umbrella "Gozi") | ~2006–nay | MSVC đời cũ→vừa | MSVC≤10/11-12 |
+| **Zloader** (Terdot/DELoader/Zeus Sphinx) | ✅ loader giao payload (có module Zeus) — Malpedia `win.zloader` / MISP banker | **90** | ~2016–nay | **MSVC14** (hiện đại) | malware MSVC14 |
+| **Qakbot/Qbot** | ✅ banking trojan (2007) → loader/IAB mô-đun; #1 loader 2023 (ReliaQuest); Trend Micro, Microsoft "Gold Lagoon" | **0 qua MB** (get_siginfo không trả) → cần VX/VirusShare/MalShare | ~2007–2023 | MSVC14 | malware MSVC14 |
+| **Ramnit** | banking trojan (gốc là worm) — **phân loại chưa xác minh lần tra này**; xác minh Malpedia `win.ramnit` | **31** | ~2010–nay | MSVC đời vừa | MSVC11-12/14 |
+| **Carbanak/Anunak** | ⚠️ **phần lớn nguồn gọi BACKDOOR** của FIN7/Cobalt (dựng trên source Carberp); MITRE G0008/G0046; vài nguồn gọi banking/RAT → **KHÔNG phải banking-trojan kinh điển** | — | ~2013–nay | — | **ĐỀ XUẤT LOẠI** (construct-validity, như SystemBC) |
+
+**Kết luận phân loại:** nhận **Zeus, Gozi, Zloader, Qakbot** (banking/loader đúng loại). **Ramnit** nhận **sau khi xác minh**
+Malpedia. **Carbanak LOẠI** (backdoor APT, lệch lớp hành vi — lặp lỗi RQF-02/SystemBC). SystemBC vẫn loại (proxy).
+
+### 4.4 VX-Underground theo family (nguồn phụ, thủ công)
+- Đã có **8 mẫu VX import thủ công** (`DATASET.md`). VX phát hành theo **collection/family** dạng file-share
+  (không có API `get_siginfo`) → **trần = ước lượng sau khi tải thủ công từng collection**, không khảo sát tự động được.
+  Hữu ích để lấy family MB **không trả** (Qakbot, Ursnif/ISFB dưới tên riêng) **nếu** xác minh nhãn + đúng loại banking.
+  Ghi nguồn + hash như mẫu VX hiện có.
 
 ---
 
