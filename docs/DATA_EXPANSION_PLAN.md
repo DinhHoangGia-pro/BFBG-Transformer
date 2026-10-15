@@ -411,3 +411,26 @@ Script `vt_report.py`. Chưa tra thêm tới ngày mai (hạn mức 500/ngày đ
   **không phải ground-truth tuyệt đối** cho mọi mẫu → **cần VT cross-check trước khi khóa nhãn v4**.
 - **Mẫu nghi (benign):** chưa — chưa tra benign (ưu tiên malware trước; benign 669 tra ngày mai).
 - Còn lại: **124 malware + 669 benign** tra **ngày mai** (quota reset), resumable từ `vt_summary.jsonl`.
+
+---
+
+## 9. Harvest benign v4 — PHIÊN 1 (2026-10-15, Scoop only) — KHÔNG khóa v4
+Quy tắc `V4_BENIGN_RULES_FROZEN.md`, seed 20261015, isolation `~/bfbg_benign_work/v4_benign*`. Nguồn phiên này:
+**Scoop Main+Extras+Versions** (các nguồn khác chưa viết fetcher — xem pilot §10). Dừng sạch giữa chừng (resumable).
+
+| ô mục tiêu | kept (pre-lift) | lift-OK | mục tiêu | thiếu (§2) |
+|---|---|---|---|---|
+| MSVC≤10 × 256K-1M (ô #1) | **7** | 3 | 100 | 77 |
+| MSVC14 × 256K-1M | 37 | 21 | 100 | 43 |
+| MSVC14 × 1-4M | 86 | 60 | 100 | 13 |
+| MSVC11-12 × 256K-1M | 0 | 0 | 20 | 14 |
+| MSVC11-12 × 1-4M | 0 | 0 | 20 | 17 |
+| MSVC11-12 × <256K | 0 | 0 | 20 | 20 |
+
+- 338 app xử lý · **130 kept** (pre-lift) · **84 lift-OK** (46 kept chưa lift do dừng giữa chừng — resumable,
+  0 nf0/.NET/build_fail trong phần đã lift) · dedup loại **43** (37 sha256 + 6 ppdeep≥90) · **skip_nontarget 2.520**
+  · app_fail 31 · ~124 phút.
+- **Linker major (kept): 123×v14, 7×v2** → Scoop (kể cả Versions) **gần như chỉ ra MSVC14 hiện đại**.
+- **Đọc kết quả:** MSVC14 (ô #2/#3) **đạt/vượt mức thiếu** (kept 37 & 86 vs thiếu 43 & 13). **Ô #1 MSVC≤10
+  gần như không nhích (7)** và **MSVC11-12 = 0** từ Scoop → cần nguồn khác (NirSoft/PortableApps/GitHub-cũ/freeware).
+- **Cổng vẫn ĐÓNG:** 130 benign này ở thư mục riêng, **chưa khóa v4**, chưa tính vào §0.1.
