@@ -1,6 +1,7 @@
-# BFBG-Transformer
+# BFBG-Transformer (code repo)
 
-Phát hiện malware PE bằng Binary Function Block Graph + Transformer. Kiến trúc kế thừa từ T-CFBG (EVM smart contract); xem `docs/LESSONS_FROM_EVM_CODEBASE.md`.
+Mã nguồn cho bài (hướng B): **"A Shortcut-Aware Evaluation Protocol and Benchmark for Static Banking-Trojan Detection"**.
+BFBG (Binary Function Block Graph + Transformer) ở đây là **mô hình được ĐÁNH GIÁ**, không phải đóng góp kiến trúc của bài; đóng góp là **giao thức đánh giá nhận-biết-shortcut + benchmark** (manifest/hash đóng băng, split theo cụm near-duplicate, holdout chéo nguồn, baseline probe). Tên repo/thư mục code giữ nguyên. Kiến trúc kế thừa từ T-CFBG; xem `docs/LESSONS_FROM_EVM_CODEBASE.md`.
 
 ## Cài đặt sau khi clone
 

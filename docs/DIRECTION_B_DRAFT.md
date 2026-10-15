@@ -4,9 +4,8 @@
 > B biến chính các phát hiện tiêu cực/kiểm toán thành đóng góp **phương pháp luận + benchmark**.
 > Chưa chọn hộ A/B. Mọi số là **dev-set (choco), post-hoc**, chưa đụng holdout kiểm định cuối.
 
-## Tiêu đề (nháp)
-"Confound hơn cấu trúc: vì sao mô hình đồ thị/transformer không vượt baseline metadata-PE
-trong phát hiện banking-trojan xuyên-họ, và một bệnh lý cửa-sổ-đầu-vào"
+## Tiêu đề (đã chốt)
+"A Shortcut-Aware Evaluation Protocol and Benchmark for Static Banking-Trojan Detection"
 
 ## Đóng góp (claim)
 1. **Kiểm toán confound có hệ thống** trên tác vụ malicious-family vs benign: cho thấy baseline

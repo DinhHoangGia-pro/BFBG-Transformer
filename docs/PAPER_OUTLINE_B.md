@@ -2,9 +2,8 @@
 
 *Written for: đồng tác giả + phản biện. Mọi số là dev-set/post-hoc cho tới khi chạm holdout cuối.*
 
-## Tiêu đề (nháp)
-"Confound hơn cấu trúc: baseline PE-metadata vượt mô hình đồ thị/transformer trong phát hiện
-banking-trojan xuyên-họ, và một bệnh lý cửa-sổ-đầu-vào"
+## Tiêu đề (đã chốt)
+"A Shortcut-Aware Evaluation Protocol and Benchmark for Static Banking-Trojan Detection"
 
 ## Đóng góp (claims — tất cả gắn phạm vi)
 C1. Kiểm toán confound có hệ thống trên tác vụ family-vs-benign: baseline **metadata-PE** tổng quát tốt nhất

@@ -1,6 +1,6 @@
 # Dataset
 
-Mô tả nguồn dữ liệu và lựa chọn family cho BFBG-Transformer. Đề tài: **Cross-Family Banking-Trojan Detection**.
+Mô tả nguồn dữ liệu và lựa chọn family. Bài (hướng B): **A Shortcut-Aware Evaluation Protocol and Benchmark for Static Banking-Trojan Detection**. (BFBG chỉ là mô hình được đánh giá, không phải đóng góp kiến trúc.)
 
 > Số liệu dưới đây là **số thật cuối cùng sau khi thu thập + lift** (cập nhật 2026-10-03, hết Giai đoạn B). Phần khảo sát trước-fetch (trần API từng family) xem lịch sử git của file này.
 
