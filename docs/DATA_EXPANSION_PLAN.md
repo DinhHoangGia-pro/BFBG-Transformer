@@ -32,6 +32,11 @@ Khi cổng **đóng** (chưa đạt), chỉ được: **thu thập, lift, dedup,
 → Cổng **ĐÓNG**: phiên này và tới khi mọi ô trên "đạt", chỉ thu thập/lift/dedup/khóa-manifest/viết-docs.
 Benign hiện tại từ v1/v2/v3 (chưa có mẫu v4 nào). Cập nhật bảng này sau mỗi đợt thu thập + dedup.
 
+**Pilot 2026-10-15 (đo yield, §4.5):** tải thử 75 malware (Zeus/Gozi/Zloader, 25/họ, seed 20261015) vào thư mục
+RIÊNG — **KHÔNG khóa vào v4**, nên con số "708" ở trên **không đổi**. Pilot xác nhận yield MB cao (native 96%,
+rơi 3%, 0 trùng với dữ liệu cũ). Số malware khác biệt chỉ tăng **sau khi** tải thật + ppdeep nội bộ + khóa manifest v4.
+**Còn thiếu để mở cổng:** malware khác biệt ~792; benign 6 ô (77/43/13/14/17/20); nhãn v4; holdout v4. **Không đề xuất train.**
+
 ---
 
 ## 1. Trạng thái run GRL (tóm tắt)
@@ -175,8 +180,33 @@ Malpedia. **Carbanak LOẠI** (backdoor APT, lệch lớp hành vi — lặp l�
 ### 4.4 VX-Underground theo family (nguồn phụ, thủ công)
 - Đã có **8 mẫu VX import thủ công** (`DATASET.md`). VX phát hành theo **collection/family** dạng file-share
   (không có API `get_siginfo`) → **trần = ước lượng sau khi tải thủ công từng collection**, không khảo sát tự động được.
-  Hữu ích để lấy family MB **không trả** (Qakbot, Ursnif/ISFB dưới tên riêng) **nếu** xác minh nhãn + đúng loại banking.
+- **Danh mục (CHƯA XÁC MINH):** nguồn thứ ba liệt kê collection top-level gồm ATM Malware, Argus, Bazaar,
+  **Families**, InTheWild, Twitter IOC, VirusSign, VirusShare. Site `vx-underground.org` **chặn fetch tự động (403)**
+  → không liệt kê được nội dung bộ **Families** cụ thể ở đây; cần duyệt thủ công trên site.
+- **CHƯA tải bộ Qakbot nào trong phiên này.** Tải VX cần thao tác thủ công + xác minh mật khẩu/nhãn + đúng loại banking
+  → **hoãn, hỏi trước**. Hữu ích để lấy family MB **không trả** (Qakbot, Ursnif/ISFB dưới tên riêng) sau khi xác minh.
   Ghi nguồn + hash như mẫu VX hiện có.
+
+### 4.5 Pilot tải thử MalwareBazaar — ĐO THẬT (seed 20261015, 2026-10-15) — KHÔNG khóa vào v4
+Tải 25 mẫu/họ vào `data/raw/pilot_v4_malicious/<family>` (**RIÊNG**, không chạm v1/v2/v3). Lift: workers=4,
+MemoryMax=14G, nice 19, timeout 900, `--append`, OOM (ProcessCrash exit-9) tách Timeout. Out-dir riêng
+`data/features_graph_pilot_v4`. Scripts: `pilot_malware_v4_fetch.py` / `pilot_malware_v4_report.py`.
+Quy tắc loại/dedup khóa **trước** khi tải (sha256 vs **1967** sha cũ, size≤12MB, .NET loại ở lift, rơi không thay thế).
+
+| họ | tải | lift OK | .NET | rơi | native% | rơi% | trùng sha256 (cũ) | trùng ppdeep≥90 (5 họ cũ) |
+|---|---|---|---|---|---|---|---|---|
+| Zeus | 25 | 25 | 0 | 0 | 100% | 0% | 0 | 0 |
+| Gozi | 25 | 23 | 2 | 0 | 92% | 0% | 0 | 0 |
+| Zloader | 25 | 22 | 1 | 2 | 96% | 8% | 0 | 0 |
+| **TỔNG** | **75** | **70** | **3** | **2** | **96%** | **3%** | **0** | **0** |
+
+- **Rơi:** 2× `UnicodeDecodeError` (Zloader; cle/pe `forwarder.decode`) — **0 Timeout, 0 OOM/ProcessCrash**.
+- **Linker major (pefile):** Zeus **nghiêng cũ** (v9×10, v10×5, v1–v8 còn lại → **MSVC≤10** đúng dự kiến);
+  Gozi hỗn hợp (v9/v10 trội + v14×6); Zloader **lưỡng cực** (v1–v8 cũ + v14×9 hiện đại).
+- **Đọc kết quả:** yield cao (native 96%, .NET 4%, rơi 3%, 0 timeout/OOM) → MB là nguồn tốt, lift ổn định.
+  **0 trùng sha256 + 0 trùng ppdeep≥90 với 5 họ hiện có** → 3 họ mới KHÁC BIỆT dataset cũ.
+- **CHƯA đo near-dup NỘI BỘ từng họ mới** (chỉ 25 mẫu) → khác biệt sau pull đầy đủ **vẫn theo dải §4.1 (20–50%)**,
+  cần ppdeep nội bộ khi tải thật. Pilot chỉ xác nhận **yield + khác biệt chéo-họ**, **KHÔNG khóa vào v4** (cổng vẫn đóng).
 
 ---
 
