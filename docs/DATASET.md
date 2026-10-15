@@ -1,6 +1,6 @@
 # Dataset
 
-Mô tả nguồn dữ liệu và lựa chọn family. Bài (hướng B): **A Shortcut-Aware Evaluation Protocol and Benchmark for Static Banking-Trojan Detection**. (BFBG chỉ là mô hình được đánh giá, không phải đóng góp kiến trúc.)
+Mô tả nguồn dữ liệu và lựa chọn family. Bài — tên làm việc (MODEL-FIRST, chưa chốt): **Toolchain-Invariant Hierarchical Graph Transformers for Static Banking-Trojan Detection** (xem `docs/PAPER_OUTLINE_MODEL.md`). Benchmark/giao thức đánh giá là phương tiện đo bất biến.
 
 > Số liệu dưới đây là **số thật cuối cùng sau khi thu thập + lift** (cập nhật 2026-10-03, hết Giai đoạn B). Phần khảo sát trước-fetch (trần API từng family) xem lịch sử git của file này.
 

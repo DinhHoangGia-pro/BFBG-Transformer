@@ -1,3 +1,6 @@
+> **LỊCH SỬ / SUPERSEDED (2026-10-15):** hướng đã chuyển sang MODEL-FIRST — xem `docs/PAPER_OUTLINE_MODEL.md`.
+> Tiêu đề "Shortcut-Aware ..." ở đây GIỮ LÀM LỊCH SỬ (giao thức đánh giá vẫn dùng làm phương tiện).
+
 # Đề cương bài — Hướng B (measurement / cautionary study)
 
 *Written for: đồng tác giả + phản biện. Mọi số là dev-set/post-hoc cho tới khi chạm holdout cuối.*

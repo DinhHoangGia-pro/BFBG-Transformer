@@ -1,7 +1,12 @@
 # BFBG-Transformer (code repo)
 
-Mã nguồn cho bài (hướng B): **"A Shortcut-Aware Evaluation Protocol and Benchmark for Static Banking-Trojan Detection"**.
-BFBG (Binary Function Block Graph + Transformer) ở đây là **mô hình được ĐÁNH GIÁ**, không phải đóng góp kiến trúc của bài; đóng góp là **giao thức đánh giá nhận-biết-shortcut + benchmark** (manifest/hash đóng băng, split theo cụm near-duplicate, holdout chéo nguồn, baseline probe). Tên repo/thư mục code giữ nguyên. Kiến trúc kế thừa từ T-CFBG; xem `docs/LESSONS_FROM_EVM_CODEBASE.md`.
+Mã nguồn cho bài. **Tên làm việc hiện tại (MODEL-FIRST, chưa chốt): "Toolchain-Invariant Hierarchical
+Graph Transformers for Static Banking-Trojan Detection"** — xem `docs/PAPER_OUTLINE_MODEL.md`,
+`docs/GRL_DESIGN.md`. Mô hình bất biến-toolchain + chọn hàm bằng học là **đề xuất, CHƯA chứng minh**
+(tiêu chí ghi trước; đổi tên nếu bất biến không đạt). Bản đo-lường/benchmark trước đó
+(*"A Shortcut-Aware Evaluation Protocol and Benchmark ..."*) giữ làm lịch sử/giao thức đánh giá
+trong `docs/PAPER_OUTLINE_B.md`, `docs/DIRECTION_B_DRAFT.md`. Tên repo/thư mục code giữ nguyên.
+Kiến trúc kế thừa từ T-CFBG; xem `docs/LESSONS_FROM_EVM_CODEBASE.md`.
 
 ## Cài đặt sau khi clone
 

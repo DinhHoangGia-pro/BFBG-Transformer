@@ -1,3 +1,6 @@
+> **LỊCH SỬ / SUPERSEDED (2026-10-15):** hướng đã chuyển sang MODEL-FIRST — xem `docs/PAPER_OUTLINE_MODEL.md`.
+> Tiêu đề "Shortcut-Aware ..." ở đây GIỮ LÀM LỊCH SỬ (giao thức đánh giá vẫn dùng làm phương tiện).
+
 # (Hướng B — bản nháp 1 trang) Confounds trong phát hiện banking-trojan xuyên-họ trên PE
 
 > Diễn giải của tôi về "hướng (B)": thay vì công bố một bộ phát hiện BFBG mới (hướng A),
