@@ -512,3 +512,38 @@ Pilot §10: nguồn tự động (Scoop/NirSoft/PA) **không** cho MSVC≤10 ở
   Mình sẽ áp đúng `V4_BENIGN_RULES_FROZEN.md` (dedup sha+ppdeep, size≤12MB, loại installer/forwarder/3rd-party/.NET,
   bin bằng bộ đã sửa) và báo yield theo bin — **chỉ khi bạn cấp URL** (không tự cào quy mô lớn).
 - **Lưu ý cap vendor:** tránh lại dồn một vendor; ưu tiên **đa dự án** để bin MSVC≤10 không lệch một nguồn.
+
+---
+
+## 12. Harvest benign v4 — PHIÊN 2 (2026-10-16, chỉ 2 ô MSVC14) + cap vendor trên số thật
+Resume phiên 1, bộ bin đã sửa (GNU chỉ khi `.eh_frame`/mingw-dll), chỉ nhắm MSVC14×256K-1M & ×1-4M. Dừng sạch
+(resumable). Số là **tích lũy v4 benign** (phiên 1+2).
+
+| ô | kept (pre-lift) | lift-OK | mục tiêu | còn |
+|---|---|---|---|---|
+| MSVC14 × 1-4M | **95** | 60 | 100 | +5 |
+| MSVC14 × 256K-1M | **43** | 21 | 100 | +57 |
+| MSVC≤10 × 256K-1M | 7 | 3 | (bỏ ép, §5.1) | — |
+
+- 381 app xử lý · **145 kept** · 84 lift-OK (61 chưa lift — resumable, 0 nf0/.NET/fail trong phần đã lift)
+  · nguồn Extras 97 / Main 28 / Versions 20 · dedup loại **53** (47 sha256 + 6 ppdeep≥90) · skip_nontarget 3.093 · app_fail 33.
+
+### 12.1 Cap vendor ≤35%/bin + ISO ≤35% — TÍNH TRÊN SỐ THẬT (kept v4)
+(vendor = app Scoop, proxy; publisher thật không track nhưng app Scoop đa dạng)
+- **bin MSVC14 (n=138):** vendor nhiều nhất = `skylark` 3 mẫu = **2%** (56 app khác nhau) → **≤35% ✓** (rất phân tán).
+- **bin MSVC≤10 (n=7):** vendor nhiều nhất = `tsukimi` 3 mẫu = **43% > 35%** — NHƯNG n=7 (quá nhỏ) và bin này
+  **không dùng kiểm bất biến** (§5.1); khi gom MSVC≤10 đầy đủ phải siết cap lại. **Ghi cờ.**
+- **ISO (Windows ISO): 0%** trong v4 (v4 là Scoop-only; ISO chỉ nằm ở train v1/v2 cũ). Cap ISO ≤35% **đạt** cho v4.
+
+### 12.2 Malware đưa vào TRAIN CHÍNH (không tính Zeus-lineage) + cổng còn thiếu
+Theo §11: **Zeus-lineage (Zeus 337 + Zloader 61 = 398 distinct) = NHÓM RIÊNG, KHÔNG vào train chính.**
+- **Train chính (distinct, không Zeus-lineage):**
+  - Đã khóa (v1-v3, 5 family cũ): **708**.
+  - Mới khả dụng không-Zeus-lineage (§4.6): **Gozi 131 + Ramnit 30 = 161** (CHƯA khóa).
+  - → **Tiềm năng train chính = 708 + 161 = 869 distinct** (nếu khóa).
+- **Nhóm riêng Zeus-lineage:** 398 distinct (báo riêng, không trộn train chính).
+- **Cổng (mục tiêu ~1500 distinct train chính):** hiện khóa **708/1500**; nếu khóa 161 mới → 869/1500 →
+  **còn thiếu ~631 distinct** cho train chính (cần thêm family đúng loại không-Zeus-lineage: Qakbot/Gozi-mở-rộng/
+  tinba/carberp… — phần lớn phải qua VX/VirusShare/BODMAS-email, xem §4/§8).
+- **Benign:** MSVC14×1-4M gần đủ (95/100), MSVC14×256K-1M **43/100 (thiếu 57)**; MSVC≤10/11-12 theo mục tiêu
+  cấp-bin (§5.1, bỏ ép size). **Chưa khóa v4.**
