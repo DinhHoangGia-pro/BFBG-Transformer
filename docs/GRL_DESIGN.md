@@ -50,3 +50,13 @@ Keep section-17 schedule otherwise (early stopping on val loss, grad-clip 1.0, 4
 - Decide whether to collect a confound-matched v4 first (HOLDOUT_V4_MATCH_ESTIMATE.md) or evaluate
   invariance on existing splits.
 - Explicit "train" instruction (long run > 30 min requires approval).
+
+## "Không đạt" là kết quả HỢP LỆ (ghi trước 2026-10-15)
+- Nếu biến thể 1 KHÔNG đạt gate (linear-probe toolchain KHÔNG giảm vào trong 0.05 của majority-chance,
+  HOẶC AUC dev giảm > 0.03 so BFBG không-adversarial cùng seed) → **DỪNG, báo, KHÔNG chạy biến thể 2--3**.
+- Kết quả "không đạt" là hợp lệ và được báo cáo thẳng; khi đó **bài QUAY VỀ tên/định hướng audit**
+  ("A Shortcut-Aware Evaluation Protocol and Benchmark ..."; PAPER_OUTLINE_B.md) — tên "Toolchain-Invariant"
+  chỉ giữ nếu gate đạt.
+- Run thăm dò: biến thể 1 (GRL trên pooled_program, adversary toolchain), lambda_max=1.0, 2 seed
+  {101,202}, fold BumbleBee, dev choco, §17 early-stop, trần 8h. Báo: AUC chéo nguồn, linear-probe
+  toolchain/family (CV cụm) + majority-chance, recall theo bin. KHÔNG chạm v3/holdout v2.
