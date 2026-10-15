@@ -240,8 +240,17 @@ Mạng serial (≤3 luồng), backoff 429/502/503 trong `api_query`. **Ramnit th
 ## 5. KẾ HOẠCH v4 (mục tiêu, nguồn, thứ tự, thời gian, rủi ro, ngưỡng khóa)
 
 ### 5.1 Mục tiêu theo ô (benign) — thực dụng, KHÔNG ép khớp 1:1
-Khớp 1:1 cần ~1085 benign (§2) — khó khả thi. Mục tiêu đề xuất: **mỗi ô LỚN có ≥100 benign MỖI PHÍA
-đủ chia train/test qua group-aware CV**, các ô nhỏ "tồn tại được" (≥20) để bin không rỗng.
+> **CHỐT 2026-10-16 (a) — chuyển sang mục tiêu CẤP BIN (theo pilot §10).** Pilot cho thấy ô MSVC≤10×256K-1M
+> (yield 7%) và MSVC11-12 (0) **không lấp được** ở quy mô mục tiêu bằng nguồn tải tự động. → **Bỏ ràng buộc
+> SIZE cho các bin cũ; đặt mục tiêu theo BIN toolchain** (gộp mọi size), dùng reweight theo bin ở loader:
+> - **MSVC≤10 (mọi size):** gom hết thu được (NirSoft phủ `<256K`); **KHÔNG ép ≥100 ở 256K-1M**.
+> - **MSVC11-12:** gộp vào bin **"MSVC-cũ (≤12)"** khi đánh giá; **không mục tiêu số riêng**.
+> - **MSVC14 × 256K-1M và MSVC14 × 1-4M:** giữ **≥100 mỗi ô** (khả thi từ Scoop — đang thu, §9/§11).
+> **HẠN CHẾ (ghi trong bài):** bin **MSVC≤10 benign** gồm chủ yếu mẫu **nhỏ (<256K)** và **gần một vendor (NirSoft)**
+> → **không kiểm được bất biến toolchain TRONG bin này** (lệch vendor + size); bất biến chỉ đánh giá được ở bin MSVC14.
+
+(Lịch sử — mục tiêu theo-ô ban đầu, đã thay bằng cấp-bin ở trên:) Khớp 1:1 cần ~1085 benign (§2) — khó khả thi.
+Mục tiêu cũ: mỗi ô LỚN có ≥100 benign/phía; ô nhỏ ≥20.
 
 | Ô thiếu (§2) | benign hiện | mục tiêu v4 | nguồn chính |
 |---|---|---|---|
@@ -274,9 +283,12 @@ Khớp 1:1 cần ~1085 benign (§2) — khó khả thi. Mục tiêu đề xuất
 - **Tổng tới khi khóa v4:** ước lượng **~1 tuần máy** nếu nguồn benign ô #1 đạt yield đủ; **rủi ro kéo dài** nếu ô #1/#6 thiếu.
 
 ### 5.5 Ngưỡng ĐỦ để khóa v4 (đề xuất — chốt với người dùng)
-- **Benign:** mỗi ô LỚN (#1,#2,#3) **≥100 mẫu/ phía**, chia được train/test qua group-aware CV (cụm near-dup
-  + vendor, không chia ngẫu nhiên từng mẫu); ô nhỏ (#4,#5,#6) **≥20** để bin tồn tại; **không vendor nào >35%/bin**;
-  **không nguồn Microsoft/ISO >30–40% tổng**; bin GNU/Go/Rust **≤10% tổng**.
+- **Benign (CHỐT 2026-10-16 (a) — CẤP BIN, không ép size cho bin cũ):**
+  - **MSVC14 × 256K-1M ≥100** và **MSVC14 × 1-4M ≥100** (ô khả thi), chia train/test qua group-aware CV.
+  - **MSVC≤10 (mọi size):** gom hết thu được (không ngưỡng số cứng); **bin này KHÔNG dùng để kiểm bất biến toolchain**
+    (lệch <256K + một vendor NirSoft — xem hạn chế §5.1).
+  - **MSVC11-12:** gộp vào bin "MSVC-cũ (≤12)"; không ngưỡng riêng.
+  - Ràng buộc chung: **không vendor nào >35%/bin**; **không Microsoft/ISO >30–40% tổng**; GNU/Go/Rust **≤10% tổng**.
 - **Malware:** **~1500 mẫu khác biệt** (sau ppdeep), trải đủ MSVC≤10 / 11-12 / 14 để cân với benign; mỗi family
   báo **(số mẫu, số khác biệt, % trùng)** — không báo số thô mà không kèm số khác biệt.
 - **Bất biến dedup:** 0 cụm lẫn nhãn; không mẫu v4 nào `ppdeep≥90` với holdout v2/v3; v4 không sửa v1/v2/v3.
@@ -471,3 +483,32 @@ Pilot NirSoft + PortableApps (isolation `~/bfbg_benign_work/v4_pilot2/`, không 
   còn dư** ở những ô đó; đây là **giới hạn khả thi của thu thập**, không phải lựa chọn theo kết quả.
 - Benign MSVC≤10 **lệch về `<256K` và một vendor (NirSoft)** → confound **vendor + size** (giống rủi ro ISO-65% nhưng ở cấp bin).
 - Cổng dữ liệu §0.1: giữ nguyên; các ô MSVC≤10/11-12 **đánh dấu "không khả thi đạt mục tiêu"** thay vì treo mãi.
+
+---
+
+## 11. Cập nhật 2026-10-16 — Zeus-lineage nhóm riêng + nguồn benign cũ thủ công
+
+### 11.1 Đề xuất: Zeus-lineage là NHÓM RIÊNG, KHÔNG vào train chính
+- Malware mới (§4.6): **Zeus-lineage (Zeus+Zloader) = 398 distinct**, **nghiêng mạnh MSVC≤10** (linker v6–v10,
+  §4.6). Benign MSVC≤10 lại **yếu + lệch một vendor (<256K, NirSoft)** và **không lấp được ô size-vừa** (§10).
+- **Rủi ro nếu đưa Zeus-lineage vào train/test chính:** mô hình có thể **tách theo toolchain** (MSVC≤10 ≈ malware
+  Zeus-lineage vs benign MSVC14) → **confound toolchain lặp lại** đúng thứ đang cố khử. Benign không cân được bin
+  MSVC≤10 → không trung hòa được.
+- **Đề xuất:** giữ **Zeus-lineage như một NHÓM ĐÁNH GIÁ RIÊNG** (cross-lineage holdout / tập "confound-stress"),
+  **KHÔNG trộn vào train chính cân-bin**. Train/test chính dùng family có thể cân benign (nghiêng MSVC14:
+  TrickBot/Dridex/IcedID/BumbleBee hiện tại + Zloader phần MSVC14 nếu tách được). Zeus (MSVC≤10) báo riêng.
+- **Gán split theo DÒNG MÃ NGUỒN** vẫn giữ (Zeus+Zloader cùng nhóm, không tách qua train/test) — §4.6.
+- Chốt cuối khi khóa v4; đây là đề xuất, **chưa khóa, chưa train**.
+
+### 11.2 Nguồn benign CŨ thủ công cần người dùng tìm (cho bin MSVC≤10/11-12 × 256K-1M)
+Pilot §10: nguồn tự động (Scoop/NirSoft/PA) **không** cho MSVC≤10 ở size 256K-1M. Cần **URL phiên-bản-cũ ổn định**
+(2008–2015, build MSVC gốc, chưa repack). Gợi ý nơi tìm (người dùng xác minh URL + tính hợp pháp + chưa xác minh):
+- **oldversion.com**, **FileHippo "older versions"**, **Softpedia (old builds)**, **MajorGeeks**, **SourceForge
+  "Files/OldFiles"** của từng project.
+- Project MSVC đời cũ có bản 256K-1M: **7-Zip 9.20 (2010)**, **Notepad++ 5.x (2009)**, **IrfanView 4.2x–4.3x**,
+  **PuTTY 0.60–0.62**, **WinSCP 4.x**, **FileZilla 3.3–3.5**, **Pidgin 2.6–2.10**, **Audacity 2.0.x**,
+  **VLC 1.1.x**, **GIMP 2.6 (một phần)**, **HeidiSQL (Delphi, cho bin khác)**.
+- **Yêu cầu khi gửi mình:** link tải trực tiếp (.exe/.zip payload, KHÔNG installer web), ghi phiên bản + năm.
+  Mình sẽ áp đúng `V4_BENIGN_RULES_FROZEN.md` (dedup sha+ppdeep, size≤12MB, loại installer/forwarder/3rd-party/.NET,
+  bin bằng bộ đã sửa) và báo yield theo bin — **chỉ khi bạn cấp URL** (không tự cào quy mô lớn).
+- **Lưu ý cap vendor:** tránh lại dồn một vendor; ưu tiên **đa dự án** để bin MSVC≤10 không lệch một nguồn.

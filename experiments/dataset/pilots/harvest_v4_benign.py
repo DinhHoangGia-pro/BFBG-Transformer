@@ -21,10 +21,10 @@ for d in (V4, V4FEAT, V4DL): os.makedirs(d, exist_ok=True)
 WALL0 = time.time()
 BUCKET = {"Main": "ScoopInstaller/Main", "Extras": "ScoopInstaller/Extras", "Versions": "ScoopInstaller/Versions"}
 
-# 6 o muc tiêu (bin, size-bucket) -> cap (muc tieu v4 §5.1: o lon 100, o nho 20)
+# CHOT 2026-10-16 (b): chi thu 2 o MSVC14 (muc tieu cap-bin §5.1; o MSVC<=10/11-12 khong lap duoc §10).
+# Dung sach khi ca 2 o dat 100. Payload bin khac -> skip_nontarget.
 TARGET_CELLS = {
-    ("MSVC<=10", "256K-1M"): 100, ("MSVC 14", "256K-1M"): 100, ("MSVC 14", "1-4M"): 100,
-    ("MSVC 11-12", "256K-1M"): 20, ("MSVC 11-12", "1-4M"): 20, ("MSVC 11-12", "<256K"): 20,
+    ("MSVC 14", "256K-1M"): 100, ("MSVC 14", "1-4M"): 100,
 }
 THIRD_PARTY = re.compile(r"(vcruntime|msvcp|msvcr|concrt|ucrtbase|api-ms-win|ext-ms-|qt5|qt6|libcrypto|"
                          r"libssl|ffmpeg|avcodec|avformat|avutil|swscale|icu[a-z0-9]*|zlib|libpng|d3d|"
