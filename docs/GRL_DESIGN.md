@@ -1,4 +1,24 @@
-# Gradient-reversal (toolchain-invariant) design — PRE-REGISTERED, NOT RUN
+# Gradient-reversal (toolchain-invariant) design — PRE-REGISTERED
+
+Design only (phần thiết kế dưới GIỮ NGUYÊN); **ask the user before any training run.**
+
+## Run thăm dò biến thể 1 — BỊ DỪNG SỚM (2026-10-15)
+- **Trạng thái: DỪNG BẰNG TAY bởi người dùng** (`systemctl --user stop bfbg-grl.service`, 07:56:32).
+  Không phải lỗi code, không phải crash, không phải gate-fail.
+- **Đã chạy:** ~13 phút 51 giây wall; hoàn tất **epoch 0** (`det_loss=0.5061 adv_loss=1.5499
+  val_loss=0.5033 lambda=0.245 t=616s`), đang vào epoch 1 thì bị dừng. systemd ghi `8G memory peak`
+  (chạm cap `MemoryMax=8G`). **KHÔNG sinh result JSON** (`grl_v1_s101.json`/`grl_v1_s202.json` không có).
+- **Holdout:** run chỉ dùng `train_pool` + `holdout_family_bumblebee` (positives) + `holdout_source_chocolatey`
+  (dev negatives). **KHÔNG chạm v3 benign, KHÔNG chạm holdout v2 (nirsoft)** — xác nhận trong `grl_run.py`
+  (không nạp v3/nirsoft; chỉ 3 split trên).
+- **Lý do dừng (theo người dùng):** chạy quá sớm khi **dữ liệu chưa đủ** — chưa có benign khớp-confound
+  (toolchain×size, xem `HOLDOUT_V4_MATCH_ESTIMATE.md` + `DATA_EXPANSION_PLAN.md`), nên bất-biến đo trên split
+  hiện tại sẽ lẫn với lệch phân phối nguồn/kích thước. Thu thập dữ liệu trước, chạy GRL sau.
+- **KẾT QUẢ DỞ DANG KHÔNG DÙNG LÀM BẰNG CHỨNG.** 1 epoch, không có AUC chéo nguồn, không có linear-probe,
+  không có recall-theo-bin → không báo cáo bất kỳ con số nào từ run này. Gate (mục dưới) **chưa áp dụng**
+  vì run chưa hoàn tất; đây **không** phải kết quả "không đạt".
+
+---
 
 Design only. No training is started; **ask the user before any training run.**
 
