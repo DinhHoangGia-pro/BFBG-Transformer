@@ -295,3 +295,31 @@ Khớp 1:1 cần ~1085 benign (§2) — khó khả thi. Mục tiêu đề xuất
 - [ ] Duyệt **tải malware** Zeus/Gozi/Zloader/Ramnit (và/hoặc VX-Underground).
 - [ ] Chốt **ngưỡng khóa v4** ở §5.5 (≥100/ô lớn/phía, ~1500 malware khác biệt) hoặc điều chỉnh.
 - [ ] Không chạm v1/v2/v3/holdout; v4 là tập mới; không push (người dùng push).
+
+---
+
+## 7. Xác minh nhãn bằng VirusTotal — TIỀN-ĐĂNG-KÝ (ghi 2026-10-15, TRƯỚC khi tra)
+Tài khoản VT (key chỉ trong `.env`, không commit/không in). **Tier free: chỉ TRA CỨU** (500/ngày, 240/giờ,
+4/phút; **intelligence_downloads=0 → KHÔNG tải mẫu qua VT**). Không train, không chạm holdout. Cổng vẫn ĐÓNG.
+
+### 7.1 Malware mới (614 mẫu lift-OK, §4.6)
+- Tra `GET /api/v3/files/{sha256}` → lấy `last_analysis_stats.malicious`, `popular_threat_classification`
+  (`suggested_threat_label` + `popular_threat_name`). **Đối chiếu nhãn MalwareBazaar** (family fetch).
+- **Chỉ BÁO** mức đồng thuận family (khớp / lệch / không thấy trên VT). Các mẫu này **chưa khóa v4** nên
+  không xóa gì; dùng để **củng cố ngưỡng "nhãn v4 đã xác minh"** trước khi khóa.
+
+### 7.2 Benign v1–v3 (~669 = 504 raw v1/v2 + 165 v3) — NGƯỠNG LOẠI CHỐT TRƯỚC KHI TRA
+- Tra hash → `last_analysis_stats.malicious` (số engine gắn cờ).
+- **NGƯỠNG TIỀN-ĐĂNG-KÝ: `malicious ≥ 3 engine` → ĐÁNH DẤU "benign-nghi-ngờ".**
+- **KHÔNG xóa khỏi v1/v2/v3 đã khóa** (bất biến immutable). Chỉ: (a) **báo** danh sách + số engine;
+  (b) tính lại **metric PHỤ** (ví dụ FPR/AUC khi loại/giữ các mẫu bị đánh dấu) như một **ablation**, không
+  thay số liệu v1/v2/v3 gốc. 1–2 engine gắn cờ = **không** đủ ngưỡng (nhiễu/heuristic) → chỉ ghi chú.
+- Lý do chọn ≥3: giảm dương-tính-giả của một engine đơn lẻ; ngưỡng chốt **trước** khi nhìn kết quả để tránh
+  chọn ngưỡng theo số liệu.
+
+### 7.3 Vận hành
+- Rate-limit **4/phút** (sleep ~16s), **<500/ngày**, **resumable** (bỏ qua hash đã tra), lưu **kết quả thô**
+  (`data/vt/raw/<sha>.json`) + tóm tắt (`data/vt/vt_summary.jsonl`). Xử lý 429 (chờ), 404 = không thấy.
+- Thứ tự: (1) malware 614 trước, (2) benign 669 sau. Vì cap 500/ngày < 1283 → chạy **nhiều ngày**, resume.
+- Script: `experiments/dataset/pilots/vt_lookup.py`. Key đọc từ `.env`, **không bao giờ in/commit**.
+- `data/vt/*` nằm trong `data/*` → **gitignored** (không commit mẫu/thô); chỉ commit script + báo cáo tổng hợp.
