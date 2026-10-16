@@ -646,3 +646,45 @@ engine đã khóa). Khi xong: `vt_report.py` → ghi nghi-ngờ **theo bin và n
   banking-đúng-loại không-Zeus. **Đề xuất chốt với người dùng:** (i) hạ mục tiêu train-chính xuống ~900–1000, HOẶC
   (ii) đưa Zeus-lineage vào với **đánh giá nhận-biết-toolchain** (báo riêng theo bin), HOẶC (iii) nới định nghĩa
   lớp (thêm loader đúng hệ sinh thái). **Chưa chốt, chưa khóa, không train.**
+
+---
+
+## 15. Cập nhật CỔNG sau khi tải đủ Tinba (2026-10-16) — HAI số
+
+### Tinba đủ (MB tag+signature, dedup chéo)
+- Tải đủ **264 raw** (218 mới + pilot), lift workers=4/14G/900s resumable, **0 Timeout** đợt full; dedup sha vs toàn bộ.
+- **distinct (ppdeep≥90) = 92**; **trùng dữ liệu cũ = 2**; **MSVC14 = 0** (linker v6×107, v8×110, v10×19 → **toàn MSVC≤10**).
+
+### (a) Malware TRAIN CHÍNH — tổng distinct (không Zeus-lineage, không Nymaim-downloader)
+| nhóm | distinct |
+|---|---|
+| old 5 (TrickBot 189, BumbleBee 254, IcedID 114, Emotet 77, Dridex 68) | 702 |
+| Gozi (dir 227)† | 139 |
+| Ramnit (dir 46)† | 31 |
+| **Tinba (dir 264, MỚI)** | **92** |
+| **TỔNG train chính distinct** | **964** |
+- **Mục tiêu 1500 → còn thiếu ~536.** (Giữ mục tiêu, không hạ.)
+- † **CẢNH BÁO dir-growth:** Gozi/Ramnit/Tinba dir hiện **lớn hơn §4.6** (Gozi 157→227, Ramnit 31→46) — có thể do
+  re-fetch union Gozi/ISFB/Ursnif bổ sung mẫu MB mới. **Cần người dùng xác minh** (tái lập manifest). Số ở đây là
+  **trạng thái dir hiện tại**, chưa khóa.
+
+### (b) TRONG BIN MSVC14 (bin benign SẠCH confound, §14) — distinct theo họ
+| họ | MSVC14 distinct | / tổng distinct họ |
+|---|---|---|
+| TrickBot | 5 | 189 |
+| IcedID | 5 | 114 |
+| Dridex | 2 | 68 |
+| Gozi | 3 | 139 |
+| BumbleBee / Emotet / Ramnit / **Tinba** | 0 | 254/77/31/92 |
+| **TỔNG malware MSVC14 (positives)** | **15** | — |
+| **benign MSVC14 (negatives, §14)** | **470** | — |
+
+- **AUC CI dự kiến (Hanley-McNeil, giả định AUC=0.90, m=15 pos, n=470 neg): ±0.105 → ~[0.795, 1.000]** — **RỘNG**
+  (do chỉ 15 positives). Đánh giá bất-biến trong bin MSVC14 sẽ **kém chính xác** trừ khi tăng malware MSVC14.
+- **GHI RÕ: các họ MỚI thêm (Zeus/Gozi/Zloader/Ramnit/Tinba) gần như TOÀN MSVC≤10** → đóng góp **~0** cho bin MSVC14.
+  Tăng tổng distinct (a) KHÔNG cải thiện (b). **Mâu thuẫn cốt lõi:** bin có benign sạch (MSVC14) thiếu malware (15);
+  bin có nhiều malware (MSVC≤10, ~900) thì benign lệch NirSoft 53% (§14) → **không bin nào vừa đủ malware vừa sạch benign**.
+- **Hệ quả:** muốn kiểm bất-biến toolchain đáng tin trong MSVC14 cần **nguồn malware MSVC14** (trojan BIÊN DỊCH MỚI,
+  vd TrickBot/IcedID/QakBot đời mới MSVC14) — các họ banking cũ (Zeus/Tinba/Gozi) KHÔNG giúp. Ghi làm hạn chế/định hướng.
+
+**Cổng 🔴 ĐÓNG — chưa khóa v4, không train.** Tinba ở thư mục riêng (`mbtag_pilot/tinba`), chưa khóa.
