@@ -811,3 +811,39 @@ trên benign (không pack) nên bỏ sót. Ví dụ BumbleBee: **244 mẫu linke
   pilot 25/họ, dedup, bin linker-primary, ghi nguồn; **hỏi trước khi tải**.
 
 **Cổng 🔴 ĐÓNG — không train, không khóa v4, không chạm v3/holdout.** Dừng sau bảng.
+
+---
+
+## 18. Lực phân tích bin MSVC14 + pilot loader hiện đại (2026-10-16)
+
+### 18.1 (task 1) LỰC PHÂN TÍCH trong bin MSVC14 (loại holdout BumbleBee/choco/nirsoft + v3)
+Tập: **203 malware / 497 benign MSVC14, 696 cluster**. AUC CI = cluster-bootstrap (2000).
+| mô hình metadata | AUC | 95% CI (cluster-boot) | SE |
+|---|---|---|---|
+| FULL (8 feat, gồm entropy+Rich) | **0.952** | [0.937, 0.966] | 0.0075 |
+| bỏ entropy+Rich | **0.892** | [0.865, 0.920] | 0.0142 |
+- paired dAUC(full − bỏ) = **+0.060** [+0.041, +0.080] → **có ý nghĩa**.
+- **MDD (chênh AUC nhỏ nhất phát hiện được, 80% power, α=0.05) ≈ 0.028.**
+- **Hệ quả:** trong bin MSVC14, một mô hình (vd BFBG) chỉ **"hơn baseline metadata" đáng tin nếu vượt ≥~0.028 AUC**.
+  Baseline để so: **0.892 (bỏ entropy+Rich)** hoặc **0.952 (full)**. Lực đủ để phát hiện chênh ~0.03 trở lên.
+
+### 18.2 (task 2) PILOT loader hiện đại (MB tag, first_seen≥2022, 25/họ, seed 20261016)
+| họ | tải | liftOK | .NET | rơi | distinct | trùng cũ | bin | Rich | CRT | maxEnt tb | %>7.2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Latrodectus | 25 | 25 | 0 | 0 | 17 | 0 | MSVC14 14 / ≤10 9 / 11-12 1 / khac 1 | 96% | 4% | 7.23 | 60% |
+| PikaBot | 25 | 24 | 0 | 1 | 18 | 0 | MSVC14 15 / ≤10 4 / khac 6 | 76% | 4% | 7.35 | 60% |
+- Chéo 35 distinct/50 (0 cụm lẫn 2 họ). **Cả hai chủ yếu MSVC14** → bổ sung đúng bin cần (malware MSVC14).
+- **CRT-import 4% + entropy cao (60%>7.2, pack nhiều hơn BumbleBee/IcedID)** → sẽ **củng cố confound import-style/pack**
+  trong bin MSVC14 (CRT 12% vs benign 82%). Khi gộp phải báo kèm baseline metadata + ablation (§18.1/§17.2).
+
+### 18.3 (task 3) GÁN LINEAGE (cho split — nhóm theo dòng mã nguồn, không tách qua train/test)
+- **Latrodectus ↔ IcedID** (LUNAR SPIDER, kế nhiệm IcedID) → **nhóm "IcedID-lineage"**.
+- **PikaBot ↔ QakBot** (kế nhiệm QakBot) → **nhóm "QakBot-lineage"** (QakBot chưa có → PikaBot mở nhóm này).
+- DarkGate: **hoãn** (commodity, không hệ sinh thái banking — §17.5).
+
+### 18.4 (task 4) CỔNG — (a)(b)
+- Pilot **CHƯA khóa** → số hiện tại KHÔNG đổi: **(a) train chính 964/1500 (thiếu 536)**; **(b) MSVC14 437 malware /
+  565 benign → AUC CI ±0.021; baseline metadata 0.892–0.952; MDD 0.028.**
+- **Dự phóng NẾU tải đủ Latrodectus(123)+PikaBot(176):** distinct thêm ~**120–210** (pilot 68–72% distinct; full cao hơn)
+  → (a) ~**1080–1170/1500**; MSVC14 malware (b) tăng thêm ~**70–170** (Latro 56% + Pika 60% MSVC14) → bin MSVC14 càng đủ lực.
+- **Hỏi trước khi tải đủ.** Chưa tải, chưa khóa, không train, không chạm v3/holdout.
