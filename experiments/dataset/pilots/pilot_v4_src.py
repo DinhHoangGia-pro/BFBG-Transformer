@@ -71,10 +71,14 @@ def pe_bin(path):
     if ".symtab" in secs or any(s.startswith(".go") for s in secs): return "Go", lk
     if "CODE" in secs or "DATA" in secs or ".itext" in secs: return "Delphi", lk
     if ".eh_frame" in secs or any(d in simp for d in ("libgcc", "libstdc++", "libwinpthread", "mingw", "msys-")): return "GNU/MinGW", lk
+    if lk is not None:   # linker-primary (pack xoa rich/CRT nhung linker major con)
+        if 6 <= lk <= 10: return "MSVC<=10", lk
+        if lk in (11, 12, 13): return "MSVC 11-12", lk
+        if 14 <= lk <= 19: return "MSVC 14", lk
     if rich or "ucrtbase.dll" in imps or any("vcruntime" in d for d in imps) or any("api-ms-win-crt" in d for d in imps) or "msvcrt.dll" in imps:
-        if lk <= 10: return "MSVC<=10", lk
+        if lk and lk <= 10: return "MSVC<=10", lk
         if lk in (11, 12): return "MSVC 11-12", lk
-        if lk >= 14: return "MSVC 14", lk
+        if lk and lk >= 14: return "MSVC 14", lk
     return "khac", lk
 
 

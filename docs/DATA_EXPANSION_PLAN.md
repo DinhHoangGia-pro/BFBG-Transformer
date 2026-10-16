@@ -688,3 +688,68 @@ engine đã khóa). Khi xong: `vt_report.py` → ghi nghi-ngờ **theo bin và n
   vd TrickBot/IcedID/QakBot đời mới MSVC14) — các họ banking cũ (Zeus/Tinba/Gozi) KHÔNG giúp. Ghi làm hạn chế/định hướng.
 
 **Cổng 🔴 ĐÓNG — chưa khóa v4, không train.** Tinba ở thư mục riêng (`mbtag_pilot/tinba`), chưa khóa.
+
+---
+
+## 16. SỬA bộ phân loại bin + §15 SAI (2026-10-16) — malware MSVC14 bị undercount nặng
+
+### 16.1 Lỗi bộ phân loại (task 1) — bảng họ × (linker/Rich/CRT) × bin
+`tc_bin` cũ **đòi Rich header HOẶC import CRT-DLL** mới gọi MSVC. Malware **bị PACK** (UPX/custom) **xóa Rich
++ xóa import CRT** nhưng **MajorLinkerVersion=14 vẫn còn** → bị ném vào **"khac"**. Bộ validate 80% trước chỉ kiểm
+trên benign (không pack) nên bỏ sót. Ví dụ BumbleBee: **244 mẫu linker=14, rich=False, CRT=False → "khac"**.
+
+**SỬA: LINKER-PRIMARY** — sau khi loại Go/Delphi/GNU (`.eh_frame`/mingw-dll), **bin theo MajorLinkerVersion**
+(6–10→MSVC≤10; 11–13→MSVC11-12; 14–19→MSVC14), KHÔNG đòi Rich/CRT. Khớp binning gốc của `HOLDOUT_V4_MATCH_ESTIMATE`
+(malware MSVC14=566). Đã sửa trong `harvest_v4_benign.py` + `pilot_v4_src.py`.
+
+**MSVC14 distinct theo họ — CŨ (bug) → MỚI (sửa):**
+| họ | CŨ | → MỚI | / distinct |
+|---|---|---|---|
+| BumbleBee | 0 | **244** | 254 |
+| IcedID | 5 | **79** | 114 |
+| TrickBot | 5 | **45** | 189 |
+| Gozi | 3 | **32** | 139 |
+| Emotet | 0 | **28** | 77 |
+| Dridex | 2 | **7** | 68 |
+| Ramnit | 0 | 2 | 31 |
+| Tinba | 0 | 0 | 92 (đúng — toàn MSVC≤10) |
+
+### 16.2 GATE ĐÚNG (manifest-authoritative + bin đã sửa) — THAY §15
+- **(a) Malware train chính tổng distinct = 964** (old 702 + Gozi 139 + Ramnit 31 + Tinba 92). **Thiếu ~536 / 1500.** (không đổi so §15)
+- **(b) Trong bin MSVC14: malware distinct = 437** (pos) · **benign MSVC14 = 565** (neg; bin mới, trước 470).
+  **AUC CI dự kiến @0.90: ±0.021 → [0.879, 0.921]** — **HẸP, đủ lực.**
+- **RÚT LẠI §15:** "chỉ 15 MSVC14 / CI ±0.105 rộng / mâu thuẫn bin không bin nào vừa đủ" là **ARTIFACT của bug phân loại**,
+  KHÔNG đúng. Thực tế **bin MSVC14 vừa nhiều malware (437) vừa benign sạch (565) → đánh giá bất-biến toolchain đủ lực.**
+- **Cần làm lại:** cap vendor/ISO §14 tính bằng bin CŨ → **phải tính lại với bin đã sửa** (benign MSVC14 565 thay 470);
+  dự kiến ISO% ở MSVC14 vẫn ≤35% (v4 Scoop pha loãng) nhưng phải xác minh. Ghi TODO.
+
+### 16.3 Dir-growth (task 2) — tái lập từ MANIFEST (hashed), KHÔNG dùng thư mục
+| họ | manifest (committed, authoritative) | thư mục thực tế | DƯ không-trong-manifest |
+|---|---|---|---|
+| Zeus | 357 | 450 | +93 |
+| Gozi | 157 | 227 | +70 |
+| Zloader | 90 | 138 | +48 |
+| Ramnit | 31 | 46 | +15 |
+| Tinba (mbtag) | 243 | 264 | +21 |
+| **Tổng** | — | — | **+247 KHÔNG trong manifest** |
+- **Manifest commit đúng như §4.6** (Gozi 157, Ramnit 31). Thư mục có **~247 file KHÔNG có trong bất kỳ manifest nào**
+  (Gozi: 70 file dir không-trong-manifest, 0 manifest-thiếu-dir). **§15 tính theo dir → thổi phồng; §4.6/§16.2 theo manifest là đúng.**
+- **Nguồn 247 file dư: KHÔNG xác định được từ bản ghi** (nghi một lần fetch_full/pilot chạy lại tải thêm mẫu MB mới
+  nhưng không ghi manifest, hoặc tồn từ phiên trước). **KHUYẾN NGHỊ: cách ly 247 file dư, KHÔNG dùng/không khóa tới khi
+  điều tra**; chỉ dùng tập **manifest-authoritative** (Zeus357/Gozi157/Zloader90/Ramnit31 + Tinba243).
+
+### 16.4 Nguồn malware MSVC14 HIỆN ĐẠI (task 4) — dù đã có 437, để tiến 1500 + tươi mới
+> Lưu ý: bin MSVC14 **đã đủ lực** (437 pos). Danh sách này để **tăng tổng distinct train chính** và thêm malware
+> MSVC14 **đời mới** (loader/banking 2022–2025), không bắt buộc cho tính đủ-lực MSVC14.
+
+| nguồn/họ | loại | MSVC14? | điều kiện lấy |
+|---|---|---|---|
+| **QakBot** | banking/loader | thường MSVC14 | MB không trả → **BODMAS-email / VX thủ công** |
+| **TrickBot/IcedID/Emotet mẫu MỚI** (first_seen 2022+) | banking | MSVC14 | **MB** theo tag + lọc `first_seen` mới (dedup vs hiện có) |
+| **BumbleBee thêm** | loader | MSVC14 | MB tag `bumblebee` (ngoài 262 đã có) |
+| **Latrodectus / PikaBot / DarkGate** (loader kế nhiệm 2023-24) | loader hệ sinh thái | MSVC14 | **MB** tag — cần xác minh đúng-loại (loader banking) + lineage |
+| **Dridex/Gozi mẫu mới** | banking | một phần MSVC14 | MB tag + first_seen mới |
+- **Việc tôi làm khi duyệt:** MB tag + lọc `first_seen≥2022`, dedup sha+ppdeep vs toàn bộ, pilot 25/họ (quy trình
+  `MALWARE_SOURCING_PLAN §5`), bin bằng bộ **đã sửa**, ghi nguồn `mb-tag:<tag>`. **Hỏi trước khi tải.**
+
+**Cổng 🔴 ĐÓNG — chưa khóa v4, không train.** §15 được thay bằng §16 (giữ lại §15 làm lịch sử lỗi).

@@ -59,12 +59,18 @@ def tc_bin(path):
     if ".symtab" in secs or any(s.startswith(".go") for s in secs): return "Go", lk
     if "CODE" in secs or "DATA" in secs or ".itext" in secs or ".didata" in secs: return "Delphi", lk
     mingw = any(d in simp for d in ("libgcc", "libstdc++", "libwinpthread", "mingw", "msys-"))
-    if ".eh_frame" in secs or mingw: return "GNU/MinGW", lk   # chi GNU khi co .eh_frame/mingw-dll (bo da kiem; old-MSVC khong Rich + msvcrt KHONG phai GNU)
+    if ".eh_frame" in secs or mingw: return "GNU/MinGW", lk   # chi GNU khi co .eh_frame/mingw-dll
+    # LINKER-PRIMARY: malware pack bi xoa Rich + import CRT nhung MajorLinkerVersion van con -> bin theo linker
+    if lk is not None:
+        if 6 <= lk <= 10: return "MSVC<=10", lk
+        if lk in (11, 12, 13): return "MSVC 11-12", lk
+        if 14 <= lk <= 19: return "MSVC 14", lk
+    # linker la/odd (0, 1-5, >19): can corroborate bang rich/CRT
     if rich or "ucrtbase.dll" in imps or any("vcruntime" in d for d in imps) \
             or any("api-ms-win-crt" in d for d in imps) or "msvcrt.dll" in imps:
-        if lk <= 10: return "MSVC<=10", lk
+        if lk and lk <= 10: return "MSVC<=10", lk
         if lk in (11, 12): return "MSVC 11-12", lk
-        if lk >= 14: return "MSVC 14", lk
+        if lk and lk >= 14: return "MSVC 14", lk
         return "MSVC khac", lk
     return "khac", lk
 
