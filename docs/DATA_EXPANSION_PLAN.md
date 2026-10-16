@@ -519,11 +519,13 @@ Pilot §10: nguồn tự động (Scoop/NirSoft/PA) **không** cho MSVC≤10 ở
 Resume phiên 1, bộ bin đã sửa (GNU chỉ khi `.eh_frame`/mingw-dll), chỉ nhắm MSVC14×256K-1M & ×1-4M. Dừng sạch
 (resumable). Số là **tích lũy v4 benign** (phiên 1+2).
 
-| ô | kept (pre-lift) | lift-OK | mục tiêu | còn |
+| ô | kept (pre-lift) | lift-OK (sau khi lift nốt 61) | mục tiêu | còn |
 |---|---|---|---|---|
-| MSVC14 × 1-4M | **95** | 60 | 100 | +5 |
-| MSVC14 × 256K-1M | **43** | 21 | 100 | +57 |
-| MSVC≤10 × 256K-1M | 7 | 3 | (bỏ ép, §5.1) | — |
+| MSVC14 × 1-4M | **95** | **94** | 100 | +6 |
+| MSVC14 × 256K-1M | **43** | **43** | 100 | +57 |
+| MSVC≤10 × 256K-1M | 7 | **7** | (bỏ ép, §5.1) | — |
+
+**Lift-OK thật (2026-10-16): 144/145** (lift nốt 61 mẫu tồn; 0 rơi trong kept, 1 mẫu không tạo feature — bỏ qua).
 
 - 381 app xử lý · **145 kept** · 84 lift-OK (61 chưa lift — resumable, 0 nf0/.NET/fail trong phần đã lift)
   · nguồn Extras 97 / Main 28 / Versions 20 · dedup loại **53** (47 sha256 + 6 ppdeep≥90) · skip_nontarget 3.093 · app_fail 33.
