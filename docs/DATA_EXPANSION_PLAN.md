@@ -847,3 +847,40 @@ Tập: **203 malware / 497 benign MSVC14, 696 cluster**. AUC CI = cluster-bootst
 - **Dự phóng NẾU tải đủ Latrodectus(123)+PikaBot(176):** distinct thêm ~**120–210** (pilot 68–72% distinct; full cao hơn)
   → (a) ~**1080–1170/1500**; MSVC14 malware (b) tăng thêm ~**70–170** (Latro 56% + Pika 60% MSVC14) → bin MSVC14 càng đủ lực.
 - **Hỏi trước khi tải đủ.** Chưa tải, chưa khóa, không train, không chạm v3/holdout.
+
+---
+
+## 19. Full pull Latrodectus + PikaBot (2022+, 2026-10-16) — gate (a)(b) số thật
+MB tag, first_seen≥2022, dedup sha+ppdeep≥90 vs toàn bộ cũ. **Số distinct/bin/pack = raw-based (manifest-authoritative,
+KHÔNG cần lift)**; lift (workers=4/14G/900s/resumable) đang chạy nền (loader pack nặng → lift chậm, nhiều Timeout dự kiến).
+
+| họ | n (manifest) | distinct (ppdeep) | MSVC14 distinct | trùng cũ | bin | Rich | CRT | maxEnt tb | %>7.2 |
+|---|---|---|---|---|---|---|---|---|---|
+| Latrodectus | 123 | **83** | **62** | 0 | MSVC14 74 / ≤10 38 / 11-12 9 / khac 2 | 96% | 4% | 7.21 | 59% |
+| PikaBot | 176 | **74** | **29** | 0 | MSVC14 99 / ≤10 45 / khac 30 / 11-12 2 | 83% | 10% | 7.38 | 64% |
+- **Chéo 157 distinct / 299 (0 cụm lẫn 2 họ)**, **0 trùng dữ liệu cũ**. Cả hai nhiều MSVC14; **pack cao (59-64% >7.2)**,
+  **CRT 4-10%** → tiếp tục nuôi confound import-style/pack trong bin MSVC14 (báo kèm baseline metadata + ablation §17.2/§18.1).
+- **Lineage (gán split):** **Latrodectus → IcedID-lineage**; **PikaBot → QakBot-lineage** (gộp cùng dòng, không tách qua train/test).
+- Thư mục dư so manifest (latro 143 vs 123, pika 198 vs 176 — +42 không-trong-manifest, cùng hiện tượng §16.3) → **cách ly, dùng manifest-authoritative**.
+
+### 19.1 CỔNG (a)(b) — số thật sau khi gộp loader (CHƯA khóa v4)
+- **(a) Malware train chính tổng distinct = 964 + Latrodectus 83 + PikaBot 74 = 1.121**
+  → **CÒN THIẾU CHÍNH XÁC 379 để đạt 1.500.**
+- **(b) Trong bin MSVC14: malware distinct = 437 + 62 + 29 = 528** (positives) · **benign MSVC14 = 565** (negatives)
+  → bin MSVC14 rất đủ lực (AUC CI ±~0.02, MDD ~0.028 §18.1).
+- Zeus-lineage (398) + Nymaim (downloader) + DarkGate (commodity) vẫn **ngoài train chính**.
+
+### 19.2 CÒN LẤP ĐƯỢC 379 — danh sách họ/nguồn (ước distinct, chưa xác minh)
+| họ/nguồn | ước distinct thêm | điều kiện | lineage |
+|---|---|---|---|
+| **ISFB/Ursnif (MB tag)** ngoài Gozi-157 | ~60–140 | MB tag `isfb`(210)/`ursnif`(163), dedup chéo với Gozi | Gozi-lineage |
+| **Qakbot** | ~25–40 | **BODMAS-email / VX** (MB không có) | QakBot-lineage (cùng PikaBot) |
+| **IcedID/TrickBot mẫu mới 2022+** | ~20–60 | MB tag + first_seen, dedup vs hiện có (IcedID MB 274, TrickBot 50 mới) | sẵn có |
+| **Carberp / SpyEye / Retefe** | ~10–25 | BODMAS/VX (Carberp) ; MB SpyEye 5/Retefe 4 | non-Zeus |
+| **Latrodectus/PikaBot <2022 (cũ hơn)** | ~20–50 | MB tag bỏ lọc first_seen | IcedID/QakBot-lineage |
+| (tuỳ chọn) DarkGate nếu nới định nghĩa loader | ~50–70 | MB tag `darkgate` 104 | commodity (construct-validity) |
+- **Khả thi tới 1.500:** ISFB/Ursnif (~60–140) + Qakbot (~25–40) + IcedID/TrickBot-mới (~20–60) + Carberp/SpyEye
+  (~10–25) + loader cũ (~20–50) ≈ **~135–315** → **đủ hoặc gần đủ 379**. Ưu tiên: **ISFB/Ursnif (MB, sẵn key, lớn nhất)**,
+  rồi Qakbot (BODMAS/VX).
+
+**Cổng 🔴 ĐÓNG — không khóa v4, không train, không chạm v3/holdout.** Lift loader chạy nền (báo yield native/.NET/rơi khi xong).
