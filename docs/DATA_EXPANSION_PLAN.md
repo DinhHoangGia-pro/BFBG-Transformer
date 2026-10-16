@@ -884,3 +884,9 @@ KHÔNG cần lift)**; lift (workers=4/14G/900s/resumable) đang chạy nền (lo
   rồi Qakbot (BODMAS/VX).
 
 **Cổng 🔴 ĐÓNG — không khóa v4, không train, không chạm v3/holdout.** Lift loader chạy nền (báo yield native/.NET/rơi khi xong).
+
+### 19.3 Lift yield loader (hoàn tất)
+- **Latrodectus: 123/123 lift-OK** (0 .NET, 0 rơi).
+- **PikaBot: 163/176 lift-OK** (0 .NET, **13 Timeout** = pack nặng, CFGFast >900s).
+- Tổng loader lift-OK = **286/299**. distinct (§19, ppdeep raw) không đổi (83/74); 13 PikaBot Timeout vẫn tính
+  availability nhưng **không có feature để dùng mô hình** (lift-OK usable ít hơn distinct availability).
