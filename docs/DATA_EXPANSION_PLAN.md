@@ -580,3 +580,23 @@ Resume (bin đã sửa), chỉ nhắm 2 ô MSVC14; **tự dừng khi cả 2 đ�
 - 2 mẫu/207 không tạo feature (nf0/nặng) — bỏ qua. **Cả 2 ô MSVC14 đạt mục tiêu ≥100.**
 - Cap vendor (§12.1) giữ nguyên tính chất: bin MSVC14 rất phân tán (≤35% ✓); ISO 0%.
 - **Chưa khóa v4, không train, cổng ĐÓNG.** Benign v4 = 207 (ở thư mục riêng).
+
+### 7.6 VT benign screen — 365/669 (2026-10-16, ngưỡng TIỀN-ĐĂNG-KÝ ≥3 engine)
+Benign v1-v3 ĐÃ KHÓA (immutable). Chỉ ĐÁNH DẤU, KHÔNG xóa; dùng cho ablation metric phụ.
+
+| mức | số |
+|---|---|
+| **nghi-ngờ (malicious ≥3 engine)** | **17** |
+| 1–2 engine (dưới ngưỡng, chỉ ghi chú) | 51 |
+| sạch (0 engine) | 293 |
+| không trên VT | 4 |
+| **đã tra** | **365 / 669** (304 còn lại → ngày mai) |
+
+- **17 mẫu nghi chủ yếu là tiện ích NirSoft "dual-use"** bị một số engine gắn `hacktool`/`pua`/`pswtool`
+  (productkey, pswtool, cookieview, smartsniff, wirelessnetworkwatcher, contactsviewer) + vài `mupx` (packed,
+  mal 6–12). Cao nhất: `hacktool.nirsoft/productkey` (38 engine), `trojan.kepavll/pswtool` (32).
+- **Diễn giải:** đây là **nhiễu nhãn benign do công cụ dual-use** (recovery/password/network tools hợp pháp nhưng
+  bị gắn cờ) — **đã biết** (DATASET.md: tập dual-use stress). **KHÔNG xóa khỏi v1-v3 khóa**; khi báo cáo sẽ
+  tính **metric phụ (ablation)**: FPR/AUC khi loại 17 mẫu nghi vs giữ, để đo độ nhạy với nhiễu nhãn.
+- Danh sách sha đầy đủ: `data/vt/vt_summary.jsonl` (tag=benign, malicious≥3). Phần còn lại 304 benign tra ngày mai
+  (resumable; quota 489/500 đã dùng hôm nay).
