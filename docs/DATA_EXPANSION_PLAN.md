@@ -600,3 +600,49 @@ Benign v1-v3 ĐÃ KHÓA (immutable). Chỉ ĐÁNH DẤU, KHÔNG xóa; dùng cho 
   tính **metric phụ (ablation)**: FPR/AUC khi loại 17 mẫu nghi vs giữ, để đo độ nhạy với nhiễu nhãn.
 - Danh sách sha đầy đủ: `data/vt/vt_summary.jsonl` (tag=benign, malicious≥3). Phần còn lại 304 benign tra ngày mai
   (resumable; quota 489/500 đã dùng hôm nay).
+
+---
+
+## 14. Cập nhật 2026-10-16 (chiều) — cap v1-v4, VT benign hoãn, malware train chính
+
+### 14.1 Cap vendor ≤35%/bin + ISO ≤35%/bin — GỘP v1-v4 (876 benign, số thật)
+Bin v1/v2 từ raw (bộ đã sửa), v3 dùng `tbin`, v4 từ state. "vendor đơn" = nguồn một-vendor nhận diện được
+(MS-ISO, NirSoft, app lẻ); scoop/chocolatey coi **đa-vendor** (không gộp).
+
+| bin | n | ISO | ISO% | vendor đơn lớn nhất | % | vi phạm |
+|---|---|---|---|---|---|---|
+| MSVC 14 | 470 | 147 | **31%** | MS-ISO | 31% | **OK** |
+| MSVC≤10 | 182 | 0 | 0% | **NirSoft** | **53%** | **VI PHẠM (vendor>35%)** |
+| khác | 161 | 19 | 12% | MS-ISO | 12% | OK |
+| GNU/MinGW | 22 | 0 | 0% | git-for-windows | 18% | OK |
+| Go | 35 | 0 | 0% | — | 0% | OK |
+| Delphi | 6 | 0 | 0% | — | 0% | OK |
+
+- **ISO ≤35%: ĐẠT mọi bin.** v4 (199 MSVC14 Scoop đa-vendor) **kéo ISO ở bin MSVC14 từ ~65% (v1) xuống 31%** → confound ISO đã giảm mạnh.
+- **Vendor >35%: VI PHẠM duy nhất ở bin MSVC≤10 — NirSoft 53%** (96/182 = 46 v2 + 50 v3). Đây là confound
+  **một-vendor** đã biết; **không sửa được bằng NirSoft** (pilot §10: nguồn MSVC≤10 khác gần như không có ở size-vừa).
+  → **Hạn chế (đã ghi §5.1): bin MSVC≤10 KHÔNG dùng kiểm bất biến toolchain** (lệch NirSoft + <256K).
+- Bin MSVC14 (ô đã thu v4) **sạch confound vendor/ISO** → **phù hợp để đánh giá bất biến**.
+
+### 14.2 VT benign screen — HOÃN tới mai (quota)
+Quota VT hôm nay dùng **489/500** (124 malware + 365 benign) → **304 benign còn lại tra NGÀY MAI** (ngưỡng ≥3
+engine đã khóa). Khi xong: `vt_report.py` → ghi nghi-ngờ **theo bin và nguồn** vào §7. (Hôm nay: 17 nghi/365, §7.6.)
+
+### 14.3 Malware TRAIN CHÍNH (không Zeus-lineage) — còn thiếu & họ lấy được
+- **Train chính distinct (không Zeus-lineage):** đã khóa **708** + mới (Gozi 131 + Ramnit 30) = **869 tiềm năng**.
+- **Mục tiêu ~1500 → thiếu ~631.** Zeus-lineage (398) để **nhóm riêng** (§11).
+- **Họ banking KHÔNG-Zeus còn lấy được (lấp phần thiếu):**
+  | họ | nguồn khả dụng | ước distinct thêm | ghi chú |
+  |---|---|---|---|
+  | **Qakbot** (+qbot) | BODMAS (51) / VX; **MB không trả** (§4) | ~25–40 | phải xin BODMAS-email hoặc VX thủ công |
+  | **Tinba** | BODMAS (23) / VX | ~10–18 | MB không có (§8) |
+  | **Carberp** | BODMAS (14) / VX | ~7–12 | MB không có |
+  | Nymaim | BODMAS (8) / VX | ~4–7 | |
+  | SpyEye | BODMAS (2) / VX | ~1–2 | |
+  | Gozi/Ramnit | MB **đã lấy hết** (157/31) | 0 | đã cạn ở MB |
+  - **Tổng thêm khả dụng (không-Zeus) ≈ +50–80 distinct** (chủ yếu qua **BODMAS-email / VX thủ công**, không qua MB).
+- **Thực tế:** 869 + (~50–80 BODMAS/VX) ≈ **~920–950 distinct train chính** → **vẫn < 1500**. Vũ trụ banking-trojan
+  KHÔNG-Zeus có hạn ở các nguồn tải được → **mục tiêu 1500 train-chính nhiều khả năng KHÔNG khả thi** nếu chỉ
+  banking-đúng-loại không-Zeus. **Đề xuất chốt với người dùng:** (i) hạ mục tiêu train-chính xuống ~900–1000, HOẶC
+  (ii) đưa Zeus-lineage vào với **đánh giá nhận-biết-toolchain** (báo riêng theo bin), HOẶC (iii) nới định nghĩa
+  lớp (thêm loader đúng hệ sinh thái). **Chưa chốt, chưa khóa, không train.**
