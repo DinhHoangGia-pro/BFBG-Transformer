@@ -753,3 +753,61 @@ trên benign (không pack) nên bỏ sót. Ví dụ BumbleBee: **244 mẫu linke
   `MALWARE_SOURCING_PLAN §5`), bin bằng bộ **đã sửa**, ghi nguồn `mb-tag:<tag>`. **Hỏi trước khi tải.**
 
 **Cổng 🔴 ĐÓNG — chưa khóa v4, không train.** §15 được thay bằng §16 (giữ lại §15 làm lịch sử lỗi).
+
+---
+
+## 17. Hand-check linker + probe trong bin MSVC14 + định nghĩa bin + loader hiện đại (2026-10-16)
+
+### 17.1 (task 1) Hand-check 15 mẫu linker=14 (BumbleBee/IcedID/Emotet) — linker THẬT hay packer?
+- **14/15 có Rich=True + section MSVC chuẩn** (.text/.rdata/.pdata/.gfids), entropy .text ~6.2–6.5 → **linker=14 là THẬT
+  (MSVC compiler), KHÔNG do packer**. Chỉ 1/15 UPX-packed (Emotet, UPX0/UPX1 ent 8.0).
+- **Sửa giải thích §16.1:** nguyên nhân gốc KHÔNG phải "packer xóa Rich", mà là **`fast_load=True` khiến pefile
+  KHÔNG parse Rich** (rich luôn=False trong tc_bin) → rơi về đòi CRT-import → mẫu import-ít bị ném "khac".
+  Fix linker-primary vẫn đúng; MSVC14 malware là **MSVC14 thật, phần lớn không pack**.
+
+### 17.2 (task 2) Bảng pack + probe metadata TRONG bin MSVC14 (loại holdout BumbleBee/choco/nirsoft + v3)
+| nhãn | n | Rich | CRT-import | maxEnt tb | %maxEnt>7.2 |
+|---|---|---|---|---|---|
+| malware | 203 | 96% | **12%** | 6.93 | 30% |
+| benign | 493 | 94% | **82%** | 6.30 | 3% |
+- **Rich gần bằng nhau (96/94%) → KHÔNG phải confound Rich.** Khác biệt lớn: **CRT-import 12% vs 82%** (malware
+  resolve API động/loader; benign link CRT) + entropy (pack 30% vs 3%).
+- **Probe metadata (OOF, GroupKFold=cluster):** FULL (8 feat gồm entropy+Rich) **AUC=0.951** [cluster-boot 0.934–0.966];
+  **bỏ entropy+Rich → AUC=0.894** (dAUC −0.057).
+- **Kết luận:** ngay TRONG bin MSVC14 (cùng toolchain), metadata vẫn tách malware/benign **~0.95**; bỏ entropy+Rich
+  **vẫn 0.894** → **confound KHÔNG chỉ do pack/toolchain**, chủ yếu **import-style (CRT 12/82%) + size + #sections**.
+  → Khi đánh giá BFBG trong bin này phải báo kèm baseline metadata + ablation bỏ entropy/Rich/import-style.
+
+### 17.3 (task 3) ĐỊNH NGHĨA BIN theo từng kết quả — bảng nào cần tính lại
+| kết quả / bảng | binning đã dùng | đúng? | cần tính lại? |
+|---|---|---|---|
+| `HOLDOUT_V4_MATCH_ESTIMATE §2` malware×size | **linker-based** | ✅ | không |
+| §4.6 distinct/lineage (Gozi/Zeus…) | distinct=ppdeep (OK); bin-display=tc_bin cũ | distinct ✅; MSVC14-display sót | distinct OK; bin-display tính lại nếu dùng |
+| §9/§12/§13 v4 benign cells (MSVC14 100/100) | harvester tc_bin (CRT-req, fast_load) | benign import CRT → **phần lớn đúng** | OK (benign không pack); đã xác nhận |
+| §14 cap vendor/ISO | tc_bin cũ | ❌ | **ĐÃ tính lại** (17.4) |
+| §15 gate (b) MSVC14=15 | tc_bin cũ (BUG) | ❌ | **THAY bằng §16/§17** (437) |
+| §16.2 gate | linker-primary | ✅ | — |
+| **v3 `tbin`** (manifest) | validate_tc (CRT-req) | benign → phần lớn OK | **GIỮ NGUYÊN** (theo lệnh; v3 đã khóa) |
+
+### 17.4 (task 4) Cap vendor/ISO GỘP v1-v4 — bin LINKER-PRIMARY (876 benign)
+| bin | n | ISO% | vendor-đơn lớn nhất | vi phạm |
+|---|---|---|---|---|
+| MSVC 14 | 565 | **29%** | MS-ISO 29% | **OK** |
+| MSVC≤10 | 167 | 0% | **NirSoft 57%** | **VI PHẠM (>35%)** |
+| MSVC khac/Go/khac/GNU/MSVC11-12/Delphi | ≤46 | ≤11% | ≤18% | OK |
+- Giữ kết luận §14: **ISO ≤35% đạt mọi bin** (MSVC14 29%, v4 Scoop pha loãng); **vendor VI PHẠM chỉ ở MSVC≤10
+  (NirSoft 57%)** → bin MSVC≤10 không dùng kiểm bất-biến; **bin MSVC14 sạch** (ISO 29%, vendor ≤29%).
+
+### 17.5 (task 5) Loader HIỆN ĐẠI (MB tag, first_seen≥2022) — xác minh loại (CHƯA tải)
+| họ | MB PE≤12MB (2022+) | Malpedia | đúng loại? |
+|---|---|---|---|
+| **Latrodectus** | 123 | backdoor/loader của **LUNAR SPIDER (creators of IcedID)**, thay IcedID | ✅ hệ sinh thái IcedID (như BumbleBee) |
+| **PikaBot** | 176 | downloader+loader+backdoor, **kế nhiệm QakBot** / Black Basta | ✅ hệ sinh thái QakBot |
+| **DarkGate** | 104 | **commodity loader** (HVNC/keylog/stealer), không gắn banking cụ thể | ⚠️ **construct-validity** (như SystemBC) → thận trọng/loại |
+| QakBot | 0 (MB) | — | cần BODMAS/VX |
+| IcedID / TrickBot (mẫu mới) | 274 / 50 (2022+) | đã có loại | thêm mẫu MSVC14 đời mới |
+- **Khả dụng ngay (MB, MSVC14 đời mới):** Latrodectus 123 + PikaBot 176 ≈ **~299** loader đúng-hệ-sinh-thái →
+  tăng mạnh malware MSVC14 train-chính + tiến tới 1500. **DarkGate hoãn** (commodity). **Việc tôi làm khi duyệt:**
+  pilot 25/họ, dedup, bin linker-primary, ghi nguồn; **hỏi trước khi tải**.
+
+**Cổng 🔴 ĐÓNG — không train, không khóa v4, không chạm v3/holdout.** Dừng sau bảng.
