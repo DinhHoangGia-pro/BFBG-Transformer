@@ -549,3 +549,34 @@ Theo §11: **Zeus-lineage (Zeus 337 + Zloader 61 = 398 distinct) = NHÓM RIÊNG,
   tinba/carberp… — phần lớn phải qua VX/VirusShare/BODMAS-email, xem §4/§8).
 - **Benign:** MSVC14×1-4M gần đủ (95/100), MSVC14×256K-1M **43/100 (thiếu 57)**; MSVC≤10/11-12 theo mục tiêu
   cấp-bin (§5.1, bỏ ép size). **Chưa khóa v4.**
+
+### 7.5 VT malware consensus — HOÀN TẤT 614/614 (2026-10-16)
+| họ | tra | khớp họ | khác-họ | <3 engine | ko-VT |
+|---|---|---|---|---|---|
+| Zeus | 353 | 294 | 59 | 0 | 0 |
+| Gozi | 145 | 72 | 72 | 0 | 1 |
+| Zloader | 86 | 53 | 33 | 0 | 0 |
+| Ramnit | 30 | 14 | 16 | 0 | 0 |
+| **TỔNG** | **614** | **433 (71%)** | **180** | **0** | **1** |
+- **0 mẫu <3 engine** → toàn bộ 614 đều malicious (nhãn "malware" vững). **71% khớp family** (Zeus 83% cao nhất,
+  Gozi 50% thấp nhất — phân tán). 180 khác-họ = VT gán nhãn generic/đồng-xuất-hiện (upatre/loki/stop/azorult…),
+  không phải MB sai — xem §7.4. → dùng VT cross-check trước khi khóa nhãn v4.
+- **Benign screen (§7.2, ngưỡng ≥3 engine):** đang tra (benign 67/669 lúc ghi; budget 365/ngày → phần còn lại
+  ~242 benign tra ngày mai). `vt_report.py` sẽ ghi số nghi-ngờ khi xong batch benign.
+
+---
+
+## 13. Harvest benign v4 MSVC14 — HOÀN TẤT 2 ô (2026-10-16)
+Resume (bin đã sửa), chỉ nhắm 2 ô MSVC14; **tự dừng khi cả 2 đạt 100** (cells_full). Nhịp 256K-1M sau khi 1-4M
+đầy: ~**13–20 kept/10 phút** (lấp tốt — KHÔNG phải ô không-lấp-được như MSVC≤10×256K-1M §10).
+
+| ô | kept | **lift-OK** | mục tiêu |
+|---|---|---|---|
+| **MSVC14 × 256K-1M** | **100** | **99** | 100 ✅ |
+| **MSVC14 × 1-4M** | **100** | **99** | 100 ✅ |
+| MSVC≤10 × 256K-1M | 7 | 7 | (bỏ ép, §5.1) |
+| **TỔNG v4 benign** | **207** | **205** | — |
+
+- 2 mẫu/207 không tạo feature (nf0/nặng) — bỏ qua. **Cả 2 ô MSVC14 đạt mục tiêu ≥100.**
+- Cap vendor (§12.1) giữ nguyên tính chất: bin MSVC14 rất phân tán (≤35% ✓); ISO 0%.
+- **Chưa khóa v4, không train, cổng ĐÓNG.** Benign v4 = 207 (ở thư mục riêng).
