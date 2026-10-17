@@ -907,3 +907,38 @@ KHÔNG cần lift)**; lift (workers=4/14G/900s/resumable) đang chạy nền (lo
 - **KHÔNG xóa khỏi v1-v3 đã khóa** (immutable); dùng cho **ablation metric phụ**: FPR/AUC khi loại 31 mẫu nghi vs giữ,
   và riêng trong bin MSVC14 (loại 5 nghi). Danh sách sha: `data/vt/vt_summary.jsonl` (tag=benign, malicious≥3).
 - VT lookup toàn bộ HOÀN TẤT: **614/614 malware + 669/669 benign** (quota 305/500 hôm nay).
+
+---
+
+## 20. BODMAS binaries CỤC BỘ — re-arm + lift verified; pilot Qakbot+Carberp (2026-10-17)
+Người dùng đã tải **BODMAS full** về `/home/dhgia/Work/WorkingD/WORK/Research/BODMAS/`
+(`BODMAS_disarmed_malware_binaries.zip` 68G = 57.293 disarmed PE; `meta_disarm.csv`; metadata). **Dùng cục bộ, không tải.**
+Xử lý như **malware sống** (chỉ đọc bytes, KHÔNG execute; rút chọn lọc theo hash, không giải nén 68G).
+
+### 20.1 Cơ chế disarm/re-arm (đã xác minh)
+- Disarm = `OPTIONAL_HEADER.Subsystem=0` + `FILE_HEADER.Machine=0` (giống SOREL). Re-arm = khôi phục 2 field từ
+  `meta_disarm.csv` (sha→Subsystem,Machine; Machine **332 = x86 32-bit**). **angr cần Machine hợp lệ → RE-ARM trước khi lift.**
+- Script riêng `bodmas_extract_rearm.py` (chạy `-I`, isolated): unzip chọn lọc `altered/<sha>.exe` → set 2 field → ghi
+  `~/bfbg_benign_work/bodmas_pilot/<fam>/<sha>`. **KHÔNG sửa `meta_disarm.csv`.**
+
+### 20.2 Pilot Qakbot + Carberp (MB KHÔNG có 2 họ này — giá trị unique BODMAS)
+| họ | re-armed | liftOK | .NET | rơi | distinct | trùng cũ | bin | machine | Rich | CRT | maxEnt | %>7.2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Qakbot** (qakbot+qbot) | 25 | **25** | 0 | 0 | **16** | 0 | MSVC≤10 17 / khac 8 | x86-32 | 17% | 0% | 6.34 | 17% |
+| **Carberp** | 14 | **14** | 0 | 0 | **2** | 0 | MSVC 11-12 14 | x86-32 | 50% | 6.95 | — | 7% |
+- **BODMAS disarmed → re-arm → angr lift HOẠT ĐỘNG** (39/39 liftOK, 0 fail, 0 .NET) → BODMAS **dùng được** cho pipeline.
+- **Qakbot**: 25→**16 distinct** (MSVC≤10, x86-32 đời cũ, ít pack) — **nguồn Qakbot duy nhất** (MB trả 0). QakBot-lineage (cùng PikaBot).
+- **Carberp**: 14→**chỉ 2 distinct** (near-dup chiến dịch nặng) → giá trị thấp.
+- 0 trùng dữ liệu cũ. CRT 0% (loader resolve động) → giống confound import-style.
+
+### 20.3 Đóng góp dự phóng cho 379 còn thiếu (BODMAS non-Zeus, chưa khóa)
+| họ BODMAS | meta | ước distinct (pilot→full) | lineage | ghi chú |
+|---|---|---|---|---|
+| **Qakbot** | 51 | ~30–35 (pilot 16/25) | QakBot-lineage | **chỉ BODMAS/VX có** |
+| Carberp | 14 | ~2–4 | non-Zeus | near-dup nặng |
+| SpyEye | 2 | ~1–2 | non-Zeus | |
+| (Gozi/Ursnif BODMAS) | 56 | chồng Gozi-157 đã có | Gozi-lineage | dedup chéo |
+- **BODMAS unique non-Zeus (train chính) ≈ +35–45 distinct** (chủ yếu Qakbot). zbot/pwszbot (507) = Zeus-lineage (riêng);
+  tinba/emotet/trickbot/icedid đã có; nymaim = downloader (riêng).
+- **§8 trạng thái cập nhật: "chờ phản hồi" → ĐÃ CÓ BINARY CỤC BỘ, re-arm+lift verified.** Lift được, disarmed không cản.
+- **CHƯA khóa v4, không train.** Đề xuất: pull đủ Qakbot (51, QakBot-lineage) từ BODMAS; Carberp/SpyEye ít giá trị.
