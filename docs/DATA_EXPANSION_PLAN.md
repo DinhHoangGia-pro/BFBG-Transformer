@@ -890,3 +890,20 @@ KHÔNG cần lift)**; lift (workers=4/14G/900s/resumable) đang chạy nền (lo
 - **PikaBot: 163/176 lift-OK** (0 .NET, **13 Timeout** = pack nặng, CFGFast >900s).
 - Tổng loader lift-OK = **286/299**. distinct (§19, ppdeep raw) không đổi (83/74); 13 PikaBot Timeout vẫn tính
   availability nhưng **không có feature để dùng mô hình** (lift-OK usable ít hơn distinct availability).
+
+### 7.7 VT benign screen — HOÀN TẤT 669/669 (2026-10-17, ngưỡng ≥3 engine)
+| mức | n |
+|---|---|
+| **nghi-ngờ (malicious ≥3 engine)** | **31** (4.6%) |
+| 1–2 engine | 77 |
+| sạch (0) | 561 |
+| không trên VT | 17 |
+
+**Nghi-ngờ theo NGUỒN:** v3 13/165 (8%), **NirSoft 9/46 (20%)**, scoop 7/203 (3%), chocolatey 2/45 (4%).
+**Nghi-ngờ theo BIN:** **MSVC≤10 21/167 (13%)**, **MSVC 14 5/365 (1%)**, Go 2/35, MSVC khac 2/39, khac 1/26.
+- **Nhiễu nhãn benign tập trung ở NirSoft (20%) + bin MSVC≤10 (13%)** — dual-use recovery/password tools bị gắn
+  hacktool/pua; **đúng bin đã KHÔNG dùng kiểm bất-biến** (NirSoft 57%, §14/§17.4).
+- **Bin MSVC14 (bin đánh giá bất-biến): chỉ 1% nghi → negatives SẠCH** → không làm hỏng eval MSVC14.
+- **KHÔNG xóa khỏi v1-v3 đã khóa** (immutable); dùng cho **ablation metric phụ**: FPR/AUC khi loại 31 mẫu nghi vs giữ,
+  và riêng trong bin MSVC14 (loại 5 nghi). Danh sách sha: `data/vt/vt_summary.jsonl` (tag=benign, malicious≥3).
+- VT lookup toàn bộ HOÀN TẤT: **614/614 malware + 669/669 benign** (quota 305/500 hôm nay).
