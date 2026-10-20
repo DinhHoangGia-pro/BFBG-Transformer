@@ -1035,3 +1035,35 @@ BODMAS cục bộ: `/run/media/dhgia/DATA/WORK/Research/BODMAS` (zip 68G cũng c
   SpyEye/Carberp đã cạn, VX (Kronos/… chưa kiểm). (task 2 VT đang chạy để xác minh nhãn candidate — ghi §21.4 khi xong.)
 
 **Cổng 🔴 ĐÓNG — không khóa v4, không train.**
+
+### 21.5 Pilot ISFB/Ursnif + probe nguồn + gate cập nhật (2026-10-21)
+**(task 2) Pilot ISFB + Ursnif (MB tag, 25/họ, seed 20261021), dedup chéo Gozi-157 (ppdeep):**
+| họ | tải | distinct nội bộ | **net-new vs Gozi** | cand (sau sha-old) |
+|---|---|---|---|---|
+| ISFB | 25 | 24 | **23** | 146 |
+| Ursnif | 25 | 24 | **23** | 47 |
+- Chéo ISFB+Ursnif: 45 distinct/50. **~92% khác Gozi** dù cùng dòng (mẫu chiến dịch khác). 
+- **Dự phóng full (ISFB 146 + Ursnif 47 cand):** ~**120–170 net-new** (Gozi-lineage train) → **lấp gần hết 229**.
+
+**(task 3) Ma trận nguồn + probe shortcut nguồn:**
+- **Probe LogisticRegression dự đoán NGUỒN (BODMAS vs MB/v1) từ metadata, OOF GroupKFold-theo-họ (7 họ chung,
+  n=581): AUC = 0.573 ≈ ngẫu nhiên** → **metadata KHÔNG lộ nguồn/re-arm → rủi ro shortcut nguồn THẤP.**
+  Gộp BODMAS+MB an toàn ở mức metadata; Qakbot/Carberp (chỉ-BODMAS) không tạo confound nguồn dễ-học.
+  *(Lưu ý: đây là probe METADATA; BFBG dùng VEX/call-graph — vẫn nên probe `source` trên embedding khi train.)*
+- Khác biệt nguồn (nhỏ): BODMAS x64 10% / Rich 74% / CRT 32% / maxE 7.18; MB/v1 x64 20% / Rich 86% / CRT 23% / maxE 7.04
+  (BODMAS 2019-20 nghiêng x86-32 + pack hơn chút).
+- Bin×năm: BODMAS first_seen 2019-2020 (đa số MSVC≤10/x86-32); MB pulls 2021-2025 (Latro/Pika 2022+ MSVC14);
+  v1 2021 (TrickBot/BumbleBee MSVC14). → nguồn ~ tương quan năm/bin nhưng metadata không tách được nguồn (AUC 0.573).
+
+### 21.6 (task 4) BẢNG CỔNG — cập nhật sau ISFB/Ursnif pilot (candidate)
+| hạng mục | đã khóa | candidate (đã thu) | +dự phóng ISFB/Ursnif full | tổng khả dụng | mục tiêu | THIẾU |
+|---|---|---|---|---|---|---|
+| **Malware train chính** (distinct) | 702 | 569 (MB 419 + BODMAS 150) | +~120–170 | **~1.390–1.440** | 1.500 | **~60–110** |
+| Zeus-lineage (riêng) | 0 | 744 | — | 744 | — | — |
+| Downloader Nymaim (riêng) | 0 | ~31 | — | ~31 | — | — |
+| Benign (distinct) | 669 | +207 v4 | — | 876 | — | — |
+| (b) bin MSVC14 malware/benign | — | ~540 / 565 | — | — | — | đủ lực |
+- Sau khi tải đủ ISFB/Ursnif (chưa làm) → train chính ~1.390–1.440, **còn thiếu ~60–110** → lấp nốt bằng Citadel(nếu
+  non-Zeus)/SpyEye/VX hoặc nới định nghĩa loader. **VT candidate đang tra (§21.4 khi xong).**
+
+**Cổng 🔴 ĐÓNG — không khóa v4, không train, không chạm v3/holdout.**
