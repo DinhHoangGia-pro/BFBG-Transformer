@@ -16,7 +16,7 @@ Khi cổng **đóng** (chưa đạt), chỉ được: **thu thập, lift, dedup,
 **KHÔNG tự đề xuất train/GRL/holdout khi cổng chưa mở.** Mỗi báo cáo cuối phiên PHẢI nêu: ngưỡng nào đã
 đạt, ngưỡng nào chưa, còn thiếu bao nhiêu. Ngưỡng định nghĩa ở §5.5; trạng thái sống cập nhật ở §0.1.
 
-### 0.1 Trạng thái cổng (cập nhật 2026-10-15) — **ĐÓNG** 🔴
+### 0.1 Snapshot cổng (cập nhật 2026-10-15; ngưỡng benign cũ) — **ĐÓNG** 🔴
 | Ngưỡng (§5.5) | Mục tiêu | Hiện tại | Còn thiếu | Đạt? |
 |---|---|---|---|---|
 | Malware khác biệt (ppdeep) | ~1500 | **708** | ~792 | ❌ |
@@ -31,6 +31,12 @@ Khi cổng **đóng** (chưa đạt), chỉ được: **thu thập, lift, dedup,
 
 → Cổng **ĐÓNG**: phiên này và tới khi mọi ô trên "đạt", chỉ thu thập/lift/dedup/khóa-manifest/viết-docs.
 Benign hiện tại từ v1/v2/v3 (chưa có mẫu v4 nào). Cập nhật bảng này sau mỗi đợt thu thập + dedup.
+
+**Lưu ý cập nhật 2026-10-18:** bảng trên là snapshot lịch sử trước khi mục tiêu benign được sửa ở §5.1/§5.5;
+không dùng các ô MSVC≤10×size-vừa và MSVC11-12 làm ngưỡng hiện hành. Theo số khóa, malware vẫn **708**;
+§19 và §20.4 ghi candidate malware chưa khóa. Hai ô benign MSVC14 đã đạt **100 kept mỗi ô** (99 lift-OK mỗi ô,
+§13), nhưng nhãn family v4 và manifest/split holdout vẫn chưa khóa. Vì vậy cổng vẫn **ĐÓNG**; không cộng
+candidate BODMAS hoặc candidate v4 vào số khóa ở bảng này.
 
 **Full pull 2026-10-15 (đo thật, §4.6):** đã tải+lift+dedup đủ Zeus/Gozi/Zloader/Ramnit → **559 mẫu KHÁC BIỆT**
 (ppdeep≥90, 0 trùng 708 cũ), lưu thư mục RIÊNG. **CHƯA khóa vào v4** nên dòng "malware khác biệt = 708" ở bảng trên
@@ -942,3 +948,90 @@ Xử lý như **malware sống** (chỉ đọc bytes, KHÔNG execute; rút chọ
   tinba/emotet/trickbot/icedid đã có; nymaim = downloader (riêng).
 - **§8 trạng thái cập nhật: "chờ phản hồi" → ĐÃ CÓ BINARY CỤC BỘ, re-arm+lift verified.** Lift được, disarmed không cản.
 - **CHƯA khóa v4, không train.** Đề xuất: pull đủ Qakbot (51, QakBot-lineage) từ BODMAS; Carberp/SpyEye ít giá trị.
+
+### 20.4 Mở rộng BODMAS cục bộ — candidate report (2026-10-18; CHƯA khóa)
+- BODMAS đã có sẵn cục bộ; không tải mạng, không sửa `meta_disarm.csv`, không thực thi binary.
+  `bodmas_extract_full.py` đã re-arm 746 mẫu thuộc các family trong map riêng; không đưa vào `data/raw/` chuẩn.
+- Trong 10 family được xét cho train chính (không gồm Zeus-lineage và Nymaim-downloader): **231 mẫu re-arm**,
+  **221 có feature JSON hợp lệ**. Còn **10 chưa lift** (4 Emotet, 6 Tinba), đã có trong QA: 9 Timeout, 1 ProcessCrash.
+  Một lần thử resume được dừng trước khi mẫu đầu hoàn tất; không có feature/failure record mới. Giữ các mẫu lỗi,
+  không thay thế và không retry tiếp.
+
+| family | feature-ready | cụm distinct nội bộ | net-new trước xử lý cụm chéo-family |
+|---|---:|---:|---:|
+| Carberp | 14 | 2 | 2 |
+| Dridex | 10 | 2 | 2 |
+| Emotet | 52 | 37 | 37 |
+| Gozi | 13 | 12 | 12 |
+| IcedID | 5 | 3 | 3 |
+| Qakbot/Qbot | 51 | 32 | 32 |
+| SpyEye | 2 | 2 | 2 |
+| Tinba | 17 | 9 | 7 |
+| TrickBot | 14 | 12 | 11 |
+| Ursnif | 43 | 32 | 32 |
+
+- Đối chiếu `ppdeep≥90` trên 221 feature-ready với **3.334 hash tham chiếu** (cache malware/benign cũ, pilot v4,
+  Tinba và loader): có **142 cụm nội bộ**, **139 cụm net-new** trước rà soát lineage.
+- Có **1 cụm chéo-family Dridex–Qakbot** mang hai lineage khác nhau; cách ly cụm này khỏi candidate tự động.
+  Candidate còn **138 cụm net-new**, chưa tính là số đã khóa/đủ chuẩn. Tổng theo hàng family không cộng trực tiếp
+  được vì cụm chéo-family được thấy ở cả hai hàng.
+- Candidate manifest ngoài git: `~/bfbg_benign_work/bodmas_v4_candidate_manifest_20261018.jsonl`
+  (221 dòng; SHA-256 `932e2b03bd887878f5270742ab60aabd2b4890d2f913773e8cac515a4b7922f0`).
+  Trường `candidate_eligible` chỉ giữ đại diện cụm net-new sau khi loại cụm lineage xung đột; đây chưa phải manifest v4.
+- **Cổng không đổi:** không cộng 138 vào số đã khóa ở §0.1 hay vào manifest v4; chưa xác minh độc lập family labels,
+  chưa tạo split/manifest v4, không train, không chạy GRL, không chấm holdout. Ước lượng cũ +35–45 ở §20.3 được
+  thay bằng kết quả candidate này cho tập BODMAS cục bộ, nhưng chỉ sau rà soát nhãn và lineage mới được tính vào gate.
+
+---
+
+## 21. Pull đủ BODMAS + ref thống nhất + bảng cổng duy nhất (2026-10-21)
+BODMAS cục bộ: `/run/media/dhgia/DATA/WORK/Research/BODMAS` (zip 68G cũng còn ở path cũ — **nên xóa 1 bản để giải phóng; đĩa còn 21G**).
+Đã extract+re-arm **746 banking** (0 fail, 0 trùng sha cũ), lift 736+/746.
+
+### 21.1 (task 1) REF THỐNG NHẤT + dedup lại
+- **Ref ppdeep thống nhất = 3.359**: old_mal v1 (1416) + benign v1/v2 (v12 cache) + v3 benign + 614 pilot_v4
+  (Zeus/Gozi/Zloader/Ramnit) + Tinba MB (243) + Nymaim MB (25) + Latrodectus+PikaBot (299). (toàn bộ v1-v3 + mọi malware đã lift).
+- **BODMAS net-new distinct (ppdeep≥90 vs ref thống nhất):**
+  - **Train chính = 150** (emotet 41, ursnif 32, qakbot 32, tinba 13, gozi 12, trickbot 11, icedid 3, carberp 2, dridex 2, spyeye 2).
+  - Zeus-lineage (nhóm riêng) = 346 (zbot 330 + pwszbot 16). Downloader Nymaim (riêng) = 6.
+- (Con số "138" trước đó là giữa-chừng; **cuối cùng train net-new = 150**.)
+
+### 21.2 (task 3) NGUỒN × HỌ (số khả dụng/đã thu; mb/bodmas/vx)
+| họ | MalwareBazaar | BODMAS (meta) | VX-Underground | nhóm | NGUỒN DUY NHẤT? |
+|---|---|---|---|---|---|
+| **Qakbot** | **0** | **51** | (Families, chưa tải) | QakBot-lineage (train) | **CHỈ BODMAS** ✅ |
+| **Carberp** | **0** | **14** | (chưa tải) | train | **CHỈ BODMAS** ✅ |
+| Zloader | 90 (đã thu) | 0 | ? | Zeus-lineage | chỉ MB |
+| Ramnit | 31 (đã thu) | 0 | ? | train | chỉ MB |
+| Latrodectus | 123 (đã thu) | 0 (BODMAS 2019-20, quá cũ) | ? | IcedID-lineage(train) | chỉ MB |
+| PikaBot | 176 (đã thu) | 0 | ? | QakBot-lineage(train) | chỉ MB |
+| Citadel | 56 (chưa thu) | 0 | ? | Zeus-fork | chỉ MB |
+| Gozi | 157 (thu) | 13 | tag | Gozi-lineage(train) | MB+BODMAS |
+| Ursnif/ISFB | tag 163/210 (chưa thu) | 43 | tag | Gozi-lineage(train) | MB+BODMAS |
+| Tinba | 243 (thu 92 distinct) | 23 | ? | train | MB+BODMAS |
+| Zeus/Zbot | 357 (thu) | 473+34 | ATM/Families | Zeus-lineage | MB+BODMAS |
+| Emotet | v1 79 | 56 | ? | train | v1+BODMAS |
+| TrickBot | v1 396 | 14 | ? | train | v1+BODMAS |
+| Dridex | v1 377 | 10 | ? | train | v1+BODMAS |
+| IcedID | v1 260 | 5 | ? | train | v1+BODMAS |
+| SpyEye | 4–5 | 2 | ? | train | MB+BODMAS |
+| Nymaim | 197 | 8 | ? | downloader(riêng) | MB+BODMAS |
+| Kronos/PandaBanker/Vawtrak | 0 | 0 | (chỉ VX?) | train | **chưa nguồn nào** (VX chưa kiểm) |
+- **Họ CHỈ MỘT NGUỒN quan trọng:** **Qakbot & Carberp chỉ có ở BODMAS** (MB trả 0) → rủi ro **shortcut nguồn↔họ**
+  (model học đặc trưng BODMAS-disarm/re-arm thay vì họ) → khi gộp phải **báo ma trận nguồn×họ + linear-probe `source`**
+  (§5 MALWARE_SOURCING_PLAN). Latrodectus/PikaBot/Zloader/Ramnit/Citadel chỉ MB.
+
+### 21.3 (task 4) BẢNG CỔNG DUY NHẤT — mỗi dòng: đã khóa / candidate / thiếu (KHÔNG trộn mẫu số)
+| hạng mục | đã khóa (v1-v3) | candidate (đã thu, CHƯA khóa) | tổng khả dụng | mục tiêu | THIẾU |
+|---|---|---|---|---|---|
+| **Malware train chính** (distinct; không Zeus-lineage/downloader) | **702** | **569** = MB 419 (Gozi139+Ramnit31+Tinba92+Latro83+Pika74) + BODMAS 150 | **1.271** | 1.500 | **229** |
+| Zeus-lineage (nhóm RIÊNG) | 0 | 744 = MB 398 (Zeus337+Zloader61) + BODMAS 346 | 744 | — (báo riêng) | — |
+| Downloader Nymaim (nhóm RIÊNG) | 0 | ~31 = MB 25 + BODMAS 6 | ~31 | — (báo riêng) | — |
+| **Benign** train/eval (distinct) | **669** (504 v1/v2 + 165 v3) | +207 v4 | 876 | — (reweight theo bin) | — |
+| **(b) bin MSVC14 — malware train chính** | — | 528 (+BODMAS ~10-15 MSVC14) | ~540 pos / 565 benign neg | — | **đủ lực** (AUC CI ±~0.02, MDD 0.028) |
+- **Mẫu số tách bạch:** dòng train chính tính vs **1.500**; Zeus-lineage/downloader/benign có mẫu số RIÊNG (không gộp
+  vào 1.500); dòng (b) là **đếm trong bin MSVC14** (positives/negatives), không phải distinct-tổng.
+- **Còn thiếu 229** cho train chính → lấp bằng: ISFB/Ursnif MB-tag (chưa thu, ~60–140), Citadel-nếu-non-Zeus,
+  SpyEye/Carberp đã cạn, VX (Kronos/… chưa kiểm). (task 2 VT đang chạy để xác minh nhãn candidate — ghi §21.4 khi xong.)
+
+**Cổng 🔴 ĐÓNG — không khóa v4, không train.**
