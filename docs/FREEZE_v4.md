@@ -99,6 +99,14 @@
 - Danh sách giữ: `docs/iso_subsample_v4.txt` (138 sha, hash `57864041063ebc69c0374b01ee13b4d86f8fa8226b67d9fa8b4aecb994feceae`).
 - Train-benign sau subsample = **395** (ISO 138 + scoop 187 + nirsoft 26 + 7-zip 14 + python 12 + git 7 + notepad++ 6 + ffmpeg 5).
 
+### G. Đo throughput (run mẫu 3 epoch, fraction 1.0 base, 2026-10-21)
+- GPU RTX 2080 Super Max-Q 8GB; model 0.53M params; BATCH=4; đo trên 876 mẫu dir `features_graph` (453 v1-mal + 423 benign).
+- **~450 s/epoch (865 mẫu) → 1.9 mẫu/s** (nghẽn ở token-transformer per-function, num_workers=0).
+- **peak VRAM = 5.79/8 GB** — ⚠️ có vài batch **OOM** bị bỏ (1-2/epoch) → BATCH=4 sát trần 8GB; nên **BATCH=2 hoặc giảm `max_funcs`/AMP** để ổn định (BATCH=2 ≈ gấp đôi giờ).
+- Ngoại suy N_full=1401 (1006 mal + 395 benign sau ISO-subsample), 20 epoch: **12.1 min/epoch → ~4.05 h/run đầy đủ**.
+- **Kế hoạch rút gọn (3 fraction × 2 seed, base) ≈ 3.5 × 4.05 = ~14.2 GPU-giờ** (BATCH=4 ổn); nếu buộc BATCH=2 ~**28 GPU-giờ**.
+- Caveat: đo trên graph v1/v2 (nhỏ); mb/bodmas chưa đo, kích thước graph có thể khác → giờ thật ±.
+
 ## Trạng thái cổng
 - **CỔNG DỮ LIỆU 🔴 ĐÓNG.** Freeze v4 KHÔNG mở cổng train. Train/GRL/chấm holdout CHỈ khi DATA_EXPANSION_PLAN.md §0.1 ghi ngưỡng đã đạt.
 - Freeze này: chốt manifest + hash + quy tắc. KHÔNG re-extract raw, KHÔNG train, KHÔNG xóa gì.
