@@ -177,3 +177,13 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
 - **Khi đổi cửa sổ đầu vào (first-150↔api-density), KHÔNG ghép cặp theo seed** — chỉ so phân phối (unpaired).
 - api-density: không tách được "giữ nhiều hành vi hơn" vs "đổi confound kích thước (1.48→2.83)"; hạn chế vì n_neg=21.
 - KHÔNG chạy (a) train-in-bin (n_neg=21 → vô kết luận, hạn chế DỮ LIỆU) và (b) chạm nirsoft (chưa chốt cấu hình cuối) ở bước này. KHÔNG chạy 505/606.
+
+## 21. Learning-curve RÚT GỌN v4 — nhãn phương pháp (ghi TRƯỚC khi chạy, 2026-10-21)
+**DUYỆT chạy** (người dùng, phiên 2026-10-21): base, BATCH=2 + grad-accum 2 (effective 4), KHÔNG AMP, 3 fraction {0.25/0.5/1.0} × 2 seed {20261021,20261022}.
+- **Cấu hình:** train_pool v4 (998/1006 có feature) + benign v2-non-holdout sau ISO-subsample (395, `docs/iso_subsample_v4.txt`); val **in-dist phân tầng** (15%, cố định theo seed, tầng = lineage cho mal / source cho benign). Input model global=0 → **không có `vex_vocab_size`** (và không global feature nào) — tránh artifact §FREEZE_v4 D. Vocab INSN dựng tất định 1 lần từ tập train fraction-1.0, dùng chung mọi run.
+- **NHÃN DIỄN GIẢI (bắt buộc, ghi trước khi thấy số):**
+  1. Đường cong learning-curve **chỉ mô tả XU HƯỚNG**, KHÔNG kết luận "bão hòa dữ liệu" nếu chênh val giữa các fraction **< nhiễu giữa 2 seed**. Cần n>2 seed mới nói mạnh.
+  2. **KHÔNG chạm holdout v4/v3** trong learning-curve — chỉ val in-dist. Holdout chạm MỘT LẦN ở báo cáo cuối (FREEZE_v4 quy tắc).
+  3. Val AUC in-dist là **cận trên lạc quan** (cùng phân phối train); không phải năng lực cross-family/cross-source.
+  4. base (không GRL) → chưa khử shortcut nguồn (§FREEZE_v4 E/C: nội-họ 0.79, holdout 0.90-1.0) → điểm cao có thể do confound.
+- **Vận hành:** mỗi run lưu kết quả riêng ngay khi xong; checkpoint `ckpt_last.pt` + resume; trần 8h/run (cả systemd RuntimeMaxSec lẫn tự-dừng); cgroup systemd-run --user (MemoryMax, nice idle). Run đầu (f=1.0, s=20261021) đo giây/epoch + VRAM + #OOM(BATCH=2); **dừng & báo nếu ước >6h/run**; dừng sau run đầu, hỏi trước 5 run còn lại.
