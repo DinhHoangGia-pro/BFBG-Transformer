@@ -1232,3 +1232,48 @@ Mỗi dòng: `sha256, family, lineage, source(v1|mb|bodmas), year(first_seen), b
   benign **876**; bin MSVC14 malware ~540 / benign 565 (đủ lực, AUC CI ±0.02).
 
 **CỔNG 🔴 ĐÓNG — CHƯA khóa v4, không train. Hỏi người dùng trước khi sinh manifest + khóa.**
+
+---
+
+## 25. Thống nhất định nghĩa MSVC14 + VT xong + manifest v4 BẢN THẢO (2026-10-21, CHƯA khóa)
+
+### 25.1 (task 1) ĐỊNH NGHĨA MSVC14 — THỐNG NHẤT (chốt dùng một định nghĩa)
+Các số trước trộn mẫu số. Phân biệt rõ:
+| số | định nghĩa | nguồn |
+|---|---|---|
+| **675** | **raw SAMPLES** bin MSVC14, MỌI họ (gồm Zeus-lineage + BumbleBee + near-dup), KHÔNG distinct, chỉ raw-còn | §24 ma trận (DESCRIPTIVE) |
+| 437 | DISTINCT MSVC14, non-Zeus, (v1 4-họ + BumbleBee + Gozi + Ramnit) — **GỒM BumbleBee holdout** | §16 |
+| 528 | 437 + loaders (Latro 62 + Pika 29) | §19 |
+| ~540 | 528 + BODMAS MSVC14 (~12) | §19 (ước) |
+| **≈297–305** | **CANONICAL — "MSVC14 eval POSITIVES"** | §25 (đo) |
+- **ĐỊNH NGHĨA CHỐT (dùng cho đánh giá bất-biến):** *"MSVC14 eval positives" = mẫu malware có bin=MSVC14 (heuristic
+  linker-primary), **DISTINCT** (ppdeep≥90 cluster-rep), thuộc **train chính** (KHÔNG Zeus-lineage, KHÔNG downloader),
+  **LOẠI họ holdout (BumbleBee)**.*
+- **Đo thật (raw còn):** v1 4-họ (TrickBot45+Dridex7+IcedID79+Emotet28=159) + Gozi32+Ramnit2 + loaders(Latro62+Pika29=91)
+  + ISFB11+Ursnif1 + Retefe1 = **297**; + BODMAS-train MSVC14 (~8, raw đã xóa → pending re-extract) ≈ **~305**.
+- **benign MSVC14 eval = 493** (non-holdout; §17). → eval ~**305 pos / 493 neg** (CI ±~0.03, MDD ~0.028, §18).
+- 437/528/540 = "distinct gồm BumbleBee/Zeus-mix"; 675 = raw-all. **KHÔNG dùng các số này cho eval** — chỉ dùng 297–305.
+
+### 25.2 (task 2) VT HOÀN TẤT — §7.8
+- **malware 614/614, benign 669/669, bodmas candidate 502/502** (benign KHÔNG còn 304 — đã xong ở §7.7).
+- **BODMAS 502:** khớp-họ 52, **None 415 (83%, mẫu cũ)**, nhãn-khác 35, **nghi(<3)=0** → toàn malware; trong 87 có nhãn → khớp 60%.
+  Hạn chế §22.3 giữ nguyên (nhãn BODMAS ít corroborate; Qakbot/Carberp ~toàn None).
+
+### 25.3 (task 3) MANIFEST v4 BẢN THẢO — `docs/dataset_v4_manifest_DRAFT.jsonl` (3.542 dòng raw-level, CHƯA khóa)
+Mỗi dòng: `sha256, family, lineage, source(v1|mb|bodmas), year, stratum, cluster, raw_status, split`.
+- **source:** v1 1382 / mb 1415 / bodmas 745. **stratum:** v1-2021 1382 / MB-pre2022 441 / MB-2022+ 974 / BODMAS-2019_20 745.
+- **raw_status:** present 2498 / **`recoverable_no_relift` 1044** (loader+bodmas — raw đã xóa, tái tạo từ MB/DATA, KHÔNG lift lại).
+- **split (sơ bộ):** `zeus_group_separate` 984 (Zeus-lineage riêng), `downloader_separate` 33 (Nymaim), `train_pool` 2525.
+- **CHƯA:** distinct-rep cho non-v1 (cần ppdeep-cluster — có cache), gán holdout, hash-freeze → làm khi KHÓA.
+
+### 25.4 ĐỀ XUẤT HOLDOUT v4 (hỏi người dùng) + ước lực (Hanley-McNeil @AUC 0.90)
+| phương án holdout | positives (distinct) | neg (benign) | 95% CI | tính chất |
+|---|---|---|---|---|
+| **BumbleBee (cross-family, giữ như cũ)** | 254 | ~300 | **±0.027** | loader hệ TrickBot chưa thấy; lực mạnh nhất |
+| QakBot-lineage (Qakbot BODMAS + PikaBot MB) | ~106 | ~300 | ±0.041 | **cross-lineage + mixed-source** (test khó nhất) |
+| IcedID-lineage (Latrodectus+IcedID) | ~150 | ~300 | ±0.035 | cross-lineage |
+| BODMAS-2019_20 (temporal) | ~150 | ~300 | ±0.035 | **cross-time** (test confound năm/nguồn §24.1) |
+- **Đề xuất:** giữ **BumbleBee** làm holdout cross-family chính (lực ±0.027); **thêm BODMAS-temporal** HOẶC **QakBot-lineage
+  cross-lineage** làm holdout thứ hai để test confound nguồn/năm/lineage (§23–24). pos/neg + CI như trên.
+- **CỔNG 🔴 ĐÓNG — CHƯA khóa v4. Hỏi người dùng:** (a) chọn holdout nào, (b) đồng ý re-extract raw loader/bodmas khi khóa,
+  (c) rồi mới sinh manifest distinct + hash-freeze.
