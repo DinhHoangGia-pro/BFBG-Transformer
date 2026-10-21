@@ -194,3 +194,8 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
 - **best val_auc = 0.9223 @ep15**; ep19 = 0.917. Đường cong val: 0.79→0.84→0.85→0.86→0.88→0.87→0.89→0.896→0.894→0.898→0.913→... dao động quanh 0.90-0.92 từ ~ep10 (plateau mềm, 1 seed).
 - Lưu: `~/bfbg_benign_work/lc_runs/f1.0_s20261021/{summary,curve,estimate,ckpt_last}` + log.
 - ⚠️ val in-dist + base (chưa GRL) → **cận trên lạc quan, chưa khử shortcut nguồn**; 1 seed → CHƯA kết luận bão hòa.
+
+### 21b. Run 2 — f=1.0 seed=20261022 + nhiễu-seed (2026-10-21)
+- best val_auc = **0.9102 @ep17** (668s/epoch, 3.73h, peak VRAM 6.88GB, OOM train 1/val 0 mỗi epoch).
+- **Nhiễu 2 seed ở f=1.0:** seed1 0.9223 / seed2 0.9102 → **chênh 0.0121** (mean 0.9163). 
+- ⇒ **NGƯỠNG nhiễu-seed ≈ 0.012**: theo nhãn §21, chênh val giữa các fraction **< 0.012** KHÔNG được coi là khác biệt thật/bão hòa (n=2 seed, cần thêm seed mới nói mạnh).
