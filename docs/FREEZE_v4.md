@@ -107,6 +107,29 @@
 - **Kế hoạch rút gọn (3 fraction × 2 seed, base) ≈ 3.5 × 4.05 = ~14.2 GPU-giờ** (BATCH=4 ổn); nếu buộc BATCH=2 ~**28 GPU-giờ**.
 - Caveat: đo trên graph v1/v2 (nhỏ); mb/bodmas chưa đo, kích thước graph có thể khác → giờ thật ±.
 
+### H. AUDIT toàn cục `vex_vocab_size` (2026-10-21) — bảng nào bị ảnh hưởng
+Grep `vex` khắp `scripts/ experiments/ src/ docs/ paper_tables/ ~/bfbg_benign_work`:
+| nơi | dùng vex_vocab_size làm FEATURE? | kết luận |
+|---|---|---|
+| `src/training/probe_baselines.py` (GRAPH 7 feat) | KHÔNG (`num_functions,num_api_calls,num_imports,file_size,max_section_entropy,is_likely_packed,total_nodes`) | sạch |
+| `experiments/qa/_common.py SIMPLE_FEATURES` (8 feat) + `baseline_simple_features.py` | KHÔNG (match 'vex' chỉ là comment bỏ qua `vex_vocab.json`) | sạch |
+| `~/bfbg_benign_work/source_probe.py` (§22/§23 probe nguồn, 9 PE-metadata feat) | KHÔNG | sạch |
+| model `scripts/train_tcfbg_defi.py` global_features (4) | KHÔNG (`mean/max/min_entropy, has_any_external_call`) | sạch |
+| model `src/training/bfbg_dataset.py` | global=0; vex chỉ là **kích thước vocab embedding** (hợp lệ) | sạch |
+| `src/disassembly/*`, `bfbg_builder`, `build_graphs` | vex = tokenizer/lift (dựng graph), KHÔNG phải feature | sạch |
+| **probe holdout bodmas (phiên này, §C)** | **CÓ** (static 9 feat gồm vex) | **ĐÃ SỬA 0.994→0.896** |
+| **probe val-indist train_pool (§E)** | **CÓ** (vex) | **ĐÃ SỬA 1.000→0.423/0.690/0.790** |
+
+- **Kết luận: KHÔNG có bảng v1-v3 / paper_tables / baseline / probe-nguồn committed nào dùng vex_vocab_size làm feature** → không cần tính lại gì ngoài 2 probe phiên này (đã làm, giữ số cũ + đánh dấu ⚠️ ở §C/§E).
+- bumblebee holdout (§C, 0.998) dùng PE-metadata, vốn không có vex → không ảnh hưởng.
+
+### G'. Kế hoạch rút gọn — cấu hình BATCH=2 + accumulation 2 (cập nhật)
+- **BATCH=2 micro + grad-accumulation 2 → effective batch 4** (giữ nguyên động học so với §G). VRAM ~½ của BATCH=4 (5.79GB) ≈ **~3-3.5 GB → an toàn trong 8GB, hết OOM**.
+- **Giờ:** vì nghẽn là **token-transformer per-function (CPU, num_workers=0)**, tổng compute/epoch ≈ KHÔNG đổi khi chia micro-batch (accumulation giữ nguyên số forward/backward) → throughput ~1.9 mẫu/s **giữ nguyên → ~4-4.5 h/run đầy đủ, rút gọn 6 run ≈ ~14-16 GPU-h**.
+  - ⚠️ Con số **~28 GPU-h** chỉ đúng ở kịch bản xấu: GPU không lấp đầy ở micro-batch 2 làm throughput **giảm nửa** (ít khả năng vì bottleneck là CPU, nhưng CHƯA đo BATCH=2) → **đo lại ở run thật đầu tiên** để chốt.
+- **AMP (fp16):** Turing (2080) có tensor-core → AMP giảm VRAM ~½ nữa + có thể tăng tốc nhẹ; NHƯNG (a) bottleneck CPU per-function nên lợi throughput ít, (b) fp16 dễ gây NaN ở softmax-attention + BCE `sem_loss` → **đề xuất KHÔNG AMP** (hoặc chỉ autocast phần GAT/Transformer, giữ fp32 cho loss). Không AMP = ổn định, giờ như trên.
+- Khuyến nghị kèm: `num_workers≥4` để giảm nghẽn CPU (có thể cắt giờ đáng kể — chưa đo).
+
 ## Trạng thái cổng
 - **CỔNG DỮ LIỆU 🔴 ĐÓNG.** Freeze v4 KHÔNG mở cổng train. Train/GRL/chấm holdout CHỈ khi DATA_EXPANSION_PLAN.md §0.1 ghi ngưỡng đã đạt.
 - Freeze này: chốt manifest + hash + quy tắc. KHÔNG re-extract raw, KHÔNG train, KHÔNG xóa gì.
