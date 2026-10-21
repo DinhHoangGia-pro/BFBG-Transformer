@@ -187,3 +187,10 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
   3. Val AUC in-dist là **cận trên lạc quan** (cùng phân phối train); không phải năng lực cross-family/cross-source.
   4. base (không GRL) → chưa khử shortcut nguồn (§FREEZE_v4 E/C: nội-họ 0.79, holdout 0.90-1.0) → điểm cao có thể do confound.
 - **Vận hành:** mỗi run lưu kết quả riêng ngay khi xong; checkpoint `ckpt_last.pt` + resume; trần 8h/run (cả systemd RuntimeMaxSec lẫn tự-dừng); cgroup systemd-run --user (MemoryMax, nice idle). Run đầu (f=1.0, s=20261021) đo giây/epoch + VRAM + #OOM(BATCH=2); **dừng & báo nếu ước >6h/run**; dừng sau run đầu, hỏi trước 5 run còn lại.
+
+### 21a. Run đầu — kết quả (f=1.0, seed=20261021, 2026-10-21)
+- BATCH=2 + accum 2, no AMP, global=0 (không vex), train=1184 / val=209 (in-dist phân tầng), cgroup 8h.
+- **giây/epoch ≈ 668s** (ổn định) → **tổng 3.73h/20 epoch** (< cổng 6h). **peak VRAM 6.13/8 GB**; OOM BATCH=2: train 0 / **val 1 mỗi epoch** (1 graph lớn bị bỏ → val AUC trên ~208/209; cần giảm max_funcs cho mẫu đó nếu muốn trọn).
+- **best val_auc = 0.9223 @ep15**; ep19 = 0.917. Đường cong val: 0.79→0.84→0.85→0.86→0.88→0.87→0.89→0.896→0.894→0.898→0.913→... dao động quanh 0.90-0.92 từ ~ep10 (plateau mềm, 1 seed).
+- Lưu: `~/bfbg_benign_work/lc_runs/f1.0_s20261021/{summary,curve,estimate,ckpt_last}` + log.
+- ⚠️ val in-dist + base (chưa GRL) → **cận trên lạc quan, chưa khử shortcut nguồn**; 1 seed → CHƯA kết luận bão hòa.
