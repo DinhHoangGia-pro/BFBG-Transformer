@@ -199,3 +199,18 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
 - best val_auc = **0.9102 @ep17** (668s/epoch, 3.73h, peak VRAM 6.88GB, OOM train 1/val 0 mỗi epoch).
 - **Nhiễu 2 seed ở f=1.0:** seed1 0.9223 / seed2 0.9102 → **chênh 0.0121** (mean 0.9163). 
 - ⇒ **NGƯỠNG nhiễu-seed ≈ 0.012**: theo nhãn §21, chênh val giữa các fraction **< 0.012** KHÔNG được coi là khác biệt thật/bão hòa (n=2 seed, cần thêm seed mới nói mạnh).
+
+### 21c. TẠM DỪNG — checklist chạy tiếp (người dùng: "ngày mai chạy tiếp khi tôi nói tiếp tục", 2026-10-21)
+- **Đã xong:** f1.0×seed21 (0.9223) + f1.0×seed22 (0.9102); nhiễu-seed 0.0121.
+- **CÒN LẠI 4 run** (chỉ chạy KHI người dùng nói "tiếp tục"):
+  - f0.5 ×20261021, f0.5 ×20261022  (~1.9h/run)
+  - f0.25 ×20261021, f0.25 ×20261022  (~0.95h/run)
+- **Lệnh mỗi run** (cgroup 8h, ckpt+resume, vocab chung đã có `lc_runs/vocab_insn.json`):
+  ```
+  systemd-run --user -u lc_runX -p MemoryMax=14G -p Nice=19 -p IOSchedulingClass=idle \
+    -p CPUWeight=20 -p RuntimeMaxSec=28800 --working-directory="$HOME/Work/Defi/BFBG-Transformer" \
+    bash -lc "~/bfbg_venv/bin/python -u ~/bfbg_benign_work/lc_train.py --fraction <F> --seed <S> \
+      > ~/bfbg_benign_work/lc_runs/f<F>_s<S>.log 2>&1"
+  ```
+- Script `~/bfbg_benign_work/lc_train.py`; chỉ-mục feature `/tmp/claude-1001/featidx.json` (nếu mất → dựng lại từ 8 dir features_graph*/v4_benign_features).
+- Giữ nguyên: base, BATCH=2+accum2, no AMP, global=0 (không vex), val in-dist phân tầng, ISO subsample. **KHÔNG chạm holdout v4/v3.**
