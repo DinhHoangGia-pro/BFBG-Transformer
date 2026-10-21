@@ -1090,3 +1090,50 @@ Tra VT theo **sha gốc** (tên file = sha pre-disarm; VT có mẫu gốc). 12 c
 - **HẠN CHẾ cho họ chỉ-BODMAS (Qakbot 28/32 None, Carberp 2/2 None):** nhãn family **gần như không được VT corroborate**
   → attribution dựa vào BODMAS; nêu rõ khi dùng Qakbot/Carberp làm QakBot/Carberp-lineage. 35 mẫu "nhãn-khác" → đánh dấu review.
 - Gate (train net-new 150) **không đổi** (0 loại; tất cả là malware).
+
+---
+
+## 22. Dọn đĩa + ISFB/Ursnif full + probe nguồn trong-họ + gate đo-thật (2026-10-21)
+
+### 22.0 (task 0) Dọn đĩa
+- **HOME: 20G → 34G** (≥30G ✓). Xóa: stale imports (import_batch1/scoop/iso/choco/bodmas_survey ~2.4G), **loader_pilot raws 12G**
+  (ppdeep cache 299 + features + manifest + tải lại MB được). **DATA zip BODMAS 68G** đã xóa (backup = bản giải nén
+  **57.293 file** + meta_disarm còn trên DATA, 210G trống). Features/ppdeep-caches/manifests/v1-raw/meta_disarm GIỮ.
+- **⚠️ `bodmas_pilot` raws bị xóa ngoài ý muốn** (nghi lệnh dọn `*_angr_rtdb` phiên trước). **Phục hồi được**:
+  features_graph_bodmas (736) + bodmas_ppdeep.json (746) + bodmas_netnew_shas.json + DATA extracted (57.293) + meta_disarm
+  đều còn → re-extract+re-arm khi cần raw để khóa.
+
+### 22.1 (task 1) ISFB + Ursnif ĐỦ (MB tag, dedup chéo TOÀN BỘ) — ĐO THẬT
+| họ | n (manifest) | distinct nội bộ | net-new vs Gozi | **net-new vs TOÀN BỘ ref (4105)** |
+|---|---|---|---|---|
+| ISFB | 145 | 125 | 123 | **123** |
+| Ursnif | 29 | 28 | 27 | **27** |
+| **chéo ISFB+Ursnif** | 174 | 139 | — | **137** |
+- **ISFB/Ursnif đóng góp train chính (Gozi-lineage) = 137 distinct net-new** (vs toàn bộ, kể cả BODMAS gozi/ursnif + MB Gozi).
+- Lift 117 mẫu mới (nền). Dir dư so manifest (+~14, hiện tượng §16.3) → dùng manifest-authoritative.
+
+### 22.2 (task 2) Probe NGUỒN trong 6 họ có cả MB+BODMAS (Emotet/Gozi/TrickBot/Tinba/Dridex/IcedID)
+- Feature metadata từ JSON (max/mean-entropy, #imports, #api, #functions, log-size, #sections). n=466 (BODMAS 110 / MB 356).
+- **AUC dự đoán NGUỒN, OOF GroupKFold-theo-họ = 0.206 (< 0.5)** → **metadata KHÔNG dự đoán được nguồn ổn định**
+  (hướng nguồn lệch theo từng họ, không tổng quát hoá) → **KHÔNG có shortcut nguồn↔họ đáng ngại ở mức metadata**.
+  Per-họ: emotet 0.38, trickbot 0.25, dridex 0.09, icedid 0.13, gozi 0.22, tinba 0.19 (đều <0.5).
+- **Qakbot & Carberp: KHÔNG KIỂM ĐƯỢC** (chỉ một nguồn = BODMAS) → không thể tách source↔family; **ghi hạn chế**:
+  nếu model tách được Qakbot/Carberp, không loại trừ được việc học đặc trưng BODMAS/re-arm (cần probe `source` trên
+  embedding + giữ các họ này ở nhóm đánh giá, không trộn tuỳ tiện).
+
+### 22.3 (task 3) HẠN CHẾ — VT xác nhận họ BODMAS yếu
+- **82% candidate BODMAS KHÔNG có nhãn popular VT** (`suggested_threat_label`=None; mẫu cũ 2019-20) — §21.4. Trong 86 mẫu
+  có nhãn → khớp 59%. → **nhãn family BODMAS chủ yếu dựa labeling nội bộ BODMAS, ít corroborate độc lập**; đặc biệt
+  **Qakbot (28/32 None) + Carberp (2/2 None)** — attribution gần như chỉ dựa BODMAS. Nêu rõ trong bài (threats to validity).
+- Toàn bộ candidate BODMAS vẫn là **malware xác nhận** (0 mẫu <3 engine).
+
+### 22.4 (task 4) BẢNG CỔNG — ĐO THẬT (không dự phóng)
+| hạng mục | đã khóa (v1-v3) | candidate (đã thu, dedup, ĐO THẬT) | tổng | mục tiêu | THIẾU |
+|---|---|---|---|---|---|
+| **Malware train chính** (distinct) | **702** | **706** = MB 419 (Gozi139+Ramnit31+Tinba92+Latro83+Pika74) + BODMAS 150 + ISFB/Ursnif 137 | **1.408** | 1.500 | **92** |
+| Zeus-lineage (riêng) | 0 | 744 (MB 398 + BODMAS 346) | 744 | — | — |
+| Downloader Nymaim (riêng) | 0 | ~31 | ~31 | — | — |
+| Benign (distinct) | 669 | +207 (v4) | 876 | — | — |
+| (b) bin MSVC14 malware / benign | — | ~540 / 565 | — | — | đủ lực (CI ±0.02) |
+- **Train chính 1.408/1.500 → còn thiếu 92** (ĐO THẬT, không dự phóng). Lấp 92 cuối: Citadel(nếu non-Zeus, MB 56),
+  SpyEye/Retefe, họ VX chưa kiểm (Kronos…), hoặc ISFB/Ursnif thêm (tag chưa cạn). **Cổng 🔴 ĐÓNG — không khóa v4, không train.**
