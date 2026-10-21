@@ -67,17 +67,37 @@
 7. **benign v4 = 0 trong train** — toàn bộ 207 benign v4 làm neg holdout; train-benign = v1/v2 (ISO+scoop+nirsoft+vendor), **không có benign nguồn-mới trong train**.
 8. **neg holdout TOÀN Scoop** (MSVC14) → nguồn neg đồng nhất, lệch bin so với pos bodmas (MSVC≤10).
 
-### C. Probe tách NGUỒN trong chính holdout (neg Scoop vs pos malware)
+### C. Probe tách NGUỒN trong chính holdout (neg Scoop vs pos malware) — ĐÃ SỬA (loại artifact vex)
 | holdout | pos / neg | đặc trưng probe | AUC (OOF 5-fold) |
 |---|---|---|---|
-| holdout_bumblebee | 254 / 103 | PE-metadata nguồn (9 feat) | **0.998** |
-| holdout_bodmas_temporal | 140 / 102 | static features (model input, 9 feat) | **0.994** |
+| holdout_bumblebee | 254 / 103 | PE-metadata nguồn (9 feat, không vex) | **0.998** |
+| holdout_bodmas_temporal | 140 / 102 | static features nội dung (8 feat, **bỏ vex**) | **0.896** |
 
-- **Kết luận: cả hai holdout GẦN NHƯ TÁCH HOÀN TOÀN chỉ bằng metadata/độ-phức-tạp nguồn — KHÔNG cần nội dung mã độc.**
+- ⚠️ **SỬA:** số 0.994 ghi lần đầu cho bodmas **lẫn artifact pipeline** `vex_vocab_size` (xem mục D) → loại vex còn **0.896**. Vẫn là shortcut mạnh nhưng thấp hơn.
+- **Kết luận: cả hai holdout TÁCH RẤT MẠNH bằng metadata/độ-phức-tạp nguồn — gần như không cần nội dung mã độc.**
   - bumblebee: `num_imports` 1.6 (packed) vs 15.5; `crt` 0 vs 0.98 → import-table/CRT là shortcut.
-  - bodmas: `num_api_calls` 630 vs 4837; `num_functions` 1391 vs 4525 → malware nhỏ vs app Scoop lớn → shortcut kích thước/phức-tạp trùng nguồn.
-- **Hệ quả:** điểm cao trên 2 holdout này CÓ THỂ do khai thác shortcut nguồn (packer/kích-thước), KHÔNG phải năng lực phát hiện mã độc thật. **Phải GRL/khử-confound nguồn + báo cáo kèm cảnh báo này; coi điểm holdout là CẬN TRÊN lạc quan.**
+  - bodmas: `num_api_calls` 630 vs 4837; `num_functions` 1391 vs 4525 → malware nhỏ vs app Scoop lớn → shortcut kích-thước/phức-tạp trùng nguồn.
+- **Hệ quả:** điểm cao trên 2 holdout này CÓ THỂ do khai thác shortcut nguồn (packer/kích-thước), KHÔNG phải năng lực phát hiện mã độc thật. **Phải GRL/khử-confound nguồn + báo cáo kèm cảnh báo; coi điểm holdout là CẬN TRÊN lạc quan.**
 - bodmas probe chạy trên **static feature đã lift** (raw đã xóa `recoverable_no_relift`; PE-metadata-từ-raw hoãn, cần re-arm). 10/150 pos thiếu feature.
+
+### D. ⚠️ ARTIFACT PIPELINE: `vex_vocab_size` lộ nguồn hoàn hảo (data-hygiene bắt buộc)
+- `vex_vocab_size` KHÁC theo **batch lift / thư mục feature**, KHÔNG theo nội dung: v1 (`features_graph`) = 420-425; mb (`features_graph_loader`) = 587-588; bodmas = 588; scoop = ~573. **Không chồng lấp** → tách nguồn AUC=1.000 giả.
+- **BẮT BUỘC: loại `vex_vocab_size` (và mọi feature phụ thuộc batch lift) khỏi input model**, hoặc chuẩn hóa chung một vocab, nếu không model học nguồn tầm thường. Mọi probe/metric phải loại feature này.
+
+### E. Probe nguồn TRONG val in-dist của train_pool (Task 1, mb vs v1, 8 feat bỏ vex)
+- train_pool: mb=553 / v1=453; chỉ **IcedID-lineage** có cả 2 nguồn (v1 114 / mb 83) — các họ khác đơn-nguồn (nguồn≈họ).
+| probe | AUC | diễn giải |
+|---|---|---|
+| OOF group-by-lineage (khóa cả họ) | **0.423** | <0.5 → nguồn KHÔNG tách ổn định khi tổng quát qua họ (bất ổn, không phải "sạch") |
+| OOF cluster 5-fold (không khóa họ) | **0.690** | lẫn với họ (nguồn≈họ) |
+| **within-IcedID (test sạch duy nhất)** | **0.790** | shortcut nguồn trong-cùng-họ mức vừa, THẬT (v1 cũ vs mb mới khác size/entropy/import) |
+- **Kết luận:** trong train có shortcut nguồn nội-họ ~0.79 (khớp §23 per-family 0.63-0.995) → **cần GRL/phân tầng nguồn khi train**, không chỉ ở holdout.
+- (Với vex: cả 3 = 1.000 — artifact, xem mục D.)
+
+### F. Xử lý ISO 39.2% (Task 2) — subsample ở LOADER (không xóa raw)
+- Quy tắc: giữ **k=138/166** ISO (`windows11-eval-iso`), seed **20261021** (`random.Random(20261021).sample`), sắp sha256 → ISO% = 138/395 = **34.9% ≤ 35%**; bỏ 28 (chỉ mask ở loader, raw giữ nguyên).
+- Danh sách giữ: `docs/iso_subsample_v4.txt` (138 sha, hash `57864041063ebc69c0374b01ee13b4d86f8fa8226b67d9fa8b4aecb994feceae`).
+- Train-benign sau subsample = **395** (ISO 138 + scoop 187 + nirsoft 26 + 7-zip 14 + python 12 + git 7 + notepad++ 6 + ffmpeg 5).
 
 ## Trạng thái cổng
 - **CỔNG DỮ LIỆU 🔴 ĐÓNG.** Freeze v4 KHÔNG mở cổng train. Train/GRL/chấm holdout CHỈ khi DATA_EXPANSION_PLAN.md §0.1 ghi ngưỡng đã đạt.
