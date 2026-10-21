@@ -1277,3 +1277,46 @@ Mỗi dòng: `sha256, family, lineage, source(v1|mb|bodmas), year, stratum, clus
   cross-lineage** làm holdout thứ hai để test confound nguồn/năm/lineage (§23–24). pos/neg + CI như trên.
 - **CỔNG 🔴 ĐÓNG — CHƯA khóa v4. Hỏi người dùng:** (a) chọn holdout nào, (b) đồng ý re-extract raw loader/bodmas khi khóa,
   (c) rồi mới sinh manifest distinct + hash-freeze.
+
+---
+
+## 26. MANIFEST v4 DISTINCT — BẢN THẢO (seed 20261021, CHƯA KHÓA) 2026-10-21
+File: `docs/dataset_v4_manifest_distinct_DRAFT.jsonl` (tất định: ppdeep≥90 union-find toàn cục, rep=sha nhỏ nhất/cụm, sắp theo sha).
+**HASH DỰ KIẾN (SHA256) = `05e53c1d86bd0714735a8dff932fa22ba1554c5be7cfb3fa092ed9c5e9b8e54a`** — khóa khi người dùng nói "khóa".
+
+### 26.1 Split (malware distinct = 2.208 cụm)
+| split | pos (distinct) | ghi chú |
+|---|---|---|
+| **train_pool** | **1.006** | train chính (non-Zeus, non-BumbleBee, non-BODMAS) |
+| **holdout_bumblebee** | **254** | cross-family (loader hệ TrickBot) |
+| **holdout_bodmas_temporal** | **150** | cross-time/nguồn (BODMAS 2019-20, non-Zeus) |
+| zeus_separate (RIÊNG) | 767 | Zeus/Zbot/Zloader/Citadel/pwszbot — KHÔNG vào train/holdout chính |
+| downloader_separate (RIÊNG) | 31 | Nymaim |
+- **train_pool theo lineage:** TrickBot 189, Gozi-lineage 268, IcedID-lineage 197, Tinba 90, QakBot-lineage 74, Emotet 76,
+  Dridex 68, Ramnit 30, SpyEye 4, Retefe 4, vx 6.
+- **LOFO:** loại **195 mẫu một-nguồn** (PikaBot/Latrodectus/Ramnit/SpyEye/Retefe — family≡source) khỏi train_pool →
+  **LOFO chỉ trên 811 pos đa-nguồn** (Emotet/Gozi/TrickBot/Tinba/Dridex/IcedID có cả v1+MB+BODMAS).
+
+### 26.2 Negatives holdout (tách khỏi train + v3)
+- **Neg = carve từ v4 benign (207)** — KHÔNG trùng train benign (v1/v2) và KHÔNG trùng v3 (v3 giữ nguyên holdout riêng).
+- Đề xuất carve tất định (seed 20261021): ~100 → holdout_bumblebee-neg, ~100 → holdout_bodmas_temporal-neg (rời nhau).
+- train benign = v1/v2 non-holdout + phần v4 còn lại.
+
+### 26.3 LỰC THỐNG KÊ từng holdout (Hanley-McNeil @AUC 0.90)
+| holdout | pos | neg | 95% CI |
+|---|---|---|---|
+| holdout_bumblebee | 254 | ~100 | **±0.031** |
+| holdout_bodmas_temporal | 150 | ~100 | **±0.038** |
+- **Train còn lại (pos):** **1.006** (811 dùng được cho LOFO). Benign train: v1/v2 non-holdout + v4 dư.
+
+### 26.4 GIỚI HẠN (threats to validity — bắt buộc ghi trong bài)
+1. **BumbleBee đã dùng trong PHÁT TRIỂN** (probe §17, các pilot, quyết định split trước) → **KHÔNG phải holdout "chưa từng
+   chạm" hoàn toàn** → điểm trên holdout_bumblebee **lạc quan hơn** một holdout sạch; nêu rõ.
+2. **holdout_bodmas_temporal GỘP confound:** nguồn (BODMAS disarm/re-arm) + năm (2019-20) + nhãn-yếu → kết quả **không tách
+   được** là do cross-time hay cross-source hay label-noise. Diễn giải thận trọng; kèm probe `source`/`year` (§24: AUC 0.72-0.77 trong bin).
+3. **Nhãn họ BODMAS yếu** (82% None trên VT; Qakbot/Carberp ~toàn None) → family attribution của nhánh BODMAS kém tin cậy.
+4. **raw loader/bodmas đã xóa** (`recoverable_no_relift`) → khi khóa phải re-extract (MB/DATA) để có raw; feature đã lift sẵn.
+5. Mục tiêu 1.500 không đạt (train chính 1.416 distinct; §24.3).
+
+**CỔNG 🔴 ĐÓNG — CHƯA KHÓA. Hỏi người dùng:** duyệt split/holdout/neg-carve ở trên + hash dự kiến → rồi nói **"khóa"** để mình
+sinh `dataset_v4_manifest.jsonl` (bản khóa) + FREEZE_v4 (hash) + re-extract raw. KHÔNG train.
