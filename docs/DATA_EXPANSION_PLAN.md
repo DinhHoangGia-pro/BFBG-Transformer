@@ -1067,3 +1067,26 @@ BODMAS cục bộ: `/run/media/dhgia/DATA/WORK/Research/BODMAS` (zip 68G cũng c
   non-Zeus)/SpyEye/VX hoặc nới định nghĩa loader. **VT candidate đang tra (§21.4 khi xong).**
 
 **Cổng 🔴 ĐÓNG — không khóa v4, không train, không chạm v3/holdout.**
+
+### 21.4 VT xác minh candidate BODMAS (490/502, 2026-10-21; ngưỡng khóa ≥3 engine)
+Tra VT theo **sha gốc** (tên file = sha pre-disarm; VT có mẫu gốc). 12 candidate còn lại → mai (quota 500/ngày).
+| họ (nhãn BODMAS) | tra | khớp-họ | None (VT ko nhãn) | nhãn-khác | nghi (<3 engine) |
+|---|---|---|---|---|---|
+| zbot | 318 | 20 | 283 | 15 | 0 |
+| emotet | 41 | 12 | 25 | 4 | 0 |
+| qakbot | 32 | 4 | 28 | 0 | 0 |
+| ursnif | 32 | 2 | 24 | 6 | 0 |
+| pwszbot | 16 | 0 | 15 | 1 | 0 |
+| tinba | 13 | 6 | 3 | 4 | 0 |
+| gozi | 12 | 0 | 10 | 2 | 0 |
+| trickbot | 11 | 6 | 2 | 3 | 0 |
+| nymaim/icedid/carberp/dridex/spyeye | 15 | 1 | 14 | 0 | 0 |
+| **TỔNG** | **490** | **51** | **404 (82%)** | **35 (7%)** | **0** |
+- **0 mẫu <3 engine → TOÀN BỘ 490 là malware** (xác nhận độc lập). **Không loại candidate nào** (ngưỡng khóa ≥3).
+- **82% KHÔNG có nhãn popular VT** (`suggested_threat_label`=None) — vì mẫu **cũ 2019-2020**, VT thiếu consensus family,
+  **KHÔNG phải nhãn mâu thuẫn**. Trong **86 mẫu CÓ nhãn VT → khớp họ 59%** (≈ MB 71% khi có nhãn); nhãn-khác chỉ 7%.
+- **vs MB (71% khớp, mẫu mới):** nhãn family BODMAS **đồng thuận tương đương KHI VT có ý kiến**, nhưng VT **phần lớn
+  bỏ trống** (mẫu cũ) → **nhãn family BODMAS chủ yếu dựa vào labeling của BODMAS, ít được VT xác nhận độc lập**.
+- **HẠN CHẾ cho họ chỉ-BODMAS (Qakbot 28/32 None, Carberp 2/2 None):** nhãn family **gần như không được VT corroborate**
+  → attribution dựa vào BODMAS; nêu rõ khi dùng Qakbot/Carberp làm QakBot/Carberp-lineage. 35 mẫu "nhãn-khác" → đánh dấu review.
+- Gate (train net-new 150) **không đổi** (0 loại; tất cả là malware).
