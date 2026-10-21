@@ -1187,3 +1187,48 @@ Thiết kế đúng: mỗi họ có cả MB+BODMAS → predict NGUỒN (BODMAS v
 - **Còn thiếu 84 (đo thật):** banking non-Zeus đã gần cạn (MB+BODMAS). Lựa chọn (hỏi người dùng): (i) VX cho Kronos/Vawtrak
   (chưa kiểm khả dụng), (ii) đưa Zeus-lineage (767) vào với **đánh giá nhận-biết-nguồn/toolchain**, (iii) hạ mục tiêu ~1.416.
   **Cổng 🔴 ĐÓNG — không khóa v4, không train.**
+
+---
+
+## 24. CHUẨN BỊ KHÓA v4 (chưa khóa — hỏi người dùng) — 2026-10-21
+**Chốt: dừng lấp malware ở 1.416 train chính; KHÔNG đuổi 1.500.**
+
+### 24.1 (task 1) Ma trận source×family×year×bin + probe nguồn/năm TRONG bin
+Ma trận (raw còn; loader/bodmas dùng số §19/§21):
+| bin | tổng | v1 (2021) | MB<2022 | MB 2022+ |
+|---|---|---|---|---|
+| MSVC≤10 | 1509 | 686 | 560 | 263 |
+| MSVC 14 | 675 | 574 | 36 | 65 |
+| khác | 194 | 40 | 102 | 52 |
+| MSVC 11-12 | 104 | 79 | 11 | 14 |
+- **Probe predict "MB2022+ vs cũ" TRONG bin (OOF cụm ppdeep): MSVC14 AUC=0.770 · MSVC≤10 AUC=0.721.**
+- → **Confound NGUỒN/NĂM tồn tại NGAY TRONG từng bin toolchain** (không chỉ giữa bin). Khống chế bin KHÔNG đủ khử
+  nguồn/năm. **Bắt buộc phân tầng nguồn/năm trong split + probe `source`/`year` trên embedding khi train.**
+
+### 24.2 (task 2) SPEC MANIFEST v4 TẤT ĐỊNH (bản thảo — CHƯA sinh/khóa)
+Mỗi dòng: `sha256, family, lineage, source(v1|mb|bodmas), year(first_seen), bin(linker-primary), size, cluster, split, stratum`.
+- **Tất định:** seed `V4_SEED=20261021`; sắp theo sha256; hash manifest (SHA256) + ghi vào FREEZE khi khóa.
+- **Split theo LINEAGE (không tách cụm/lineage qua train/test):** Gozi-lineage (gozi/isfb/ursnif), QakBot-lineage
+  (qakbot/pikabot), IcedID-lineage (icedid/latrodectus), + từng họ độc lập. **Zeus-lineage (zbot/zloader/citadel/pwszbot)
+  = NHÓM RIÊNG, không vào train/test chính** (báo riêng). Nymaim (downloader) = riêng.
+- **Phân tầng NGUỒN/NĂM:** mỗi split cân theo stratum {v1-2021, MB<2022, MB2022+, BODMAS-2019/20} để tránh model học
+  nguồn/năm (§24.1). Báo phân bố nguồn×split.
+- **Họ MỘT NGUỒN loại khỏi LOFO:** Qakbot/Carberp (chỉ BODMAS), Latrodectus/PikaBot/Zloader/Ramnit/SpyEye/Retefe (chỉ MB)
+  → **KHÔNG dùng làm fold "leave-one-family-out"** (vì family≡source → LOFO đo nhầm source). LOFO chỉ trên họ có **đa nguồn**
+  (Emotet/Gozi/TrickBot/Tinba/Dridex/IcedID).
+- **Ghi nguồn+năm từng mẫu** (đã có trong manifest fetch: first_seen; bodmas=timestamp; v1≈2021).
+- **Raw đã xóa (loader, bodmas_pilot):** re-extract từ DATA (bodmas) / re-download MB (loader) **trước khi khóa** để sinh raw.
+- **Bất biến:** dedup sha+ppdeep≥90 (đã làm); 0 cụm lẫn nhãn; không mẫu nào trùng holdout v2/v3; v4 không sửa v1-v3.
+
+### 24.3 (task 3) MỤC TIÊU 1.500 KHÔNG ĐẠT — lý do + số thật
+- **Train chính distinct đo thật = 1.416/1.500 (thiếu 84).** Không đạt.
+- **Lý do:** **vũ trụ banking-trojan NON-Zeus tải được đã gần cạn** — MB (get_siginfo + tag + first_seen) và BODMAS đã vét
+  (Gozi/ISFB/Ursnif/Tinba/Emotet/TrickBot/Dridex/IcedID/Qakbot/Carberp/SpyEye/Retefe/Latrodectus/PikaBot); các họ còn lại
+  hoặc là **Zeus-lineage** (để riêng: 767), **downloader** (Nymaim, riêng), **không đúng loại** (DarkGate/SystemBC/Carbanak),
+  hoặc **không có trên nguồn tải được** (Kronos/Vawtrak/PandaBanker — chỉ VX, chưa kiểm/xác minh).
+- **Quyết định người dùng:** chốt dừng ở 1.416. (Nếu cần 1.500: chỉ còn (i) VX chưa kiểm, (ii) nới định nghĩa lớp,
+  (iii) đưa Zeus-lineage vào với eval nhận-biết-nguồn — đều có đánh đổi.)
+- **Số thật tổng kết:** train chính **1.416** (khóa 702 + candidate 714); Zeus-lineage **767** (riêng); Nymaim **~31** (riêng);
+  benign **876**; bin MSVC14 malware ~540 / benign 565 (đủ lực, AUC CI ±0.02).
+
+**CỔNG 🔴 ĐÓNG — CHƯA khóa v4, không train. Hỏi người dùng trước khi sinh manifest + khóa.**
