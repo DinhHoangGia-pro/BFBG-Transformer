@@ -1137,3 +1137,53 @@ Tra VT theo **sha gốc** (tên file = sha pre-disarm; VT có mẫu gốc). 12 c
 | (b) bin MSVC14 malware / benign | — | ~540 / 565 | — | — | đủ lực (CI ±0.02) |
 - **Train chính 1.408/1.500 → còn thiếu 92** (ĐO THẬT, không dự phóng). Lấp 92 cuối: Citadel(nếu non-Zeus, MB 56),
   SpyEye/Retefe, họ VX chưa kiểm (Kronos…), hoặc ISFB/Ursnif thêm (tag chưa cạn). **Cổng 🔴 ĐÓNG — không khóa v4, không train.**
+
+---
+
+## 23. SỬA probe nguồn (trong-họ) + fill-92 + gate đo-thật (2026-10-21)
+
+### 23.1 (task 1) PROBE NGUỒN TRONG TỪNG HỌ — SỬA KẾT LUẬN §22.2
+Thiết kế đúng: mỗi họ có cả MB+BODMAS → predict NGUỒN (BODMAS vs MB) từ metadata (JSON), **OOF GroupKFold theo CỤM ppdeep**.
+| họ | n_BODMAS | n_MB | AUC(nguồn) |
+|---|---|---|---|
+| **gozi** | 13 | 145 | **0.995** |
+| emotet | 52 | 79 | **0.707** |
+| tinba | 17 | 243 | **0.707** |
+| trickbot | 13 | 396 | **0.684** |
+| icedid | 5 | 260 | 0.630 (n_BODMAS nhỏ) |
+| dridex | 10 | 377 | 0.041 (n_BODMAS nhỏ → bất ổn) |
+- **KẾT LUẬN ĐÚNG: metadata TÁCH ĐƯỢC nguồn trong nhiều họ (0.63–0.995; gozi gần hoàn hảo) → RỦI RO SHORTCUT NGUỒN LÀ THẬT.**
+  BODMAS (2019-20) vs MB (2021+) khác metadata/năm/build. **§22.2 cũ SAI**: AUC 0.206 (cross-family, leave-one-family-out)
+  là **probe BẤT ỔN ĐỊNH (đảo chiều giữa họ), KHÔNG phải "không lộ nguồn"**.
+- **Qakbot/Carberp: KHÔNG kiểm được** (chỉ-BODMAS) → không loại trừ shortcut.
+- **HỆ QUẢ (ghi threats-to-validity + thiết kế train):** KHI TRỘN BODMAS+MB trong một họ, model có thể học **nguồn/năm**
+  thay vì họ. Bắt buộc: (a) probe `source` trên EMBEDDING (không chỉ metadata); (b) **phân tầng theo nguồn/năm** hoặc
+  cân bằng nguồn trong mỗi họ; (c) cân nhắc giữ BODMAS như **stratum thời gian riêng** (temporal split) khi đánh giá.
+
+### 23.2 (task 2) FILL-92 — pilot Citadel/SpyEye/Retefe (MB sig+tag), đo thật
+| họ | tải | distinct | net-new vs ALL | lineage/nhóm |
+|---|---|---|---|---|
+| Citadel | 30 | 23 | 23 | **Zeus-lineage (riêng)** — fork Zeus (F5/DOJ xếp cùng Zeus; Malpedia thiếu mô tả) |
+| SpyEye | 5 | 4 | 4 | non-Zeus (train chính) |
+| Retefe | 4 | 4 | 4 | non-Zeus (train chính) |
+- **Train chính +8** (SpyEye 4 + Retefe 4). Citadel +23 → Zeus-lineage. **Banking non-Zeus trên MB/BODMAS gần CẠN.**
+
+### 23.3 (task 3) BẢNG CỔNG — ĐO THẬT + nguồn từng họ
+| hạng mục | khóa (v1-v3) | candidate (đo thật, dedup) | tổng | mục tiêu | THIẾU |
+|---|---|---|---|---|---|
+| **Malware train chính** (distinct) | **702** | **714** | **1.416** | 1.500 | **84** |
+| Zeus-lineage (riêng) | 0 | 767 (Zeus337+Zloader61+BODMAS346+Citadel23) | 767 | — | — |
+| Downloader Nymaim (riêng) | 0 | ~31 | ~31 | — | — |
+| Benign (distinct) | 669 | +207 v4 | 876 | — | — |
+| (b) bin MSVC14 mal/benign | — | ~540 / 565 | — | — | đủ lực |
+
+**Candidate train chính 714 — nguồn từng họ:**
+- v1 (2021, đã khóa): TrickBot/Dridex/IcedID/BumbleBee/Emotet.
+- **MB (427):** Gozi 139, Tinba 92, Latrodectus 83, PikaBot 74, Ramnit 31, ISFB/Ursnif (một phần của 137), SpyEye 4, Retefe 4.
+- **BODMAS (150):** emotet 41, ursnif 32, **qakbot 32 (CHỈ BODMAS)**, tinba 13, gozi 12, trickbot 11, icedid 3, **carberp 2 (CHỈ BODMAS)**, dridex 2, spyeye 2.
+- **ISFB/Ursnif (137):** MB-tag, Gozi-lineage.
+- **Họ CHỈ MỘT NGUỒN:** Qakbot/Carberp (BODMAS); Latrodectus/PikaBot/Zloader/Ramnit/SpyEye/Retefe (MB) → rủi ro source-shortcut (§23.1).
+
+- **Còn thiếu 84 (đo thật):** banking non-Zeus đã gần cạn (MB+BODMAS). Lựa chọn (hỏi người dùng): (i) VX cho Kronos/Vawtrak
+  (chưa kiểm khả dụng), (ii) đưa Zeus-lineage (767) vào với **đánh giá nhận-biết-nguồn/toolchain**, (iii) hạ mục tiêu ~1.416.
+  **Cổng 🔴 ĐÓNG — không khóa v4, không train.**
