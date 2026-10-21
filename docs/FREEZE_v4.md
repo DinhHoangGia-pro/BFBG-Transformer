@@ -45,6 +45,40 @@
 5. **Neg holdout bin-mismatch:** benign v4 là MSVC14 (Scoop) → khớp bin với holdout_bumblebee (MSVC14 loaders) nhưng LỆCH bin với holdout_bodmas_temporal (phần lớn MSVC≤10) → một phần tách được ở bodmas-temporal có thể do khác bin toolchain, không chỉ cross-time.
 6. Mục tiêu 1.500 train chính không đạt (1.416 distinct non-Zeus; §24.3; non-Zeus banking cạn nguồn).
 
+## BỔ SUNG 2026-10-21 — thành phần benign train + probe nguồn holdout (KHÔNG đổi hash manifest)
+
+### A. Thành phần benign TRAIN (v2 non-holdout, label=0, n=423; bin = classifier LINKER-PRIMARY)
+| nguồn | kind | MSVC≤10 | 11-12 | MSVC14 | GNU | Go | Delphi | khác | tổng |
+|---|---|---|---|---|---|---|---|---|---|
+| windows11-eval-iso | ISO | 0 | 1 | 165 | 0 | 0 | 0 | 0 | 166 |
+| scoop | vendor | 47 | 8 | 110 | 6 | 12 | 2 | 2 | 187 |
+| nirsoft | vendor | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 26 |
+| 7-zip.org | vendor | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 14 |
+| python.org-embeddable | vendor | 0 | 0 | 12 | 0 | 0 | 0 | 0 | 12 |
+| git-for-windows | vendor | 3 | 0 | 0 | 4 | 0 | 0 | 0 | 7 |
+| notepad++ | vendor | 0 | 0 | 6 | 0 | 0 | 0 | 0 | 6 |
+| ffmpeg | vendor | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 5 |
+| **TỔNG** | | **95** | **9** | **293** | **10** | **12** | **2** | **2** | **423** |
+
+- **ISO = 166/423 = 39.2% > cap 35%** (vượt). MSVC14 = 293/423 = 69% benign train dồn vào một bin.
+- **Cap vendor ≤35%/bin VƯỢT ở nhiều bin:** MSVC14 ISO 56% + scoop 38%; MSVC≤10 scoop 49%; Go scoop 100%; v.v. (các cap này là quy tắc harvest v3/v4; tập train v1/v2 đã khóa từ trước KHÔNG áp hồi tố — chỉ ghi nhận quan sát).
+
+### B. HẠN CHẾ mới (ghi rõ trong bài)
+7. **benign v4 = 0 trong train** — toàn bộ 207 benign v4 làm neg holdout; train-benign = v1/v2 (ISO+scoop+nirsoft+vendor), **không có benign nguồn-mới trong train**.
+8. **neg holdout TOÀN Scoop** (MSVC14) → nguồn neg đồng nhất, lệch bin so với pos bodmas (MSVC≤10).
+
+### C. Probe tách NGUỒN trong chính holdout (neg Scoop vs pos malware)
+| holdout | pos / neg | đặc trưng probe | AUC (OOF 5-fold) |
+|---|---|---|---|
+| holdout_bumblebee | 254 / 103 | PE-metadata nguồn (9 feat) | **0.998** |
+| holdout_bodmas_temporal | 140 / 102 | static features (model input, 9 feat) | **0.994** |
+
+- **Kết luận: cả hai holdout GẦN NHƯ TÁCH HOÀN TOÀN chỉ bằng metadata/độ-phức-tạp nguồn — KHÔNG cần nội dung mã độc.**
+  - bumblebee: `num_imports` 1.6 (packed) vs 15.5; `crt` 0 vs 0.98 → import-table/CRT là shortcut.
+  - bodmas: `num_api_calls` 630 vs 4837; `num_functions` 1391 vs 4525 → malware nhỏ vs app Scoop lớn → shortcut kích thước/phức-tạp trùng nguồn.
+- **Hệ quả:** điểm cao trên 2 holdout này CÓ THỂ do khai thác shortcut nguồn (packer/kích-thước), KHÔNG phải năng lực phát hiện mã độc thật. **Phải GRL/khử-confound nguồn + báo cáo kèm cảnh báo này; coi điểm holdout là CẬN TRÊN lạc quan.**
+- bodmas probe chạy trên **static feature đã lift** (raw đã xóa `recoverable_no_relift`; PE-metadata-từ-raw hoãn, cần re-arm). 10/150 pos thiếu feature.
+
 ## Trạng thái cổng
 - **CỔNG DỮ LIỆU 🔴 ĐÓNG.** Freeze v4 KHÔNG mở cổng train. Train/GRL/chấm holdout CHỈ khi DATA_EXPANSION_PLAN.md §0.1 ghi ngưỡng đã đạt.
 - Freeze này: chốt manifest + hash + quy tắc. KHÔNG re-extract raw, KHÔNG train, KHÔNG xóa gì.
