@@ -136,3 +136,5 @@ Grep `vex` khắp `scripts/ experiments/ src/ docs/ paper_tables/ ~/bfbg_benign_
 
 ## BỔ SUNG 2026-10-22 — cross-family (ngoài phạm vi khóa, tham chiếu)
 - LOFO-retrain sạch họ IcedID: BFBG 0.67 vs metadata/graph-RF ~0.91 (TRAINING_DESIGN §26). Số frozen §24 (0.934) bị thổi do encoder thấy họ → KHÔNG dùng. Không ảnh hưởng manifest/hash (05e53c1d).
+
+- LOFO dừng sau họ 1 (§26a): hạn chế 1 họ / 1 seed / 20ep chưa hội tụ → BFBG 0.67 là cận dưới. Không ảnh hưởng manifest/hash.

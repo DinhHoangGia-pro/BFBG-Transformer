@@ -312,3 +312,11 @@ Encoder BFBG **leave-IcedID-lineage-out** (loại khỏi cả train+val); test =
 - ⚠️ **SỬA frozen §24:** số frozen embedding IcedID **0.934** là **THỔI PHỒNG do encoder f1.0 ĐÃ train trên IcedID** (chỉ head LOFO). Khi encoder **thực sự không thấy** IcedID → chỉ **0.67**. ⇒ **con số frozen §24 (avg 0.966) KHÔNG phải bằng chứng cross-family; bỏ, dùng LOFO-retrain sạch.** Feature rẻ (extractor cố định) không bị lỗi này nên LOFO của chúng vẫn hợp lệ.
 - **Hệ quả claim:** cùng chiều với in-dist (§21e, RF thắng) — hiện **chưa có bằng chứng BFBG vượt baseline rẻ** ở cả in-dist lẫn cross-family (họ 1). Chờ họ 2-3 trước khi kết luận tổng thể.
 - Lưu: `~/bfbg_benign_work/lc_lofo/IcedID-lineage/{summary,curve,ckpt_last}`.
+
+### 26a. Dừng LOFO sau họ 1 (quyết định người dùng, 2026-10-23)
+- **Dừng LOFO-retrain sau HỌ 1** theo quy tắc phiên ghi trước §25 (chạy từng họ/phiên, hỏi trước họ kế); người dùng quyết không chạy họ 2-3.
+- **HẠN CHẾ của bằng chứng cross-family (bắt buộc ghi):**
+  1. **Chỉ 1 họ (IcedID-lineage)** → KHÔNG tổng quát hóa kết luận "BFBG thua" cho mọi họ; chỉ phát biểu cho IcedID.
+  2. **1 seed (20261021)** → không có khoảng nhiễu-seed cho LOFO.
+  3. **20 epoch CHƯA HỘI TỤ** — đường test-AUC còn dốc lên (ep0 0.45 → ep19 0.67, không plateau, early-stop không bật) ⇒ **0.67 là CẬN DƯỚI** (BFBG LOFO có thể còn tăng nếu train lâu hơn / tune). KHÔNG kết luận BFBG "không thể" cross-family; chỉ: ở ngân sách 20-epoch, BFBG thua baseline rẻ ~0.24 (CI không chồng).
+  4. Baseline rẻ dùng feature cố định (không học) nên LOFO của chúng sạch và ổn định; so sánh công bằng về mặt "không thấy họ" nhưng BFBG tốn compute hơn nhiều.
