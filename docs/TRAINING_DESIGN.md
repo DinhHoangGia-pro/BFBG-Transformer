@@ -214,3 +214,16 @@ Nhãn POST-HOC (ghi SAU khi thấy kết quả 2 seed api-density {101:0.971, 20
   ```
 - Script `~/bfbg_benign_work/lc_train.py`; chỉ-mục feature `/tmp/claude-1001/featidx.json` (nếu mất → dựng lại từ 8 dir features_graph*/v4_benign_features).
 - Giữ nguyên: base, BATCH=2+accum2, no AMP, global=0 (không vex), val in-dist phân tầng, ISO subsample. **KHÔNG chạm holdout v4/v3.**
+
+### 21d. Learning-curve ĐẦY ĐỦ — kết quả cuối (6/6 run, 2026-10-22)
+val in-dist cố định 209 (phân tầng), best val AUC:
+| fraction | n_train | seed20261021 | seed20261022 | mean | chênh-seed |
+|---|---|---|---|---|---|
+| 0.25 | 295 | 0.8510 | 0.8584 | **0.8547** | 0.0074 |
+| 0.50 | 592 | 0.8803 | 0.8834 | **0.8819** | 0.0031 |
+| 1.00 | 1184 | 0.9223 | 0.9102 | **0.9163** | 0.0121 |
+
+- **Bước tăng (mean):** 0.25→0.50 = **+0.0272**; 0.50→1.00 = **+0.0344**. Cả hai **> ngưỡng nhiễu-seed 0.012** → khác biệt THẬT.
+- **KẾT LUẬN (theo nhãn §21):** đường cong **vẫn dốc lên tới 1184 mẫu, CHƯA bão hòa** — thêm dữ liệu train (nếu có) **vẫn còn giúp**; KHÔNG có bằng chứng bão hòa ở mức dữ liệu hiện tại. (Mâu thuẫn nhẹ với kỳ vọng "dừng 1416 là đủ": thực ra 1416 chưa tới điểm phẳng, nhưng non-Zeus banking đã cạn nguồn (§24.3) → giới hạn DỮ LIỆU, không phải lựa chọn tối ưu.)
+- **GIỚI HẠN:** (a) val in-dist + base (chưa GRL) = **cận trên lạc quan, chưa khử shortcut nguồn** (§FREEZE_v4 C/E: nội-họ 0.79, holdout 0.90-1.0) → điểm tuyệt đối 0.92 KHÔNG phải năng lực phát hiện thật; (b) n=2 seed → ngưỡng nhiễu thô; (c) 20 epoch cố định, không tuning; (d) 1 val-batch OOM bị bỏ ở vài run (~208/209). **KHÔNG chạm holdout v4/v3.**
+- Vận hành thực tế: 668s/epoch (f1.0) BATCH=2+accum2 no AMP, peak VRAM ≤6.9/8GB, tổng 6 run ≈ 13.6 GPU-giờ (khớp ước ~14).
