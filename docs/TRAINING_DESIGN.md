@@ -293,3 +293,9 @@ Leave-one-malware-lineage-out: train head trên (mal họ≠F + benign_train 333
 - ⚠️ **CAVEAT NẶNG (chưa phải cross-family sạch):** encoder BFBG f1.0 **ĐÃ train trên TẤT CẢ họ (kể cả F)**; chỉ HEAD là leave-F-out. ⇒ số 0.966 **lạc quan/upper-bound**, KHÔNG phải tổng quát sang họ CHƯA TỪNG THẤY. feature rẻ là extractor cố định (không "học" F) nên LOFO của chúng sạch → so sánh **thiên vị BFBG**.
 - **Để kết luận sạch cần:** train BFBG **leave-F-out cả ENCODER** (đắt: ~3.5-3.7h/họ × 8 ≈ ~30h; hoặc rút gọn 3 họ × 1 seed ≈ ~11h). Chỉ khi đó mới so cross-family công bằng với RF.
 - **Tạm kết Hướng 2:** có TÍN HIỆU DƯƠNG cho BFBG (ngược in-dist) → **đáng làm phép thử sạch trước khi quyết GRL**; nhưng chưa đủ bằng chứng (caveat encoder-thấy-F).
+
+### 25. LOFO retrain SẠCH (leave-lineage-out encoder) — nhãn tiền-đăng-ký (dev, post-hoc, 2026-10-22)
+**Thứ tự cố định (ghi trước, không đổi):** 1) IcedID-lineage (icedid+latrodectus, n=197), 2) Gozi-lineage (gozi+isfb+ursnif, n=268), 3) Tinba (n=90).
+- Mỗi họ: train BFBG **leave-lineage-out** (loại khỏi CẢ train và val của encoder); test fold = (mal họ đó) + benign_test (15%, seed 20261021). 1 seed=20261021, BATCH=2+accum2, no AMP, global=0 (không vex), ISO subsample. Baseline graph-RF/metadata-RF/bag-tokens **cùng fold**, AUC + cluster-boot CI.
+- **Ngưỡng đọc (ghi TRƯỚC):** chênh AUC(BFBG − baseline tốt nhất) **< 0.05 = KHÔNG phân biệt**; chỉ coi BFBG có lợi thế cross-family nếu **dẫn ≥0.05 ở ≥2/3 họ**.
+- **Vận hành:** chạy theo PHIÊN 4h/họ, checkpoint last mỗi epoch + --resume, kết quả lưu riêng `lc_lofo/<lineage>/`. Hết phiên dừng sạch, báo bảng, KHÔNG tự bắt đầu họ tiếp. **KHÔNG chạm holdout v4/v3.** Nhãn: **dev, post-hoc**.
