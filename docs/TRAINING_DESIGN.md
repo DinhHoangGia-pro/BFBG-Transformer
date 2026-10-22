@@ -255,3 +255,28 @@ val in-dist cố định 209 (phân tầng), best val AUC:
 - **Tiêu chí thành công (ghi TRƯỚC):** (a) probe nguồn embedding **< 0.75**; (b) val AUC in-dist **không giảm quá 0.03** so với base (base f1.0 last-ep mean 0.913 → sàn 0.883). Đạt cả 2 mới đủ điều kiện chấm holdout (một lần).
 - **Kế hoạch rút gọn:** f=1.0, **2 seed {20261021,22}**, λ_max=1.0, **1 biến thể** (adversary=stratum nguồn/năm). Ước **~4.0-4.7h/run × 2 ≈ ~9 GPU-giờ**. **CHƯA chạy — hỏi người dùng trước.**
 - Giữ cố định: BATCH=2+accum2, no AMP, global=0 (không vex), val in-dist cùng split, ISO subsample. **KHÔNG chạm holdout v4/v3.**
+
+### 21f. Provenance-probe mở rộng (≥4 họ 2-nhóm, năm-trong-họ) — embedding vs feature rẻ (2026-10-22)
+Probe provenance = dự đoán nhóm NĂM (2 nhóm lớn nhất ≥5) TRONG từng họ, LogReg OOF-cụm (mẫu distinct), cluster-bootstrap 95% CI; **trung bình 4 họ** (QakBot 2023v2024, Gozi 2023v2022, IcedID 2021v2025, Ramnit 2021v2020). train_pool, KHÔNG chạm holdout.
+| feature | avg AUC | QakBot | Gozi | IcedID | Ramnit |
+|---|---|---|---|---|---|
+| **embedding (BFBG f1.0)** | **0.732** | 0.725[.57,.87] | 0.838[.78,.89] | 0.811[.73,.89] | 0.554[.29,.80] |
+| metadata (RF-feats) | 0.688 | 0.885[.75,.98] | 0.660[.59,.73] | 0.800[.69,.90] | 0.405[.16,.67] |
+| graph (RF-feats) | 0.697 | 0.713[.51,.89] | 0.477[.40,.56] | 0.893[.83,.94] | 0.703[.44,.93] |
+| bag-of-tokens | 0.809 | 0.806[.65,.93] | 0.843[.78,.90] | 0.878[.80,.95] | 0.711[.46,.92] |
+- **Nhận định:** embedding mã hóa provenance năm-trong-họ ở **0.73 (TB)** — vừa phải, **KHÔNG cao hơn** đáng kể so với feature rẻ (meta 0.69, graph 0.70) và **thấp hơn bag-of-tokens (0.81)**. CI rộng (n/họ nhỏ, Ramnit n=22 → không tin cậy).
+- **Phụ thuộc ĐỊNH NGHĨA tiêu chí:** probe nguồn mb-vs-v1 within-IcedID = **0.76** (§21e); probe năm-trong-họ TB-4-họ = **0.73**. Hai số nằm hai phía ngưỡng 0.75 → **tiêu chí GRL phải ghi rõ định nghĩa + CI**.
+
+### 22 (SỬA). Tiêu chí GRL kèm CI + hệ quả BFBG<RF
+- **Probe-nguồn CHỐT:** provenance năm-trong-họ, LogReg OOF-cụm, TB ≥4 họ (QakBot/Gozi/IcedID/Ramnit), cluster-bootstrap CI. **Baseline non-GRL = 0.732** (CI từng họ ở §21f).
+- **Tiêu chí thành công (kèm CI, ghi TRƯỚC):**
+  (a) provenance-probe embedding (TB-4-họ) **điểm < 0.70 VÀ cận trên CI-tổng-hợp < 0.75** (siết hơn baseline 0.732, tránh "đạt nhờ nhiễu"); 
+  (b) val AUC in-dist **không giảm > 0.03** so base (f1.0 last-ep mean 0.913 → **sàn 0.883**, so bằng CI-overlap);
+  (c) báo CI cho cả (a),(b).
+- **HỆ QUẢ cho CLAIM (bắt buộc):** BFBG val in-dist (0.84/0.88/0.91) **< graph-RF (0.93/0.95/0.97) ở MỌI fraction** (§21e). ⇒ **KHÔNG được claim BFBG là bộ phát hiện in-dist tốt hơn**. Claim hợp lệ phải là: (i) **khử provenance/shortcut** (provenance-probe thấp hơn baseline rẻ) và/hoặc (ii) **tổng quát hóa cross-family/cross-source** (LOFO + holdout — nơi feature size/complexity rẻ gãy), KÈM baseline RF trong mọi bảng.
+
+### 23. Kịch bản "GRL thành công nhưng BFBG vẫn < probe rẻ" → đóng góp là gì (ghi trước)
+Nếu GRL đạt (a)+(b) nhưng val BFBG (~0.91) vẫn < graph-RF (~0.97):
+- **Đóng góp KHÔNG phải accuracy in-dist** (RF thắng). Đóng góp = **robustness/invariance**: một detector có biểu diễn **ít phụ thuộc provenance/size-shortcut hơn** (provenance-probe < RF), kỳ vọng **giữ điểm tốt hơn khi phân phối đổi** (holdout cross-time/cross-family, nơi RF dựa size/complexity sẽ sụp).
+- **Phép thử quyết định (chạm holdout MỘT LẦN, chỉ sau khi GRL đạt tiêu chí):** so **ΔAUC(in-dist → holdout)** của BFBG-GRL vs graph-RF. Nếu RF rơi mạnh còn BFBG-GRL giữ → đóng góp THẬT (robustness). Nếu cả hai rơi như nhau → **thừa nhận BFBG không có lợi thế** và báo trung thực (không cố cứu claim accuracy).
+- Nếu GRL KHÔNG đạt (a) hoặc (b): không chấm holdout; báo "chưa khử được confound" như kết quả âm.
