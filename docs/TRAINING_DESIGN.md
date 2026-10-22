@@ -227,3 +227,31 @@ val in-dist cố định 209 (phân tầng), best val AUC:
 - **KẾT LUẬN (theo nhãn §21):** đường cong **vẫn dốc lên tới 1184 mẫu, CHƯA bão hòa** — thêm dữ liệu train (nếu có) **vẫn còn giúp**; KHÔNG có bằng chứng bão hòa ở mức dữ liệu hiện tại. (Mâu thuẫn nhẹ với kỳ vọng "dừng 1416 là đủ": thực ra 1416 chưa tới điểm phẳng, nhưng non-Zeus banking đã cạn nguồn (§24.3) → giới hạn DỮ LIỆU, không phải lựa chọn tối ưu.)
 - **GIỚI HẠN:** (a) val in-dist + base (chưa GRL) = **cận trên lạc quan, chưa khử shortcut nguồn** (§FREEZE_v4 C/E: nội-họ 0.79, holdout 0.90-1.0) → điểm tuyệt đối 0.92 KHÔNG phải năng lực phát hiện thật; (b) n=2 seed → ngưỡng nhiễu thô; (c) 20 epoch cố định, không tuning; (d) 1 val-batch OOM bị bỏ ở vài run (~208/209). **KHÔNG chạm holdout v4/v3.**
 - Vận hành thực tế: 668s/epoch (f1.0) BATCH=2+accum2 no AMP, peak VRAM ≤6.9/8GB, tổng 6 run ≈ 13.6 GPU-giờ (khớp ước ~14).
+
+### 21e. PHÂN TÍCH probe vs BFBG + source-probe embedding (2026-10-22)
+**Cùng split, cùng val in-dist 209 (phân tầng), cluster-bootstrap 95% CI (mẫu distinct → bootstrap ~ cụm). Fig: `docs/figs/learning_curve_probes.png`.**
+
+**(1+2) Learning curve — mean val AUC 2 seed (probe = train trên CHÍNH split BFBG):**
+| fraction | n_train | **BFBG** (model) | metadata (RF,6f) | graph (RF,6f) | bag-of-tokens (LogReg,1088) |
+|---|---|---|---|---|---|
+| 0.25 | 295 | 0.842 | 0.922 | **0.929** | 0.765 |
+| 0.50 | 592 | 0.880 | 0.947 | **0.954** | 0.781 |
+| 1.00 | 1184 | 0.913 | 0.956 | **0.966** | 0.790 |
+- CI từng điểm (vd BFBG f1.0 s21 [0.866,0.957]; graph f1.0 s21 [0.950,0.990]) — xem `lc_runs/{bfbg_rescore,probe_curve}.json`.
+- ⚠️ **KẾT QUẢ THEN CHỐT: đặc trưng TĨNH tầm thường (graph/metadata, RF 6 feature) VƯỢT BFBG ở MỌI fraction** (graph 0.966 vs BFBG 0.913 @f=1.0). Chỉ bag-of-tokens (0.79) thua BFBG.
+- **Diễn giải:** val in-dist bị chi phối bởi **kích thước/độ-phức-tạp** (num_functions, num_api_calls, total_nodes) mà RF nắm trực tiếp và tốt hơn graph-transformer. ⇒ (a) BFBG **chưa chứng minh được giá trị trên baseline rẻ tiền** ở val in-dist; (b) "learning curve dốc lên" của BFBG chủ yếu bám cùng tín hiệu size/complexity (yếu hơn). **Bắt buộc: báo cáo BFBG KÈM baseline graph/metadata; mọi tuyên bố năng lực phải vượt baseline này.**
+
+**(3) Source-probe trên EMBEDDING run f1.0 s21 (pooled_program 128-dim):**
+- LogReg, OOF-cụm, **trong từng họ 2-nguồn, trung bình** → chỉ IcedID-lineage đủ 2 nguồn (mb83/v1114): **AUC = 0.7606**.
+- Tham chiếu group-by-lineage (qua họ) = 0.4696 (<0.5, nguồn không tổng quát qua họ).
+- ⇒ **embedding CÓ mã hóa nguồn nội-họ (0.76)**, hơi thấp hơn static features (0.79) nhưng vẫn **> ngưỡng 0.75** → cần GRL khử nguồn.
+
+## 22. Thiết kế GRL khử nguồn — BẢN SỬA (ghi trước, CHƯA chạy, 2026-10-22)
+- **Adversary (sửa):** KHÔNG dùng nhị phân mb-vs-v1. Thay bằng dự đoán **stratum nguồn/năm (4 lớp)** cho malware + **nguồn** cho benign; huấn luyện **CÓ ĐIỀU KIỆN THEO LỚP** (conditional/class-wise: adversary + GRL áp riêng theo nhóm nhãn malware/benign, không trộn) để không khử nhầm tín hiệu malware↔benign.
+- **Vị trí:** GRL trên `pooled_program` (128-dim, trước fc1). Adversary MLP dim→64→(4 hoặc K nguồn-benign), softmax CE.
+- **λ:** `λ(p)=λ_max(2/(1+e^{-10p})-1)`, **λ_max=1.0**; warm-up λ=0 vài epoch đầu.
+- **Loss:** `CE(label) + λ_sem·BCE(sem) − λ·CE_adv(stratum)` (class-wise).
+- **Probe nguồn CHỐT ĐỊNH NGHĨA (áp cho cả baseline lẫn GRL):** LogReg, OOF-cụm, trong từng họ 2-nguồn, trung bình (hiện chỉ IcedID). **Baseline non-GRL = 0.7606** (đo cùng cách, ở trên).
+- **Tiêu chí thành công (ghi TRƯỚC):** (a) probe nguồn embedding **< 0.75**; (b) val AUC in-dist **không giảm quá 0.03** so với base (base f1.0 last-ep mean 0.913 → sàn 0.883). Đạt cả 2 mới đủ điều kiện chấm holdout (một lần).
+- **Kế hoạch rút gọn:** f=1.0, **2 seed {20261021,22}**, λ_max=1.0, **1 biến thể** (adversary=stratum nguồn/năm). Ước **~4.0-4.7h/run × 2 ≈ ~9 GPU-giờ**. **CHƯA chạy — hỏi người dùng trước.**
+- Giữ cố định: BATCH=2+accum2, no AMP, global=0 (không vex), val in-dist cùng split, ISO subsample. **KHÔNG chạm holdout v4/v3.**
