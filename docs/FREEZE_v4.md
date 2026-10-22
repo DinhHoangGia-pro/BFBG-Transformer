@@ -133,3 +133,6 @@ Grep `vex` khắp `scripts/ experiments/ src/ docs/ paper_tables/ ~/bfbg_benign_
 ## Trạng thái cổng
 - **CỔNG DỮ LIỆU 🔴 ĐÓNG.** Freeze v4 KHÔNG mở cổng train. Train/GRL/chấm holdout CHỈ khi DATA_EXPANSION_PLAN.md §0.1 ghi ngưỡng đã đạt.
 - Freeze này: chốt manifest + hash + quy tắc. KHÔNG re-extract raw, KHÔNG train, KHÔNG xóa gì.
+
+## BỔ SUNG 2026-10-22 — cross-family (ngoài phạm vi khóa, tham chiếu)
+- LOFO-retrain sạch họ IcedID: BFBG 0.67 vs metadata/graph-RF ~0.91 (TRAINING_DESIGN §26). Số frozen §24 (0.934) bị thổi do encoder thấy họ → KHÔNG dùng. Không ảnh hưởng manifest/hash (05e53c1d).

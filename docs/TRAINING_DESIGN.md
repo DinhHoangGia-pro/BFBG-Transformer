@@ -299,3 +299,16 @@ Leave-one-malware-lineage-out: train head trên (mal họ≠F + benign_train 333
 - Mỗi họ: train BFBG **leave-lineage-out** (loại khỏi CẢ train và val của encoder); test fold = (mal họ đó) + benign_test (15%, seed 20261021). 1 seed=20261021, BATCH=2+accum2, no AMP, global=0 (không vex), ISO subsample. Baseline graph-RF/metadata-RF/bag-tokens **cùng fold**, AUC + cluster-boot CI.
 - **Ngưỡng đọc (ghi TRƯỚC):** chênh AUC(BFBG − baseline tốt nhất) **< 0.05 = KHÔNG phân biệt**; chỉ coi BFBG có lợi thế cross-family nếu **dẫn ≥0.05 ở ≥2/3 họ**.
 - **Vận hành:** chạy theo PHIÊN 4h/họ, checkpoint last mỗi epoch + --resume, kết quả lưu riêng `lc_lofo/<lineage>/`. Hết phiên dừng sạch, báo bảng, KHÔNG tự bắt đầu họ tiếp. **KHÔNG chạm holdout v4/v3.** Nhãn: **dev, post-hoc**.
+
+### 26. LOFO SẠCH — Họ 1 IcedID-lineage (kết quả, dev post-hoc, 2026-10-22)
+Encoder BFBG **leave-IcedID-lineage-out** (loại khỏi cả train+val); test = IcedID 197 + benign 59 (n=255). seed 20261021, 20 epoch (KHÔNG early-stop — chạy đủ), 3.34h, peak VRAM ≤7.2GB.
+| mô hình (cùng fold) | test AUC | cluster-boot 95% CI | ep tốt nhất |
+|---|---|---|---|
+| **BFBG (leave-encoder-out)** | **0.6727** | [0.590, 0.749] | 19 (=last) |
+| metadata-RF | **0.9149** | [0.874, 0.950] | — |
+| graph-RF | 0.9092 | [0.868, 0.946] | — |
+| bag-tokens | 0.6355 | [0.558, 0.708] | — |
+- **KẾT LUẬN (theo ngưỡng tiền-đăng-ký §25):** BFBG cross-family sạch **0.67 THUA metadata/graph-RF (~0.91) tới ~0.24**, CI **không chồng lấp** → BFBG **KHÔNG** có lợi thế; ngược lại kém rõ rệt ở họ IcedID. Chỉ ngang bag-tokens (CI chồng).
+- ⚠️ **SỬA frozen §24:** số frozen embedding IcedID **0.934** là **THỔI PHỒNG do encoder f1.0 ĐÃ train trên IcedID** (chỉ head LOFO). Khi encoder **thực sự không thấy** IcedID → chỉ **0.67**. ⇒ **con số frozen §24 (avg 0.966) KHÔNG phải bằng chứng cross-family; bỏ, dùng LOFO-retrain sạch.** Feature rẻ (extractor cố định) không bị lỗi này nên LOFO của chúng vẫn hợp lệ.
+- **Hệ quả claim:** cùng chiều với in-dist (§21e, RF thắng) — hiện **chưa có bằng chứng BFBG vượt baseline rẻ** ở cả in-dist lẫn cross-family (họ 1). Chờ họ 2-3 trước khi kết luận tổng thể.
+- Lưu: `~/bfbg_benign_work/lc_lofo/IcedID-lineage/{summary,curve,ckpt_last}`.
