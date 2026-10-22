@@ -280,3 +280,16 @@ Nếu GRL đạt (a)+(b) nhưng val BFBG (~0.91) vẫn < graph-RF (~0.97):
 - **Đóng góp KHÔNG phải accuracy in-dist** (RF thắng). Đóng góp = **robustness/invariance**: một detector có biểu diễn **ít phụ thuộc provenance/size-shortcut hơn** (provenance-probe < RF), kỳ vọng **giữ điểm tốt hơn khi phân phối đổi** (holdout cross-time/cross-family, nơi RF dựa size/complexity sẽ sụp).
 - **Phép thử quyết định (chạm holdout MỘT LẦN, chỉ sau khi GRL đạt tiêu chí):** so **ΔAUC(in-dist → holdout)** của BFBG-GRL vs graph-RF. Nếu RF rơi mạnh còn BFBG-GRL giữ → đóng góp THẬT (robustness). Nếu cả hai rơi như nhau → **thừa nhận BFBG không có lợi thế** và báo trung thực (không cố cứu claim accuracy).
 - Nếu GRL KHÔNG đạt (a) hoặc (b): không chấm holdout; báo "chưa khử được confound" như kết quả âm.
+
+### 24. Cross-family LOFO-detection trên FEATURE ĐÔNG CỨNG (Hướng 2, 2026-10-22)
+Leave-one-malware-lineage-out: train head trên (mal họ≠F + benign_train 333), test (mal họ F + benign_test 59). Head tuyến tính trên embedding BFBG đông cứng (f1.0 s21) vs RF/LogReg trên feature rẻ. **KHÔNG train BFBG, KHÔNG chạm holdout.** AUC phát hiện họ "để ngoài head":
+| feature | avg | QakBot | TrickBot | Gozi | Tinba | IcedID | Emotet | Dridex | Ramnit |
+|---|---|---|---|---|---|---|---|---|---|
+| **embedding BFBG** | **0.966** | 0.944 | 0.979 | 0.979 | 0.972 | 0.934 | 0.961 | 0.984 | 0.979 |
+| graph (RF) | 0.944 | 0.963 | 0.943 | 0.967 | 0.924 | 0.897 | 0.897 | 0.992 | 0.968 |
+| metadata (RF) | 0.893 | 0.968 | 0.900 | 0.930 | 0.732 | 0.875 | 0.818 | 0.987 | 0.934 |
+| bag-tokens | 0.813 | 0.826 | 0.881 | 0.850 | 0.770 | 0.599 | 0.834 | 0.856 | 0.889 |
+- **ĐẢO NGƯỢC so với in-dist (§21e, nơi graph-RF thắng BFBG):** ở cross-family, **embedding BFBG thắng mọi feature rẻ** (0.966 > graph 0.944 > meta 0.893 > bag 0.813), thắng 7/8 họ. → gợi ý biểu diễn BFBG mang tín hiệu TỔNG QUÁT HƠN size/complexity.
+- ⚠️ **CAVEAT NẶNG (chưa phải cross-family sạch):** encoder BFBG f1.0 **ĐÃ train trên TẤT CẢ họ (kể cả F)**; chỉ HEAD là leave-F-out. ⇒ số 0.966 **lạc quan/upper-bound**, KHÔNG phải tổng quát sang họ CHƯA TỪNG THẤY. feature rẻ là extractor cố định (không "học" F) nên LOFO của chúng sạch → so sánh **thiên vị BFBG**.
+- **Để kết luận sạch cần:** train BFBG **leave-F-out cả ENCODER** (đắt: ~3.5-3.7h/họ × 8 ≈ ~30h; hoặc rút gọn 3 họ × 1 seed ≈ ~11h). Chỉ khi đó mới so cross-family công bằng với RF.
+- **Tạm kết Hướng 2:** có TÍN HIỆU DƯƠNG cho BFBG (ngược in-dist) → **đáng làm phép thử sạch trước khi quyết GRL**; nhưng chưa đủ bằng chứng (caveat encoder-thấy-F).
